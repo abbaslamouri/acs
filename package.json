@@ -9,5 +9,11 @@
   "devDependencies": {
     "nuxt": "3.0.0-rc.4",
     "nuxt-windicss": "^2.4.2"
+  },
+  "dependencies": {
+    "@types/mongoose": "^5.11.97",
+    "colors": "^1.4.0",
+    "mongodb": "^4.7.0",
+    "mongoose": "^6.4.1"
   }
 }
