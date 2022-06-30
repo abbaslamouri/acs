@@ -3,6 +3,7 @@ import { MongoClient } from 'mongodb'
 // const config = useRuntimeConfig()
 // console.log('CCCCC', config)
 
-const client = new MongoClient(process.env.NUXT_DB_URL)
+const mongoClient = new MongoClient(process.env.NUXT_DB_URL)
+// const db = mongoClient.db()
 
-export default client
+export default mongoClient
