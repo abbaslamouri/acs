@@ -1,0 +1,3 @@
+.btn {
+  @apply border border-light-200 text-red-500;
+}
