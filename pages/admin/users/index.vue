@@ -11,7 +11,7 @@ const title = ref('Users | YRL')
 // const users = ref([])
 const totalCount = ref(0) // Total item count in the database
 // const count = ref(null) // item count taking into account params
-// const page = ref(1)
+const page = ref(1)
 // const perPage = ref(10)
 // const fields = '-updatedAt'
 // const keyword = ref('')
@@ -159,20 +159,17 @@ const totalCount = ref(0) // Total item count in the database
         <!-- <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1 && !keyword" /> -->
       </footer>
     </div>
-    <AdminListFallback v-else>
-      <template #header>Add your first physical or digital product</template>
-      <template #default>
-        <div class="">Add your product and variants. Products must have at least a name and a price</div>
-        <NuxtLink
-          class="btn btn__primary btn__pill px-3 py-05 text-xs items-self-end"
-          :to="{ name: 'admin-users-id', params: { id: '_' } }"
-        >
-          <!-- <IconsPlus class="w-2 h-2" /> -->
-          <span>Add</span>
-        </NuxtLink>
-      </template>
-    </AdminListFallback>
+    <div class="p-10 flex flex-col gap-2" v-else>
+      <h3>Add your first user</h3>
+      <NuxtLink
+        class="bg-[#0F172A] px-4 py-1 flex text-white items-center gap-2 rounded self-start hover:(text-red-100 bg-[#64748B])"
+        :to="{ name: 'admin-users-id', params: { id: '_' } }"
+      >
+        <IconsPlus class="w-5 h-5 fill-current" />
+        <span>Add</span>
+      </NuxtLink>
+    </div>
   </div>
 </template>
 
-<style lang="" scoped></style>
+<style lang="scss" scoped></style>

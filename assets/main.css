@@ -1,3 +1,15 @@
 .btn {
-  @apply border border-light-200 text-red-500;
+  @apply flex items-center gap-1 bg-transparent rounded cursor-pointer transition duration-400 shadow-none p-0;
+}
+
+.btn-link {
+  @apply bg-transparent text-yellow-700 capitalize  hover:(border-b-yellow-800 underline);
+}
+
+.btn-secondary {
+  @apply bg-transparent  uppercase border border-gray-400  hover:(text-gray-500 );
+}
+
+.btn-primary {
+  @apply bg-[#0F172A] text-white uppercase  hover:(text-gray-300 );
 }

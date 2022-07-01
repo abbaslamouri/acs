@@ -61,13 +61,74 @@ export default {
     <span class="placeholder" @click="inputRef.focus()">{{ label }}<span v-if="$attrs.required">*</span></span>
     <div v-if="type === 'password'">
       <span class="icon" v-if="fieldType === 'password'" @click="fieldType = 'text'">
-        <!-- <IconsVisibilityOff class="w-2 h-2" /> -->
+        <IconsHide class="w-4 h-4" />
       </span>
       <span class="icon" v-else @click="fieldType = 'password'">
-        <!-- <IconsVisibilityOn class="w-2 h-2" /> -->
+        <IconsShow class="w-4 h-4" />
       </span>
     </div>
   </div>
 </template>
 
-<style scoped lang=""></style>
+<style scoped lang="scss">
+.base-input {
+  position: relative;
+  font-size: 0.8rem;
+  padding-top: 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #ffffff;
+
+  input {
+    background-color: #ffffff;
+    appearance: none;
+    padding: 0.5rem 1rem;
+    border-radius: 3px;
+    width: 100%;
+    outline: none;
+    border: 2px solid #d1d5db;
+    transition: 0.3s ease;
+    z-index: 1;
+
+    &:focus,
+    &.dirty {
+      border-color: #94a3b8;
+      transition-delay: 0.1s;
+      background-color: #ffffff;
+    }
+
+    &:focus + .placeholder,
+    &.dirty + .placeholder {
+      top: 1rem;
+      // font-size: 1rem;
+      background-color: #ffffff;
+    }
+  }
+
+  .placeholder {
+    position: absolute;
+    font-size: 0.7rem;
+
+    left: 1rem;
+    top: calc(50% + 0.5rem);
+    transform: translateY(-50%);
+    color: #475569;
+    padding: 0 0.5rem;
+    transition: 0.3s ease;
+  }
+
+  .currency {
+    position: absolute;
+    left: 1.2rem;
+    top: calc(50% - 0.3rem);
+    font-size: 1rem;
+  }
+
+  .icon {
+    position: absolute;
+    top: 50%;
+    // transform: translateY(-10%);
+    right: 10px;
+    cursor: pointer;
+  }
+}
+</style>

@@ -22,7 +22,7 @@ if (process.client) {
       <AdminNav :toggleAdminNav="toggleAdminNav" />
     </aside>
     <main class="flex-1 flex flex-col">
-      <header class="h-14 px-10 py-2 bg-stone-800 flex justify-end items-center">
+      <header class="h-14 px-10 py-2 bg-stone-800 flex justify-end items-center text-sm">
         <LoginDropdown v-if="!isAuthenticated" />
         <ProfileDropdown v-else />
       </header>

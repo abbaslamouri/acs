@@ -47,7 +47,7 @@ const forgotPassword = async () => {
 </script>
 
 <template>
-  <div class="relative flex items-center text-white text-xs">
+  <div class="relative flex items-center text-white">
     <div
       class="fixed inset-0 w-full h-full opacity-50 bg-slate-900"
       v-if="showAuthDropdown"
@@ -67,24 +67,23 @@ const forgotPassword = async () => {
         <h3 class="title">Sin in</h3>
         <p class="text-xs">Access your account and place an order:</p>
         <div class="flex-col gap-1">
-          <FormsBaseInput label="Email" type="email" v-model="formUser.email" required />
-          <FormsBaseInput label="Password" type="password" v-model="formUser.password" required />
+          <FormsBaseInput label="Email" type="email" v-model="formUser.email" :required="true" />
+          <FormsBaseInput label="Password" type="password" v-model="formUser.password" :required="true" />
         </div>
 
         <div>
-          <button class="btn btn__secondary w-full justify-between px-1 py-05 text-xs" @click.prevent="forgotPassword">
+          <button class="btn btn-link w-full text-sm mt-3" @click.prevent="forgotPassword">
             <p>Forgot Password?</p>
-            <!-- <IconsChevronRight /> -->
           </button>
         </div>
-        <button class="btn btn__secondary w-full flex-row justify-between px-1 py-05 text-xs" @click.prevent="login">
+        <button class="btn btn-secondary w-full flex-row justify-between text-xs mt-3" @click.prevent="login">
           <p>Sign in</p>
-          <!-- <IconsChevronRight /> -->
+          <IconsArrowEast />
         </button>
-        <p class="text-sm">New User?</p>
-        <button class="btn btn__secondary w-full justify-between px-1 py-05 text-xs" @click.prevent="signup">
+        <p class="text-sm mt-4">New User?</p>
+        <button class="btn btn-secondary w-full justify-between text-xs mt-1" @click.prevent="signup">
           <p>Create an account</p>
-          <!-- <IconsChevronRight /> -->
+          <IconsArrowEast />
         </button>
       </form>
     </div>
@@ -104,20 +103,5 @@ const forgotPassword = async () => {
     }
   }
 }
-// @import '@/assets/scss/variables';
 
-// .header {
-//   border: 1px solid $slate-600;
-//   &:hover,
-//   &.selected {
-//     border: 1px solid #fff;
-//     background-color: #fff;
-//     color: $slate-800;
-//     border-radius: 3px 3px 0 0;
-
-//     svg {
-//       fill: $slate-800;
-//     }
-//   }
-// }
 </style>
