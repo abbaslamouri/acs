@@ -1,5 +1,5 @@
 .btn {
-  @apply flex items-center gap-1 bg-transparent rounded cursor-pointer transition duration-400 shadow-none p-0;
+  @apply flex items-center gap-1 bg-transparent rounded cursor-pointer transition duration-400 shadow-none;
 }
 
 .btn-link {
@@ -7,9 +7,17 @@
 }
 
 .btn-secondary {
-  @apply bg-transparent  uppercase border border-gray-400  hover:(text-gray-500 );
+  @apply bg-transparent uppercase border border-gray-400  hover:(text-gray-500 );
 }
 
 .btn-primary {
   @apply bg-[#0F172A] text-white uppercase  hover:(text-gray-300 );
+}
+
+.admin-section {
+  @apply shadow-lg border w-full p-4 rounded;
+}
+
+.admin-section-header {
+  @apply uppercase border border-transparent border-b-gray-400 font-bold inline-block mb-5;
 }

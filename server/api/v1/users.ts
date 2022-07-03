@@ -5,11 +5,14 @@ export default defineEventHandler(async (event) => {
 
   switch (event.req.method) {
     case 'GET':
-      return await fetchAllUsers()
+      // const query = useQuery(event)
+      // console.log(query)
+      return await fetchAllUsers(event)
       break
 
     case 'POST':
-      await createUser(event)
+      return await createUser(event)
+
       // return response
 
       // console.log('ER', event.res)

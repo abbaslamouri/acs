@@ -2,6 +2,7 @@ class AppError extends Error {
   // statusCode?: number
 
   custom: boolean
+  name: string
   // code?: number
   // errors?: IAppErrorErrors
   // keyValue?: object
@@ -14,6 +15,7 @@ class AppError extends Error {
     super(message)
     this.statusCode = statusCode
     this.custom = true
+    this.name = 'CustomAPIError'
     // !statusCode || !`${statusCode}`.startsWith('4') ? 'error' : 'fail'
     // this.custom = true
     // this.code = code

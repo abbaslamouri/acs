@@ -14,7 +14,7 @@ const route = useRoute()
 // const countries = ref([])
 // const states = ref([])
 // let response
-const user = ref({ name: 'Abbas Lamouri', email: '1abbaslamouri@yrlus.com', password: 'adrar0714' })
+const user = ref({ name: 'Abbas Lamouri', email: 'abbaslamouri@yrlus.com', password: 'adrar0714' })
 // const user = useState('user', () => {
 //   return { userAddresses: [] }
 // })
@@ -178,18 +178,10 @@ const saveUserInfo = async () => {
   console.log(user.value)
   const { pending, error, data } = await useFetch('/api/v1/users', {
     method: 'POST',
-    body: {
-      // id: user.value.id,
-      name: user.value.name,
-      email: user.value.email,
-      password: !user.value.id ? user.value.password : undefined,
-      verified: user.value.verified,
-      active: user.value.active,
-    },
+    body: user.value,
   })
+  if (error.value) console.log('ERROR', error.value.data)
   console.log('D', data.value)
-  console.log('E', error.value.data)
-  console.log('P', pending.value)
 
   //   const newUser = await saveDoc('users', {
   //     id: user.value.id,
@@ -314,7 +306,7 @@ const saveUserInfo = async () => {
 </script>
 
 <template>
-  <div class="xxhfull flex-col items-center gap-2 p-3">
+  <div class="h-full flex flex-col items-center gap-2 p-3">
     <Title>{{ pageTitle }}</Title>
     <header class="flex-col gap-2 w-full max-width-130">
       <div class="go-back" id="product-go-back">
@@ -332,9 +324,9 @@ const saveUserInfo = async () => {
       <div class="flex-col gap-2">
         <AdminUsersUserInfo :user="user" @updateUser="user = { ...user, ...$event }" @saveUserInfo="saveUserInfo" />
 
-        <section class="shadow-md w-full bg-white p-2 br-5" id="general-info">
-          <div class="flex-row items-center justify-between text-sm mb-1">
-            <div class="uppercase inline-block border-b-stone-300 font-bold pb-05">User Addresses</div>
+        <section class="shadow-md w-full p-2" id="general-info">
+          <div class="flex-row items-center justify-between mb-1">
+            <div class="uppercase border border-b-gray-400 font-bold inline-block">User Addresses</div>
             <div></div>
           </div>
           <div class="flex-col gap-2">

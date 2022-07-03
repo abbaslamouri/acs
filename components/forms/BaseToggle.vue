@@ -1,5 +1,5 @@
 <script setup>
-defineProps({
+const props = defineProps({
   modelValue: {
     type: Boolean,
     default: false,
@@ -19,9 +19,19 @@ defineProps({
       return !value || ['horizontal', 'vertical'].includes(value)
     },
   },
+  rounded: {
+    type: Boolean,
+    default: true,
+  },
 })
 defineEmits(['update:modelValue'])
 const attrs = useAttrs()
+
+const sliderBeforeWidth = `${0.75 * props.toogleHeight}px`
+const sliderBeforeLeft = `${0.15 * props.toogleHeight}px`
+const sliderBorderRadius = `${0.5 * props.toogleHeight}px`
+const sliderWidth = `${2 * props.toogleHeight}px`
+const sliderHeight = `${props.toogleHeight}px`
 </script>
 
 <script>
@@ -31,42 +41,31 @@ export default {
 </script>
 
 <template>
-  <!-- <div class="base-toggle flex items-center gap-4"> -->
-  <label class="toggle" :class="{ vertical: direction === 'vertical' }">
+  <label class="toggle relative flex items-center justify-center gap-2" :class="{ vertical: direction === 'vertical' }">
     <span> {{ label }}</span>
     <input
-      class=""
+      class="absolute opacity-0 w-0 h-0"
       type="checkbox"
       :checked="modelValue"
       v-bind="$attrs"
       @change="$emit('update:modelValue', $event.target.checked)"
     />
-    <span class="slider round"></span>
+    <span
+      class="slider relative block cursor-pointer bg-gray-400 transition duration-300 before:(absolute bg-white top-1/2 transform -translate-y-1/2 )"
+      :class="{ rounded }"
+    ></span>
   </label>
-  <!-- </div> -->
 </template>
 
-<style lang="" scoped>
-/* @import '@/assets/scss/variables';
+<style lang="scss" scoped>
+@import '@/assets/variables';
 
 .toggle {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  // border: 1px solid red;
-
   &.vertical {
     flex-direction: column;
   }
 
   input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-
     &:checked + .slider {
       background-color: $slate-800;
 
@@ -77,33 +76,23 @@ export default {
   }
 
   .slider {
-    position: relative;
-    display: block;
-    cursor: pointer;
-    background-color: $slate-300;
-    transition: 0.3s;
-    width: v-bind('`${2*toogleHeight}px`');
-    height: v-bind('`${toogleHeight}px`');
+    width: v-bind(sliderWidth);
+    height: v-bind(sliderHeight);
 
     &:before {
       content: '';
-      position: absolute;
-      width: v-bind('`${.75*toogleHeight}px`');
-      height: v-bind('`${.75*toogleHeight}px`');
-      background-color: $slate-50;
-      transition: 0.3s;
-      top: 50%;
-      left: v-bind('`${.25*toogleHeight}%`');
-      transform: translateY(-50%);
+      width: v-bind(sliderBeforeWidth);
+      height: v-bind(sliderBeforeWidth);
+      left: v-bind(sliderBeforeLeft);
     }
 
-    &.round {
-      border-radius: v-bind('`${.5*toogleHeight}px`');
+    &.rounded {
+      border-radius: v-bind(sliderBorderRadius);
 
       &::before {
         border-radius: 50%;
       }
     }
   }
-} */
+}
 </style>

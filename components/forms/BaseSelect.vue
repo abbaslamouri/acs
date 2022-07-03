@@ -30,9 +30,9 @@ export default {
 </script>
 
 <template>
-  <label :class="`base-select base-select-${uuid}`" v-if="label" :for="`base-select-${uuid}`">
-    <div class="label text-xs px-1">{{ label }}</div>
+  <label class="relative" :class="`base-select base-select-${uuid}`" v-if="label" :for="`base-select-${uuid}`">
     <select
+      class="appearance-none w-full bg-gray cursor-pointer border-2 border-gray-300 py-2 px-4 text-xs rounded"
       ref="selectRef"
       :value="modelValue"
       :class="`base-select-${uuid}`"
@@ -53,7 +53,75 @@ export default {
         {{ option.name }}
       </option>
     </select>
+    <div class="label absolute left-5 top-0 transform -translate-y-4 text-xs bg-[#ffffff] px-2">{{ label }}</div>
+    <IconsChevronDown class="absolute right-2 top-0" />
   </label>
 </template>
 
-<style lang="" scoped></style>
+<style lang="scss" scoped>
+@import '@/assets/variables';
+
+.base-selects {
+  position: relative;
+  // --size: 0.5em;
+  border-radius: 0.25rem;
+  height: 4.5rem;
+  border: 1px solid $slate-200;
+  background-color: white;
+  overflow: hidden;
+
+  width: 100%;
+
+  box-shadow: 0 4px 3px rgb(0 0 0 / 0.07), 0 2px 2px rgb(0 0 0 / 0.06);
+
+  label {
+    position: absolute;
+    top: 0.2rem;
+    left: 2rem;
+    font-size: 80%;
+    color: lighten($color: $slate-800, $amount: 50);
+  }
+
+  select {
+    padding: 2rem 0.75rem 1rem 2rem;
+    border: 5px solid red;
+
+    // appearance: none;
+    // width: 100%;
+    // height: 100%;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+
+    &.centered {
+      padding: 1rem 0.75rem 1rem 2rem;
+    }
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background-color: transparent;
+    width: 4em;
+  }
+  &::after {
+    position: absolute;
+    content: '';
+    width: 0.5rem;
+    height: 0;
+    height: 0;
+    pointer-events: none;
+    box-sizing: border-box;
+    right: 2rem;
+    top: 50%;
+    transform: translate(-50%, -30%);
+    border: 0.5rem solid transparent;
+    border-top: 0.5rem solid $slate-400;
+    pointer-events: none;
+  }
+}
+</style>

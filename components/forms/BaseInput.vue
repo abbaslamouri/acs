@@ -41,9 +41,10 @@ export default {
 </script>
 
 <template>
-  <div class="base-input">
+  <div class="base-input relative">
     <div class="currency" v-if="currency">$</div>
     <input
+      class="appearance-none w-full bg-gray cursor-pointer border-2 border-gray-300 py-2 px-4 text-xs rounded"
       ref="inputRef"
       :type="fieldType"
       :class="{ 'currency-input': currency, dirty: modelValue }"
@@ -58,7 +59,7 @@ export default {
       :aria-required="$attrs.required ? true : null"
       :readonly="$attrs.readonly ? true : null"
     />
-    <span class="placeholder" @click="inputRef.focus()">{{ label }}<span v-if="$attrs.required">*</span></span>
+    <span class="placeholder absolute left-5 top-0 transform -translate-y-2 text-xs bg-[#ffffff] px-2" @click="inputRef.focus()">{{ label }}<span v-if="$attrs.required">*</span></span>
     <div v-if="type === 'password'">
       <span class="icon" v-if="fieldType === 'password'" @click="fieldType = 'text'">
         <IconsHide class="w-4 h-4" />
@@ -71,17 +72,17 @@ export default {
 </template>
 
 <style scoped lang="scss">
-.base-input {
+.base-inputz {
   position: relative;
   font-size: 0.8rem;
-  padding-top: 1rem;
-  margin-bottom: 0.5rem;
+  // padding-top: 1rem;
+  // margin-bottom: 0.5rem;
   background-color: #ffffff;
 
   input {
     background-color: #ffffff;
     appearance: none;
-    padding: 0.5rem 1rem;
+    // padding: 0.5rem 1rem;
     border-radius: 3px;
     width: 100%;
     outline: none;
@@ -106,7 +107,7 @@ export default {
 
   .placeholder {
     position: absolute;
-    font-size: 0.7rem;
+    // font-size: 0.7rem;
 
     left: 1rem;
     top: calc(50% + 0.5rem);
