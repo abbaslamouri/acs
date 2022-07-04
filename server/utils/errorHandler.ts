@@ -22,8 +22,6 @@ const errorHandler = (event: any, err: any) => {
   let statusCode = 400
   // let data: any
 
-  console.log('NANE', err.name)
-
   if (err.name === 'CustomAPIError') {
     message = err.message
     statusCode = err.statusCode
@@ -36,7 +34,6 @@ const errorHandler = (event: any, err: any) => {
           Object.keys(err.keyValue)[0]
         }`
       }
-      // data = err
     }
 
     if (err.code === 121) {
@@ -46,7 +43,6 @@ const errorHandler = (event: any, err: any) => {
           if (schemaRulesNotSatisfied[i].operatorName === 'required') {
             for (const j in schemaRulesNotSatisfied[i].missingProperties) {
               message += `${schemaRulesNotSatisfied[i].missingProperties[j]} is required<br>`
-              console.log('M1', message)
             }
           }
           if (schemaRulesNotSatisfied[i].operatorName === 'properties') {
@@ -58,12 +54,8 @@ const errorHandler = (event: any, err: any) => {
           }
         }
       }
-      // data = err.errInfo.details.schemaRulesNotSatisfied
     }
   }
-  // const error = new AppError(message, statusCode)
-  console.log(statusCode)
-  console.log(message)
   return sendError(
     event,
     createError({

@@ -80,7 +80,7 @@ const transitionName = computed(() => (getPosition().includes('right') ? 'rtl' :
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/variables';
+@import '@/assets/styles/variables';
 
 .snackbar {
   &.top-left {

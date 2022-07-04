@@ -5,7 +5,7 @@ definePageMeta({
 const pageTitle = ref('User | YRL')
 
 // const config = useRuntimeConfig()
-// const { errorMsg, message, galleryMedia, mediaReference, showMediaSelector } = useAppState()
+const { errorMsg, message, galleryMedia, mediaReference, showMediaSelector } = useAppState()
 // const { fetchAll, fetchDoc, saveMedia, saveDoc, deleteDocs } = useHttp()
 const route = useRoute()
 // const router = useRouter()
@@ -180,7 +180,7 @@ const saveUserInfo = async () => {
     method: 'POST',
     body: user.value,
   })
-  if (error.value) console.log('ERROR', error.value.data)
+  if (error.value) errorMsg.value = error.value.data.statusMessage
   console.log('D', data.value)
 
   //   const newUser = await saveDoc('users', {
@@ -306,77 +306,78 @@ const saveUserInfo = async () => {
 </script>
 
 <template>
-  <div class="h-full flex flex-col items-center gap-2 p-3">
+  <div class="h-full w-full flex flex-col items-center p-3">
     <Title>{{ pageTitle }}</Title>
-    <header class="flex-col gap-2 w-full max-width-130">
-      <div class="go-back" id="product-go-back">
-        <NuxtLink class="admin-link" :to="{ name: 'admin-users' }">
-          <IconsArrowWest />
-          <span>Users</span>
-        </NuxtLink>
-      </div>
-      <h3 class="header">Edit User</h3>
-    </header>
-    <main class="main flex-1 max-width-130 w-full">
-      <!-- <div class="left-sidebar shadow-md">
+    <div class="w-full max-w-screen-xl">
+      <header class="flex flex-col gap-2 w-full">
+        <div class="go-back" id="product-go-back">
+          <NuxtLink class="flex flex-row gap-2 text-yellow-700" :to="{ name: 'admin-users' }">
+            <IconsArrowWest class="fill-yellow-700" />
+            <span>Users</span>
+          </NuxtLink>
+        </div>
+        <h3 class="header">Edit User</h3>
+      </header>
+      <main class="main flex-1 max-width-130 w-full">
+        <!-- <div class="left-sidebar shadow-md">
         <EcommerceAdminProductLeftSidebar :product="product" />
       </div> -->
-      <div class="flex-col gap-2">
-        <AdminUsersUserInfo :user="user" @updateUser="user = { ...user, ...$event }" @saveUserInfo="saveUserInfo" />
+        <div class="flex-col gap-2">
+          <AdminUsersUserInfo :user="user" @updateUser="user = { ...user, ...$event }" @saveUserInfo="saveUserInfo" />
 
-        <section class="shadow-md w-full p-2" id="general-info">
-          <div class="flex-row items-center justify-between mb-1">
-            <div class="uppercase border border-b-gray-400 font-bold inline-block">User Addresses</div>
-            <div></div>
-          </div>
-          <div class="flex-col gap-2">
-            <div v-if="!user.id">Please save user information before adding userAddresses</div>
-            <div v-else>
-              <div
-                class="customer-address flex-col items-start gap-2 p-2 border border-slate-200 br-3"
-                v-for="(userAddress, i) in user.userAddresses"
-                :key="userAddress.id"
-              >
-                <h3>Address</h3>
+          <section class="shadow-md w-full p-2" id="general-info">
+            <div class="flex-row items-center justify-between mb-1">
+              <div class="uppercase border border-b-gray-400 font-bold inline-block">User Addresses</div>
+              <div></div>
+            </div>
+            <div class="flex-col gap-2">
+              <div v-if="!user.id">Please save user information before adding userAddresses</div>
+              <div v-else>
+                <div
+                  class="customer-address flex-col items-start gap-2 p-2 border border-slate-200 br-3"
+                  v-for="(userAddress, i) in user.userAddresses"
+                  :key="userAddress.id"
+                >
+                  <h3>Address</h3>
 
-                <!-- <AdminUsersUserAddress :userAddress="userAddress" /> -->
-                <div class="flex-col">
-                  <h3>Phone Numbers</h3>
-                  <!-- <div class="flex-row" v-for="userPhoneNumber in userAddress.phoneNumbers">
+                  <!-- <AdminUsersUserAddress :userAddress="userAddress" /> -->
+                  <div class="flex-col">
+                    <h3>Phone Numbers</h3>
+                    <!-- <div class="flex-row" v-for="userPhoneNumber in userAddress.phoneNumbers">
                     <AdminUsersUserPhoneNumber :userPhoneNumber="userPhoneNumber" />
                   </div> -->
-                </div>
-                <div class="flex-col gap-05">
-                  <!-- <div class="text-green-700 flex-row items-center gap-05" v-if="userAddress.defaultShippingAddress">
+                  </div>
+                  <div class="flex-col gap-05">
+                    <!-- <div class="text-green-700 flex-row items-center gap-05" v-if="userAddress.defaultShippingAddress">
                     <IconsCheck class="w-16px h-16px fill-green-700" /> <span>Default shipping address</span>
                   </div> -->
-                  <!-- <div class="flex-row items-center" v-if="userAddress.defaultBillingAddress">
+                    <!-- <div class="flex-row items-center" v-if="userAddress.defaultBillingAddress">
                     <IconsCheck class="w-16px h-16px fill-green-700" /> <span>Default billing address</span>
                   </div> -->
-                </div>
-                <div class="flex-row gap-1">
-                  <!-- <button class="btn btn__secondary px-2 py-05 text-xs br-3" @click="editAddress(i)">
+                  </div>
+                  <div class="flex-row gap-1">
+                    <!-- <button class="btn btn__secondary px-2 py-05 text-xs br-3" @click="editAddress(i)">
                     Edit Address
                   </button> -->
-                  <!-- <button
+                    <!-- <button
                     class="btn btn__secondary px-2 py-05 text-sm br-3"
                     v-if="!userAddress.defaultBillingAddress && !userAddress.defaultShippingAddress"
                     @click="deleteAddress(i)"
                   >
                     Delete Address
                   </button> -->
+                  </div>
                 </div>
               </div>
-            </div>
-            <!-- <button
+              <!-- <button
               class="btn btn__secondary px-2 py-05 items-self-end text-xs"
               :class="{ disabled: !user.id }"
               @click="insertNewAddress"
             >
               Add Address
             </button> -->
-          </div>
-          <!-- <Modal :outerBoxWidth="75" :outerBoxHeight="90" @closeModal="closeModal" v-if="showAddressFormModal">
+            </div>
+            <!-- <Modal :outerBoxWidth="75" :outerBoxHeight="90" @closeModal="closeModal" v-if="showAddressFormModal">
             <template v-slot:header>
               <h3>Edit User Address</h3>
             </template>
@@ -395,57 +396,58 @@ const saveUserInfo = async () => {
               </section>
             </template>
           </Modal> -->
-        </section>
-        <!-- <EcommerceAdminProductPrice :product="product" @updatePrice="product.value = { ...product.value, ...$event }" /> -->
-        <!-- <EcommerceAdminProductEligibility /> -->
-        <!-- <EcommerceAdminProductNextHigherAssembly /> -->
-        <!-- <EcommerceAdminProductStockManagement
+          </section>
+          <!-- <EcommerceAdminProductPrice :product="product" @updatePrice="product.value = { ...product.value, ...$event }" /> -->
+          <!-- <EcommerceAdminProductEligibility /> -->
+          <!-- <EcommerceAdminProductNextHigherAssembly /> -->
+          <!-- <EcommerceAdminProductStockManagement
           :product="product"
           @updateStock="product.value = { ...product.value, ...$event }"
         /> -->
 
-        <!-- <EcommerceAdminProductAttributesContent
+          <!-- <EcommerceAdminProductAttributesContent
           v-if="product.id && product.productType === 'variable'"
           @toggleAttributesSlideout="showAttributesSlideout = $event"
         /> -->
-        <!-- <EcommerceAdminProductAttributesSlideout
+          <!-- <EcommerceAdminProductAttributesSlideout
           v-if="showAttributesSlideout"
           @toggleAttributesSlideout="showAttributesSlideout = $event"
           @saveAttributes="saveProduct"
         /> -->
 
-        <!-- <EcommerceAdminProductVariantsContent
+          <!-- <EcommerceAdminProductVariantsContent
           @toggleVariantsSlideout="showVariantsSlideout = $event"
           v-if="product.id && product.productType === 'variable' && product.attributes.length"
         /> -->
-        <!-- <EcommerceAdminProductVariantsSlideout
+          <!-- <EcommerceAdminProductVariantsSlideout
           v-if="showVariantsSlideout"
           @toggleVariantsSlideout="showVariantsSlideout = $event"
           @saveVariants="saveProduct"
         /> -->
-        <!-- <EcommerceProductDetails :product="product" @updateDetails="product.value = { ...product.value, ...$event }" /> -->
+          <!-- <EcommerceProductDetails :product="product" @updateDetails="product.value = { ...product.value, ...$event }" /> -->
 
-        <!-- <EcommerceProductShippingOptions :product="product" /> -->
-        <!-- <EcommerceProductDigitalDelivery :product="product" /> -->
-        <!-- <EcommerceProductExtraFields :product="product" /> -->
-        <!-- <EcommerceProductSeo :product="product" /> -->
-        <!-- <EcommerceProductMisc :product="product" /> -->
+          <!-- <EcommerceProductShippingOptions :product="product" /> -->
+          <!-- <EcommerceProductDigitalDelivery :product="product" /> -->
+          <!-- <EcommerceProductExtraFields :product="product" /> -->
+          <!-- <EcommerceProductSeo :product="product" /> -->
+          <!-- <EcommerceProductMisc :product="product" /> -->
+        </div>
+        <div class="right-sidebar">
+          <!-- <AdminUsersRightSidebar /> -->
+          <section class="admin-image-gallery shadow-md p-2 flex-col gap-2 bg-white" id="image-gallery">
+            <!-- <AdminImageGallery :gallery="user.gallery" mediaReference="userMedia" /> -->
+          </section>
+        </div>
+      </main>
+      <div class="w-full flex-row justify-end px-4 sticky bottom-4 go-to-top">
+        <a href="#product-go-back" class="btn btn__secondary px-2 py-1">Go To Top</a>
       </div>
-      <div class="right-sidebar">
-        <!-- <AdminUsersRightSidebar /> -->
-        <section class="admin-image-gallery shadow-md p-2 flex-col gap-2 bg-white" id="image-gallery">
-          <!-- <AdminImageGallery :gallery="user.gallery" mediaReference="userMedia" /> -->
-        </section>
-      </div>
-    </main>
-    <div class="w-full flex-row justify-end px-4 sticky bottom-4 go-to-top">
-      <a href="#product-go-back" class="btn btn__secondary px-2 py-1">Go To Top</a>
+      <!-- <footer class="w-full max-width-130 bg-slate-300 px-2 py-1 br-5 flex-row justify-center text-2xl">Footer</footer> -->
     </div>
-    <!-- <footer class="w-full max-width-130 bg-slate-300 px-2 py-1 br-5 flex-row justify-center text-2xl">Footer</footer> -->
   </div>
 </template>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
 /* @import '@/assets/scss/variables'; */
 
 /* .customer-address {

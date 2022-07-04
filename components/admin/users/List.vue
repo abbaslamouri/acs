@@ -94,7 +94,7 @@ const deleteUser = (userId) => {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/variables';
+@import '@/assets/styles/variables';
 
 tr {
   border-bottom: 1px solid $slate-300;

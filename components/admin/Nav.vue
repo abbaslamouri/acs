@@ -20,7 +20,7 @@ export default {
     return {
       navLinks: [
         { name: 'admin', title: 'Dashboard', icon: 'icons-home', subMenu: [], open: false },
-        { name: 'admin-users', title: 'Media', icon: 'icons-media', subMenu: [], open: false },
+        { name: 'admin-media', title: 'Media', icon: 'icons-media', subMenu: [], open: false },
         { name: 'admin-users', title: 'Users', icon: 'icons-user', subMenu: [], open: false },
       ],
     }

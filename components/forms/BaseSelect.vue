@@ -54,12 +54,12 @@ export default {
       </option>
     </select>
     <div class="label absolute left-5 top-0 transform -translate-y-4 text-xs bg-[#ffffff] px-2">{{ label }}</div>
-    <IconsChevronDown class="absolute right-2 top-0" />
+    <IconsChevronDown class="absolute right-2 -top-1" />
   </label>
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/variables';
+@import '@/assets/styles/variables';
 
 .base-selects {
   position: relative;

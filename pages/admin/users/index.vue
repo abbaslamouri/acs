@@ -46,16 +46,15 @@ const page = ref(1)
 // })
 
 const fetchAllUsers = async () => {
-  // errorMsg.value = 'KKKKKKKKK'
   const { pending, error, data } = await useFetch('/api/v1/users', { method: 'GET' })
-  if (process.server && error.value && error.value.name === 'FetchError') {
-    // return (errorMsg.value = error.value.message)
+  console.log('EEEEEEE', error.value)
+  if (error.value) {
+    if (process.client) errorMsg.value = 'We were not able to fetch users'
+    return
   }
-  // if (error.value) return (errorMsg.value = 'We were not able to fetch data')
-
-  // users.value = data.value.users
-  // count.value = data.value.count
-  // totalCount.value = data.value.totalCount
+  users.value = data.value.users
+  count.value = data.value.count
+  totalCount.value = data.value.totalCount
 }
 
 // const handleSearch = async (searchKeyword) => {

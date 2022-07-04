@@ -6,15 +6,13 @@ const fetchAllUsers = async (event: any) => {
   try {
     const totalCount = await mongoClient.db().collection('users').countDocuments()
     const users = await mongoClient.db().collection('users').find().toArray()
-    if (users) throw new AppError('JJJJKKJJJJJKJKJKJJKJKJK', 400)
-
+    if (users) throw new AppError('We were not able to fetch users', 400)
     return {
       users,
       totalCount,
       count: users.length,
     }
   } catch (err) {
-    console.log(err)
     errorHandler(event, err)
   }
 }

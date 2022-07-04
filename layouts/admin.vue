@@ -16,7 +16,7 @@ if (process.client) {
 </script>
 
 <template>
-  <div class="flex flex-row min-h-[100vh]">
+  <div class="flex flex-row min-h-[100vh] border-5 border-red-900 w-full">
     <aside class="w-[240px] bg-slate-900 text-white transition duration-400" :class="{ active: !toggleAdminNav }">
       <Branding :toggleAdminNav="toggleAdminNav" @toggleAdminNav="toggleAdminNav = !toggleAdminNav" />
       <AdminNav :toggleAdminNav="toggleAdminNav" />

@@ -2,6 +2,10 @@
   @apply flex items-center gap-1 bg-transparent rounded cursor-pointer transition duration-400 shadow-none;
 }
 
+.btn-primary {
+  @apply bg-[#0F172A] text-white uppercase  hover:(text-gray-300 );
+}
+
 .btn-link {
   @apply bg-transparent text-yellow-700 capitalize  hover:(border-b-yellow-800 underline);
 }
@@ -10,8 +14,8 @@
   @apply bg-transparent uppercase border border-gray-400  hover:(text-gray-500 );
 }
 
-.btn-primary {
-  @apply bg-[#0F172A] text-white uppercase  hover:(text-gray-300 );
+.btn-new-media {
+  @apply rounded px-4 py-1 border border-sky-600  hover:(border-sky-200 );
 }
 
 .admin-section {
