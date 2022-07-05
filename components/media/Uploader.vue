@@ -47,11 +47,12 @@ const pages = computed(() =>
 
 const fetchMedia = async () => {
   // selectedMedia.value = []
-  // response = await fetchAll('media', params.value)
-  // console.log(response)
-  // media.value = response.docs
-  // count.value = response.results
-  // totalCount.value = response.totalCount
+  response = await $fetch('/api/v1/media')
+  console.log('RES', response)
+  if (!response) return
+  media.value = response.docs
+  count.value = response.results
+  totalCount.value = response.totalCount
 }
 
 const handleUplodMedia = async (gallery) => {
@@ -72,18 +73,18 @@ const handleUplodMedia = async (gallery) => {
     for (const prop in gallery) {
       formData.append('gallery', gallery[prop])
     }
-    const uploaded = await $fetch('/api/v1/upload', { method: 'POST', body: formData })
-    console.log('RES', uploaded)
+    response = await $fetch('/api/v1/media', { method: 'POST', body: formData })
+    console.log('RES', response)
     // if (!uploaded) return
     // response = await $fetch('/api/v1/media', { method: 'POST', body: uploaded })
     // console.log('RES', response)
 
-    // if (!response) return
+    if (!response) return
     // for (const prop in media.value) {
     //   const i = response.media.findIndex((m) => m.originalName == media.value[prop].originalName)
     //   if (i !== -1) media.value[prop] = response.media[i]
     // }
-    // await fetchMedia()
+    await fetchMedia()
   } catch (err) {
     console.log('EEEEEE', err.data)
   }
@@ -114,7 +115,9 @@ const deleteMedia = async () => {
   if (!confirm('Are you sure you want to delete these files?')) return
   await Promise.all(
     selectedMedia.value.map(async (item) => {
-      response = await deleteDoc('media', item.id)
+      // response = await deleteDoc('media', item.id)
+      response = await $fetch('/api/v1/media', { method: 'DELETE', params: { id: item._id } })
+      console.log('RES', response)
     })
   )
   if (!errorMsg.value) {
@@ -153,7 +156,7 @@ const toggleSelectAll = (event) => {
   selectedMedia.value = event ? media.value : []
 }
 
-// await fetchMedia()
+await fetchMedia()
 </script>
 
 <template>
@@ -183,15 +186,15 @@ const toggleSelectAll = (event) => {
       </div>
     </div>
 
-    <div class="bottom flex-col justify-between gap-1 flex-1 overflow-auto p-2">
+    <div class="bottom flex flex-col justify-between gap-1 flex-1 overflow-auto p-4">
       <div v-if="!media.length">loading</div>
       <div v-else>
-        <!-- <MediaFileList
+        <MediaFileList
           :media="media"
           :selectedMedia="selectedMedia"
           @addToSelectedMedia="addToSelectedMedia"
           @removeFromSelectedMedia="removeFromSelectedMedia"
-        /> -->
+        />
       </div>
       <div class="pagination">
         <!-- <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1 && !keyword" /> -->

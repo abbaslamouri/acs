@@ -30,7 +30,7 @@ export default defineNuxtConfig({
 
     public: {
       apiUrl: '',
-      backendUrl: '',
+      siteUrl: '',
     },
   },
 })

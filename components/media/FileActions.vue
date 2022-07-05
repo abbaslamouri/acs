@@ -33,7 +33,7 @@ const mediaToDisplay = ref('all')
       </button>
       <div class="flex flex-row gap-4">
         <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="$emit('toggleSort', $event)" />
-        <div class="flex-row items-center gap-2 min-w-60">
+        <div class="flex bg-light-200flex-row items-center gap-2 min-w-60">
           <button
             class="bg-slate-50 border border-transparent cursor-pointer"
             v-if="selectedMedia.length === 1"

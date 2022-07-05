@@ -13,6 +13,7 @@
     "sass-loader": "^13.0.2"
   },
   "dependencies": {
+    "@types/formidable": "^2.0.5",
     "colors": "^1.4.0",
     "formidable": "^2.0.1",
     "lodash.clonedeep": "^4.5.0",
