@@ -31,7 +31,7 @@ const handleItemsSelected = (event) => {
     @drop.prevent="handleItemsDropped"
   >
     Drop files to upload here
-    <IconsUploadCloud />
+    <IconsUploadCloud class="w-10 h-10 fill-gray-500"/>
     <a class=" text-yellow-700 text-lg font-bold" href="#" @click="fileRef.click()">Or click here to choose your files</a>
     <form enctype="multipart/form-data">
       <input

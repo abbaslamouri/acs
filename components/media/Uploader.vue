@@ -48,7 +48,7 @@ const pages = computed(() =>
 const fetchMedia = async () => {
   // selectedMedia.value = []
   response = await $fetch('/api/v1/media')
-  console.log('RES', response)
+  console.log('FETCHALLRES', response)
   if (!response) return
   media.value = response.docs
   count.value = response.results
@@ -56,6 +56,7 @@ const fetchMedia = async () => {
 }
 
 const handleUplodMedia = async (gallery) => {
+  console.log('GGGGG', gallery)
   try {
     showDropZone.value = false
     console.log(gallery)
@@ -82,8 +83,8 @@ const handleUplodMedia = async (gallery) => {
     if (!response) return
     // for (const prop in media.value) {
     //   const i = response.media.findIndex((m) => m.originalName == media.value[prop].originalName)
-    //   if (i !== -1) media.value[prop] = response.media[i]
-    // }
+    //   if
+    console.log('KKKKKKKKKKKKK')
     await fetchMedia()
   } catch (err) {
     console.log('EEEEEE', err.data)
@@ -112,17 +113,25 @@ const removeFromSelectedMedia = (file) => {
 }
 
 const deleteMedia = async () => {
+  // console.log('E1', errorMsg.value)
+  // const deltetedMedia = []
   if (!confirm('Are you sure you want to delete these files?')) return
-  await Promise.all(
-    selectedMedia.value.map(async (item) => {
-      // response = await deleteDoc('media', item.id)
-      response = await $fetch('/api/v1/media', { method: 'DELETE', params: { id: item._id } })
-      console.log('RES', response)
-    })
-  )
+  // await Promise.all(
+  // selectedMedia.value.map(async (item) => {
+  // response = await deleteDoc('media', item.id)
+  response = await $fetch('/api/v1/media', { method: 'DELETE', body: selectedMedia.value })
+  console.log('RES', response)
+  // if (response) deleteMedia = response
+  // })
+  // )
+  // response = await $fetch('/api/v1/media', { method: 'POST', body: { id: item._id } })
+  // console.log('RES', response)
+  // if (response) deleteMedia = response
   if (!errorMsg.value) {
+    // console.log('E2', errorMsg.value)
+
     await fetchMedia()
-    message.value = 'Media deleted succesfully'
+    message.value = 'Media deleted succesfully asdsdassad sadsdaasddsa adsdasads'
     selectedMedia.value = []
   }
 }

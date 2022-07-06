@@ -1,24 +1,14 @@
 <script setup>
-useMeta({
-  title: 'Media | YRL',
-})
 definePageMeta({
   layout: 'admin',
 })
+const title = ref('Media | YRL')
 </script>
 
 <template>
-  <div class="media">
+  <div class="overflow-auto w-full">
     <MediaUploader />
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '@/assets/styles/variables';
-
-.media {
-  height: 92vh;
-  width: 100%;
-  background-color: $slate-100;
-}
-</style>
+<style lang="scss" scoped></style>

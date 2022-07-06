@@ -49,7 +49,7 @@ const forgotPassword = async () => {
 <template>
   <div class="relative flex items-center text-white">
     <div
-      class="fixed inset-0 w-full h-full opacity-50 bg-slate-900"
+      class="fixed inset-0 w-full h-full opacity-50 bg-slate-900 z-9"
       v-if="showAuthDropdown"
       @click="showAuthDropdown = !showAuthDropdown"
     ></div>
@@ -63,28 +63,29 @@ const forgotPassword = async () => {
         <IconsUser class="w-4 h-4 fill-white" />
         <h3 class="font-light uppercase">Sign in / Create acount</h3>
       </a>
-      <form class="shadow-md flex-col gap-2 bg-slate-50 p-2 absolute z-20 text-slate-800" v-if="showAuthDropdown">
+      <form class="shadow-md flex flex-col gap-4 bg-slate-50 p-2 absolute z-20 text-slate-800" v-if="showAuthDropdown">
         <h3 class="title">Sin in</h3>
         <p class="text-xs">Access your account and place an order:</p>
-        <div class="flex-col gap-1">
+        <div class="flex flex-col gap-4">
           <FormsBaseInput label="Email" type="email" v-model="formUser.email" :required="true" />
           <FormsBaseInput label="Password" type="password" v-model="formUser.password" :required="true" />
         </div>
-
         <div>
-          <button class="btn btn-link w-full text-sm mt-3" @click.prevent="forgotPassword">
+          <button class="btn btn-link w-full text-sm" @click.prevent="forgotPassword">
             <p>Forgot Password?</p>
           </button>
         </div>
-        <button class="btn btn-secondary w-full flex-row justify-between text-xs mt-3" @click.prevent="login">
+        <button class="btn btn-secondary w-full flex-row justify-between text-xs" @click.prevent="login">
           <p>Sign in</p>
           <IconsArrowEast />
         </button>
-        <p class="text-sm mt-4">New User?</p>
-        <button class="btn btn-secondary w-full justify-between text-xs mt-1" @click.prevent="signup">
-          <p>Create an account</p>
-          <IconsArrowEast />
-        </button>
+        <div>
+          <p class="text-sm mt-2">New User?</p>
+          <button class="btn btn-secondary w-full justify-between text-xs mt-1" @click.prevent="signup">
+            <p>Create an account</p>
+            <IconsArrowEast />
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -103,5 +104,4 @@ const forgotPassword = async () => {
     }
   }
 }
-
 </style>

@@ -1,8 +1,8 @@
 <script setup>
 const { message, errorMsg, showMediaSelector, showCartSlideout } = useAppState()
 const hideSnackbar = () => {
-  errorMsg.value = null
-  message.value = null
+  errorMsg.value = ''
+  message.value = ''
 }
 </script>
 
@@ -14,7 +14,7 @@ const hideSnackbar = () => {
         :show="errorMsg ? true : message ? true : false"
         :message="errorMsg ? errorMsg : message ? message : ''"
         :snackbarType="errorMsg ? 'Error' : 'Success'"
-        duration="0"
+        duration="5"
         @hideSnackbar="hideSnackbar"
       />
     </NuxtLayout>

@@ -54,7 +54,7 @@ const transitionName = computed(() => (getPosition().includes('right') ? 'rtl' :
 <template>
   <transition :name="transitionName">
     <div
-      class="snackbar flex-row items-center gap-2 fixed z-9999 top-7 p-2 max-w-100 text-slate-50 tracking-wide text-sm"
+      class="snackbar flex flex-row items-center gap-4 fixed z-99999 top-2 p-2 max-w-md text-slate-50 tracking-wide text-sm"
       :class="{
         error: snackbarType === 'Error',
         success: snackbarType === 'Success',
@@ -63,17 +63,17 @@ const transitionName = computed(() => (getPosition().includes('right') ? 'rtl' :
       }"
       v-show="show"
     >
-      <div class="icon">
-        <!-- <IconsSuccess v-if="snackbarType === 'Success'" /> -->
-        <!-- <IconsError v-else-if="snackbarType === 'Error'" /> -->
+      <div class="icon rounded-1/2">
+        <IconsCheck v-if="snackbarType === 'Success'" />
+        <IconsError v-else-if="snackbarType === 'Error'" />
       </div>
 
       <div class="flex-col gap-05">
-        <h3>{{ title }}</h3>
+        <h3 class="text-lg font-bold">{{ title }}</h3>
         <div v-html="message"></div>
       </div>
       <button class="btn btn__close" @click="$emit('hideSnackbar')">
-        <!-- <IconsClose class="fill-slate-50" /> -->
+        <IconsClose class="fill-slate-50" />
       </button>
     </div>
   </transition>
@@ -91,26 +91,13 @@ const transitionName = computed(() => (getPosition().includes('right') ? 'rtl' :
     right: 5rem;
   }
 
-  svg {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0.4rem;
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-
-  .btn {
-    border: none;
-  }
-
   &.error {
     background: $red-700;
     border-left: 1rem solid $red-400;
 
     .icon {
       background: $red-400;
-      border-radius: 50%;
+      // border-radius: 50%;
 
       svg {
         fill: $red-50;
@@ -124,7 +111,7 @@ const transitionName = computed(() => (getPosition().includes('right') ? 'rtl' :
 
     .icon {
       background: $green-400;
-      border-radius: 50%;
+      // border-radius: 50%;
 
       svg {
         fill: $green-50;

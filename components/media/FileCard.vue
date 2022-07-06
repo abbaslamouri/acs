@@ -28,7 +28,7 @@ const config = useRuntimeConfig()
     <div class="w-[10rem] h-[10rem] p-4 border border-gray-500" v-else>
       <IconsPdf v-if="file.mimetype && file.mimetype.includes('pdf')" class="w-full h-full" />
     </div>
-    <div class="tooltip absolute -top-2 left-[50%] p-1 rounded text-xs">{{ file.originalFilename }}</div>
+    <div class="tooltip absolute top-[25%] left-[50%] p-1 rounded text-xs">{{ file.originalFilename }}</div>
   </div>
 </template>
 

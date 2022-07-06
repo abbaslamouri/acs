@@ -12,12 +12,12 @@ import formidable from 'formidable'
 import AppError from '~/server/utils/AppError'
 
 export default defineEventHandler(async (event) => {
-  console.log('MMMMMMMM', event.req.method)
   const query = useQuery(event)
-  console.log('Query', query)
+  console.log('Query', query.docs)
+  // if(!query.docs) return
+  // for(const prop in query.docs){
 
-  // const body = await useBody(event)
-  // console.log('Body', body)
+  // }
 
   switch (event.req.method) {
     case 'GET':
@@ -25,14 +25,20 @@ export default defineEventHandler(async (event) => {
       break
 
     case 'POST':
+      // const body = await useBody(event)
+      // console.log('Body', body)
+      // if (body.action === 'delete') return deleteMedia(event, body)
       return await createMedia(event)
+      // return await createMedia(event)
 
       break
 
     case 'DELETE':
-      return await deleteMedia(event, query)
+      const body = await useBody(event)
+      console.log('Body', body)
+      return await deleteMedia(event, body)
 
-      break
+    //   break
 
     default:
       break

@@ -61,7 +61,7 @@ export default {
     />
     <span class="placeholder absolute left-5 top-0 transform -translate-y-2 text-xs bg-[#ffffff] px-2" @click="inputRef.focus()">{{ label }}<span v-if="$attrs.required">*</span></span>
     <div v-if="type === 'password'">
-      <span class="icon" v-if="fieldType === 'password'" @click="fieldType = 'text'">
+      <span class="absolute top-[30%] right-3" v-if="fieldType === 'password'" @click="fieldType = 'text'">
         <IconsHide class="w-4 h-4" />
       </span>
       <span class="icon" v-else @click="fieldType = 'password'">

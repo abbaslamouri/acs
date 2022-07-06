@@ -14,7 +14,7 @@ const fileRefs = ref([])
 </script>
 
 <template>
-  <div class="media-list flex flex-row wrap items-center justify-evenly gap-2 px-1 py-6">
+  <div class="media-list flex flex-row flex-wrap items-center justify-evenly gap-2 px-1 py-6">
     <div v-for="(file, index) in media" class="item shadow-md relative">
       <MediaFileCard
         :file="file"

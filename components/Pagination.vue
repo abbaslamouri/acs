@@ -87,7 +87,7 @@ const setCurrentPage = async (p) => {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/scss/variables';
+@import '@/assets/styles/variables';
 
 .base-select {
   select {
