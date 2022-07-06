@@ -16,10 +16,22 @@ const runtimeFile = fileURLToPath(new URL('./runtime', import.meta.url))
 const runtimeDir = path.dirname(`${runtimeFile}`)
 const uploadPath = `${path.join(runtimeDir, '../../public')}/uploads/`
 
-const fetchAll = async (event: any) => {
+const fetchAll = async (event: any, selectedFields: any = {}, sortObject: any = {}) => {
+  console.log('SSSSS', selectedFields)
+  console.log('RRRRRR', sortObject)
+
   try {
+    let docs: any
+    let cursor: any
     const totalCount = await mongoClient.db().collection('media').countDocuments()
-    const docs = await mongoClient.db().collection('media').find().toArray()
+    cursor = mongoClient.db().collection('media').find()
+    if (selectedFields) cursor = cursor.project({ ...selectedFields })
+    if (sortObject) cursor = cursor.sort(sortObject)
+
+    docs = await cursor.toArray()
+
+    // const docs = await mongoClient.db().collection('media').find().toArray()
+    // const cursor = mongoClient.db().collection('media').find()
     if (!docs) throw new AppError('We were not able to fetch media', 400)
     return {
       docs,
@@ -31,8 +43,22 @@ const fetchAll = async (event: any) => {
   }
 }
 
-const fetchAllMedia = async (event: any) => {
-  return fetchAll(event)
+const fetchAllMedia = async (event: any, query: any) => {
+  const selectedFields = {}
+  const sortObject = {}
+  const fields = query.fields.split(',')
+  // if(query.sort.startsWith("-")) sortObject= {}
+
+  for (const prop in fields) {
+    console.log(fields[prop])
+    selectedFields[fields[prop].trim()] = 1
+  }
+
+  console.log(query.sort.split('-'))
+  const sorts = query.sort.split('-')
+  if (sorts.length === 1) sortObject[sorts[0]] = 1
+  else sortObject[sorts[1]] = -1
+  return fetchAll(event, selectedFields, sortObject)
   // try {
   //   const totalCount = await mongoClient.db().collection('media').countDocuments()
   //   const docs = await mongoClient.db().collection('media').find().toArray()

@@ -13,11 +13,11 @@ const page = ref(1)
 const perPage = ref(350)
 const keyword = ref('')
 const showDropZone = ref(false)
-const fields = 'id, name, slug, originalName, folder, path, mimetype, altText, caption'
+const fields = 'name, filePath, mimetype'
 let response = ''
 
 const mediaSort = reactive({
-  field: 'createdAt',
+  field: 'name',
   order: '-',
 })
 const mediaSortOptions = [
@@ -47,7 +47,7 @@ const pages = computed(() =>
 
 const fetchMedia = async () => {
   // selectedMedia.value = []
-  response = await $fetch('/api/v1/media')
+  response = await $fetch('/api/v1/media', { params: params.value })
   console.log('FETCHALLRES', response)
   if (!response) return
   media.value = response.docs

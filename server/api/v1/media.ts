@@ -12,8 +12,8 @@ import formidable from 'formidable'
 import AppError from '~/server/utils/AppError'
 
 export default defineEventHandler(async (event) => {
-  const query = useQuery(event)
-  console.log('Query', query.docs)
+  const query = await useQuery(event)
+  console.log('Query', query)
   // if(!query.docs) return
   // for(const prop in query.docs){
 
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
   switch (event.req.method) {
     case 'GET':
-      return await fetchAllMedia(event)
+      return await fetchAllMedia(event, query)
       break
 
     case 'POST':
