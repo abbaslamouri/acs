@@ -1,10 +1,11 @@
 import fs from 'fs'
+import slugify from 'slugify'
 import formidable from 'formidable'
 import AppError from '~/server/utils/AppError'
 import errorHandler from '~/server/utils/errorHandler'
 
 import mongoClient from '~/mongo'
-import { ObjectId } from 'mongodb'
+import { AnyError, ObjectId } from 'mongodb'
 
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -27,8 +28,8 @@ const runtimeDir = path.dirname(`${runtimeFile}`)
 const uploadPath = `${path.join(runtimeDir, '../../public')}/uploads/`
 
 const setProductAuthor = () => {
-	// if ((req as any).user) req.body.createdBy = (req as any).user.id
-	// next()
+  // if ((req as any).user) req.body.createdBy = (req as any).user.id
+  // next()
 }
 
 // const searchAll = async (req: Request, res: Response, next: NextFunction) => {
@@ -77,184 +78,242 @@ const setProductAuthor = () => {
 // 	})
 // }
 
-// const createSubModels = async (product: any, dbTable: any, Model: any, atrributes: any) => {
-//   if (atrributes) {
-//     const AttributesArr = [...atrributes.split('|')]
-//     if (!AttributesArr.length) return
-//     for (const prop in AttributesArr) {
-//       AttributesArr[prop] = AttributesArr[prop].trim()
-//       const found = await Model.find({ name: AttributesArr[prop] })
-//       if (!found.length) {
-//         const attribute = await Model.create({ name: AttributesArr[prop] })
-//         if (attribute) product[dbTable].push(attribute.id)
-//       } else {
-//         product[dbTable].push(found[0].id)
-//       }
-//     }
-//   }
-//   return product
-// }
+const createSubModels = async (dbTable: any, atrributes: any) => {
+  if (!atrributes) return
+  const attributeIds = []
+  const AttributesArr = [...atrributes.split('|')]
+  if (!AttributesArr.length) return
+  for (const prop in AttributesArr) {
+    // AttributesArr[prop] = AttributesArr[prop].trim()
+    const attributeName = AttributesArr[prop].trim()
+    const attributeSlug = slugify(attributeName, { lower: true })
+    const found = await mongoClient.db().collection(dbTable).findOne({ name })
+    // const found = await Model.find({ name: AttributesArr[prop] })
+    if (found.length) {
+      attributeIds.push(found._id)
+    } else {
+      const attr = await mongoClient.db().collection(dbTable).insertOne({ name: attributeName, slug: attributeSlug })
+      if (attr && attr.insertedId) attributeIds.push(attr.insertedId)
+      // const attribute = await Model.create({ name: AttributesArr[prop] })
+      // if (attribute) product[dbTable].push(attribute.id)
+    }
+  }
+  console.log('ARRTRRTT', attributeIds)
 
-const createProducts = async (data: any) => {
-	let found: any
-	// console.log('data', data)
-	console.log('GGGGGGGGGGGG')
-	try {
-		found = await mongoClient.db().collection('oems').find().toArray()
-		console.log('FOUNDOEM')
-		return
-	} catch (err) {
-		console.log('RRRRRRRR', err)
-	}
+  return attributeIds
+}
 
-	// await Promise.all(
-	// 	data.map(async (item: any) => {
-	// 		let product = { ...item }
-	// 		product.name = item.acsPartNumber
-	// 		product.gallery = []
-	// 		product.eligibilities = []
-	// 		product.nextHigherAssemblies = []
-	// 		product.price = product.price * 1
-	// 		product.tbq = item.tbq ? true : false
-	// 		// console.log('PRODUCT', product)
-	// 		//     product.createdBy = (req as any).user.id
-	// 		let oem: any
-	// 		console.log('ZZZZZZZZZ')
-	// 		found = await mongoClient.db().collection('oems').findOne({ name: item.oem.trim() })
-	// 		console.log('FOUNDOEM')
-	// 		if (!found.length) {
-	// 			// oem = await Oem.create({ name: item.oem.trim() })
-	// 		} else {
-	// 			// oem = found[0]
-	// 		}
-	// 	})
-	// )
-	for (const prop in data) {
-		// let product = { ...data[prop] }
-		// product.name = data[prop].acsPartNumber
-		// product.gallery = []
-		// product.eligibilities = []
-		// product.nextHigherAssemblies = []
-		// product.price = product.price * 1
-		// product.tbq = data[prop].tbq ? true : false
-		// console.log('PRODUCTxxxx', product)
-		// //     product.createdBy = (req as any).user.id
-		// let oem: any
-		// found = await mongoClient.db().collection('oems').findOne({ name: data[prop].oem.trim() })
-		// console.log('FOUNDOEM', found)
-		// if (!found.length) {
-		// 	// oem = await Oem.create({ name: data[prop].oem.trim() })
-		// } else {
-		// 	// oem = found[0]
-		// }
-		//     product.oem = oem.id
-		//     let oemPartNumber: IOempartnumber
-		//     found = await Oempartnumber.find({ name: data[prop].oemPartNumber.trim() })
-		//     if (!found.length) {
-		//       oemPartNumber = await Oempartnumber.create({ name: data[prop].oemPartNumber.trim(), parent: oem.id })
-		//     } else {
-		//       oemPartNumber = found[0]
-		//     }
-		//     product.oemPartNumber = oemPartNumber.id
-		//     product.oem = oem.id
-		//     const image = await Media.find({ originalName: `${data[prop].productImage}.jpg` })
-		//     if (image.length) product.gallery.push(image[0].id)
-		//     product = await createSubModels(product, 'eligibilities', Eligibility, data[prop].eligibilities)
-		//     product = await createSubModels(
-		//       product,
-		//       'nextHigherAssemblies',
-		//       Nexthigherassembly,
-		//       data[prop].nextHigherAssemblies
-		//     )
-		//     console.log(product)
-		//     await Product.create(product)
-	}
+const createProducts = async (data: any, resolvedMedia: any, event: any) => {
+  let found: any
+  // console.log('data', data)
+  // console.log('GGGGGGGGGGGG')
+  // try {
+  //   found = await mongoClient.db().collection('oems').find().toArray()
+  //   console.log('FOUNDOEM')
+  //   return
+  // } catch (err) {
+  //   console.log('RRRRRRRR', err)
+  // }
+
+  await Promise.all(
+    data.map(async (item: any) => {
+      let product = { ...item }
+      product.name = item.acsPartNumber
+      // product.eligibilities = []
+      // product.nextHigherAssemblies = []
+      product.price = product.price * 1
+      product.tbq = item.tbq ? true : false
+      console.log('PRODUCT', product)
+      //     product.createdBy = (req as any).user.id
+      let oem: any = {}
+      const oemName = item.oem.trim()
+      const oemSlug = slugify(oemName, { lower: true })
+      found = await mongoClient.db().collection('oems').findOne({ name: oemName })
+      if (found) {
+        oem = found
+        product.oem = oem._id
+      } else {
+        oem = await mongoClient.db().collection('oems').insertOne({ name: oemName, slug: oemSlug })
+        if (oem && oem.insertedId) product.oem = oem.insertedId
+      }
+      console.log('oem', oem)
+
+      let oemPartNumber: any = {}
+      const oemPartNumberName = item.oemPartNumber.trim()
+      const oemPartNumberSlug = slugify(oemPartNumberName, { lower: true })
+      found = await mongoClient.db().collection('oempartnumbers').findOne({ name: oemPartNumberName })
+      if (found) {
+        product.oemPartNumber = found._id
+      } else {
+        oemPartNumber = await mongoClient
+          .db()
+          .collection('oempartnumbers')
+          .insertOne({ name: oemPartNumberName, slug: oemPartNumberSlug, oem: oem._id })
+        if (oemPartNumber && oemPartNumber.insertedId) product.oemPartNumber = oemPartNumber.insertedId
+      }
+      console.log('oemPartNumber', oemPartNumber)
+
+      const image = await mongoClient
+        .db()
+        .collection('media')
+        .findOne({ originalFilename: `${product.productImage}.jpg` })
+      // console.log('IMG', image)
+      if (image) product.gallery = [image._id]
+
+      const eligibilities = await createSubModels('eligibilities', product.eligibilities)
+
+      console.log('Product', product)
+
+      // await Media.find({ originalName: `${data[prop].productImage}.jpg` })
+
+      // found = await oemPartNumber.find({ name: data[prop].oemPartNumber.trim() })
+      // if (!found.length) {
+      //   oemPartNumber = await oemPartNumber.create({ name: data[prop].oemPartNumber.trim(), parent: oem.id })
+      // } else {
+      //   oemPartNumber = found[0]
+      // }
+      // product.oemPartNumber = oemPartNumber.id
+    })
+  )
+
+  fs.rename(resolvedMedia.originalPath, `${uploadPath}${resolvedMedia.name}`, async (uploadError) => {
+    try {
+      if (uploadError) throw new AppError(uploadError.message, 400)
+      if (resolvedMedia.size > 1 * 1024 * 1024) throw new AppError('File size must be less than 1 MB', 400)
+      if (!resolvedMedia.mimetype.includes('csv')) throw new AppError('Only csv format allowed!', 400)
+      console.log('ALL is good')
+    } catch (err) {
+      errorHandler(event, err)
+    }
+  })
+
+  // for (const prop in data) {
+  // let product = { ...data[prop] }
+  // product.name = data[prop].acsPartNumber
+  // product.gallery = []
+  // product.eligibilities = []
+  // product.nextHigherAssemblies = []
+  // product.price = product.price * 1
+  // product.tbq = data[prop].tbq ? true : false
+  // console.log('PRODUCTxxxx', product)
+  // //     product.createdBy = (req as any).user.id
+  // let oem: any
+  // found = await mongoClient.db().collection('oems').findOne({ name: data[prop].oem.trim() })
+  // console.log('FOUNDOEM', found)
+  // if (!found.length) {
+  // 	// oem = await Oem.create({ name: data[prop].oem.trim() })
+  // } else {
+  // 	// oem = found[0]
+  // }
+  //     product.oem = oem.id
+  //     let oemPartNumber: IOempartnumber
+  //     found = await Oempartnumber.find({ name: data[prop].oemPartNumber.trim() })
+  //     if (!found.length) {
+  //       oemPartNumber = await Oempartnumber.create({ name: data[prop].oemPartNumber.trim(), parent: oem.id })
+  //     } else {
+  //       oemPartNumber = found[0]
+  //     }
+  //     product.oemPartNumber = oemPartNumber.id
+  //     product.oem = oem.id
+  //     const image = await Media.find({ originalName: `${data[prop].productImage}.jpg` })
+  //     if (image.length) product.gallery.push(image[0].id)
+  //     product = await createSubModels(product, 'eligibilities', Eligibility, data[prop].eligibilities)
+  //     product = await createSubModels(
+  //       product,
+  //       'nextHigherAssemblies',
+  //       Nexthigherassembly,
+  //       data[prop].nextHigherAssemblies
+  //     )
+  //     console.log(product)
+  //     await Product.create(product)
+  // }
 }
 
 const seedProducts = async (event: any) => {
-	const found = await mongoClient.db().collection('oems').find().toArray()
-	console.log('FFFFFF', found)
-	return
-	let uploadPromise = new Promise((resolve, reject) => {
-		const form = formidable({ multiples: true })
-		form.parse(event.req, (err: any, fields: any, files: any) => {
-			// console.log('ARAAAA', Array.isArray(files.gallery))
-			// console.log('FFFFFFF', files)
+  console.log('FFFFFF')
+  // console.log('LIST', await mongoClient.db().listCollections().toArray())
+  let uploadPromise = new Promise((resolve, reject) => {
+    const form = formidable({ multiples: true })
+    form.parse(event.req, (err: any, fields: any, files: any) => {
+      // console.log('ARAAAA', Array.isArray(files.gallery))
+      // console.log('FFFFFFF', files)
 
-			const uploadedMedia = {
-				name: `${files.gallery.newFilename}${extname(files.gallery.originalFilename)}`,
-				originalFilename: files.gallery.originalFilename,
-				mimetype: files.gallery.mimetype,
-				fileSize: files.gallery.size,
-				originalPath: files.gallery.filepath,
-				filePath:
-					`/uploads/${files.gallery.newFilename}${extname(files.gallery.originalFilename)}` ||
-					'/uploads/placeholder.png',
-			}
-			resolve(uploadedMedia)
-		})
-	})
+      const uploadedMedia = {
+        name: `${files.gallery.newFilename}${extname(files.gallery.originalFilename)}`,
+        originalFilename: files.gallery.originalFilename,
+        mimetype: files.gallery.mimetype,
+        fileSize: files.gallery.size,
+        originalPath: files.gallery.filepath,
+        filePath:
+          `/uploads/${files.gallery.newFilename}${extname(files.gallery.originalFilename)}` ||
+          '/uploads/placeholder.png',
+      }
+      resolve(uploadedMedia)
+    })
+  })
 
-	const resolvedMedia: any = await uploadPromise
-	// console.log('MMMMMMMMMedia', resolvedMedia)
-	// console.log(uploadPath)
+  const resolvedMedia: any = await uploadPromise
+  console.log('MMMMMMMMMedia', resolvedMedia)
+  // console.log(uploadPath)
 
-	fs.renameSync(resolvedMedia.originalPath, `${uploadPath}${resolvedMedia.name}`)
-	// , async (uploadError) => {
-	// 	try {
-	// 		if (uploadError) throw new AppError(uploadError.message, 400)
-	// 		if (resolvedMedia.size > 1 * 1024 * 1024) throw new AppError('File size must be less than 1 MB', 400)
-	// 		if (!resolvedMedia.mimetype.includes('csv')) throw new AppError('Only csv format allowed!', 400)
-	// 		console.log('ALL is good')
-	// 	} catch (err) {
-	// 		errorHandler(event, err)
-	// 	}
-	// })
+  // let found: any
+  // // console.log('data', data)
+  // console.log('GGGGGGGGGGGG')
+  // try {
+  //   found = await mongoClient.db().collection('oems').find().toArray()
+  //   console.log('FOUNDOEM')
+  //   return
+  // } catch (err) {
+  //   console.log('RRRRRRRR', err)
+  // }
 
-	const data: any[] = []
-	fs.createReadStream(`${uploadPath}${resolvedMedia.name}`)
-		.pipe(parse({ delimiter: ',', columns: true }))
-		.on('data', function (row) {
-			// console.log(row)
-			data.push(row)
-		})
-		.on('end', async function () {
-			await createProducts(data)
-			return {
-				status: 'succes',
-			}
-		})
-		.on('error', function (error) {
-			console.log(error.message)
-		})
+  const data: any[] = []
+  fs.createReadStream(`${resolvedMedia.originalPath}`)
+    .pipe(parse({ delimiter: ',', columns: true }))
+    .on('data', function (row) {
+      // console.log(row)
+      data.push(row)
+    })
+    .on('end', async function () {
+      // console.log('DDDDDDD', data)
+      // const found = await mongoClient.db().collection('oems').find().toArray()
+      // console.log('FOUNDOEM', found)
+      await createProducts(data, resolvedMedia, event)
+      return {
+        status: 'succes',
+      }
+    })
+    .on('error', function (error) {
+      console.log(error.message)
+    })
 
-	console.log('DATA', data)
+  console.log('DATA', data)
 
-	// const db = mongoose.connection.db
-	// const collections = await db.listCollections().toArray()
-	// console.log('Collections', collections)
-	// db.dropCollection('products')
-	// db.dropCollection('eligibilities')
-	// db.dropCollection('nexthigherassemblies')
+  // const db = mongoose.connection.db
+  // const collections = await db.listCollections().toArray()
+  // console.log('Collections', collections)
+  // db.dropCollection('products')
+  // db.dropCollection('eligibilities')
+  // db.dropCollection('nexthigherassemblies')
 
-	// return 'seeding'
+  // return 'seeding'
 
-	// const data: any[] = []
-	// fs.createReadStream(`${__dirname}/../../../public/uploads/${(req as any).files[0].filename}`)
-	//   .pipe(parse({ delimiter: ',', columns: true }))
-	//   .on('data', function (row) {
-	//     console.log(row)
-	//     // data.push(row)
-	//   })
-	//   .on('end', async function () {
-	//     // await createProducts(req, data)
-	//     return {
-	//       status: 'succes',
-	//     }
-	//   })
-	//   .on('error', function (error) {
-	//     console.log(error.message)
-	//   })
+  // const data: any[] = []
+  // fs.createReadStream(`${__dirname}/../../../public/uploads/${(req as any).files[0].filename}`)
+  //   .pipe(parse({ delimiter: ',', columns: true }))
+  //   .on('data', function (row) {
+  //     console.log(row)
+  //     // data.push(row)
+  //   })
+  //   .on('end', async function () {
+  //     // await createProducts(req, data)
+  //     return {
+  //       status: 'succes',
+  //     }
+  //   })
+  //   .on('error', function (error) {
+  //     console.log(error.message)
+  //   })
 }
 
 export { setProductAuthor, seedProducts }
