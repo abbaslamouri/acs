@@ -41,17 +41,17 @@ const fetchAll = async (event: any) => {
   try {
     let docs: any
     let cursor: any
-    const totalCount = await mongoClient.db().collection('media').countDocuments()
-    cursor = mongoClient.db().collection('media').find()
+    const totalCount = await mongoClient.db().collection('products').countDocuments()
+    cursor = mongoClient.db().collection('products').find()
     if (fieldsObj) cursor = cursor.project({ ...fieldsObj })
     if (sortObj) cursor = cursor.sort(sortObj)
     cursor = cursor.skip(skip).limit(limit)
 
     docs = await cursor.toArray()
 
-    // const docs = await mongoClient.db().collection('media').find().toArray()
-    // const cursor = mongoClient.db().collection('media').find()
-    if (!docs) throw new AppError('We were not able to fetch media', 400)
+    // const docs = await mongoClient.db().collection('products').find().toArray()
+    // const cursor = mongoClient.db().collection('products').find()
+    if (!docs) throw new AppError('We were not able to fetch product', 400)
     return {
       docs,
       totalCount,
@@ -62,11 +62,11 @@ const fetchAll = async (event: any) => {
   }
 }
 
-const fetchAllMedia = async (event: any) => {
+const fetchAllProducts = async (event: any) => {
   return fetchAll(event)
   // try {
-  //   const totalCount = await mongoClient.db().collection('media').countDocuments()
-  //   const docs = await mongoClient.db().collection('media').find().toArray()
+  //   const totalCount = await mongoClient.db().collection('products').countDocuments()
+  //   const docs = await mongoClient.db().collection('products').find().toArray()
   //   if (!docs) throw new AppError('We were not able to fetch media', 400)
   //   return {
   //     docs,
@@ -78,7 +78,7 @@ const fetchAllMedia = async (event: any) => {
   // }
 }
 
-const createMedia = async (event: any) => {
+const createProduct = async (event: any) => {
   let uploadPromise = new Promise((resolve, reject) => {
     const form = formidable({ multiples: true })
     form.parse(event.req, (err: any, fields: any, files: any) => {
@@ -128,10 +128,10 @@ const createMedia = async (event: any) => {
     //   filePath: `/uploads/${file.newFilename}${extname(file.originalFilename)}` || '/uploads/placeholder.png',
     // }
     let found = {}
-    const savedMedia = await mongoClient.db().collection('media').insertMany(resolvedMedia)
+    const savedMedia = await mongoClient.db().collection('products').insertMany(resolvedMedia)
     console.log('SSSSSS', savedMedia)
     // if (savedMedia && savedMedia.insertedCount) {
-    //   found = await mongoClient.db().collection('media').findOne({ _id: savedMedia.insertedId })
+    //   found = await mongoClient.db().collection('products').findOne({ _id: savedMedia.insertedId })
     //   // console.log('SSSSSS', found)
     // }
 
@@ -160,7 +160,7 @@ const createMedia = async (event: any) => {
     // console.log('DDDDDDD', data)
     // await mongoClient.close()
     // await mongoClient.connect()
-    // const savedMedia = await mongoClient.db().collection('media').insertOne(data)
+    // const savedMedia = await mongoClient.db().collection('products').insertOne(data)
     // console.log('SSSSSS', savedMedia)
     // await mongoClient.close()
   } catch (err) {
@@ -168,13 +168,13 @@ const createMedia = async (event: any) => {
   }
 }
 
-const deleteMedia = async (event: any) => {
+const deleteProduct = async (event: any) => {
   try {
     const body = await useBody(event)
     console.log('Body', body)
     // const doc = await mongoClient
     //   .db()
-    //   .collection('media')
+    //   .collection('products')
     //   .findOne({ _id: new ObjectId(query.id) })
     // if (!doc) throw new AppError(`We were not able to find media with id=${query.id}`, 400)
 
@@ -182,7 +182,7 @@ const deleteMedia = async (event: any) => {
       body.map(async (item: any) => {
         const result = await mongoClient
           .db()
-          .collection('media')
+          .collection('products')
           .deleteOne({ _id: new ObjectId(item._id) })
         console.log('RESULTS', result)
       })
@@ -200,7 +200,7 @@ const deleteMedia = async (event: any) => {
 
     // const deletedMedia = await mongoClient
     //   .db()
-    //   .collection('media')
+    //   .collection('products')
     //   .deleteOne({ _id: new ObjectId(query.id) })
     // console.log(deletedMedia)
     // if (!deletedMedia || !deletedMedia.deletedCount) throw new AppError('We were not able to delete media', 400)
@@ -211,4 +211,4 @@ const deleteMedia = async (event: any) => {
   }
 }
 
-export { fetchAllMedia, createMedia, deleteMedia }
+export { fetchAllProducts, createProduct, deleteProduct }

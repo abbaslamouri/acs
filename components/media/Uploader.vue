@@ -10,15 +10,15 @@ const media = ref([])
 const count = ref(0)
 const totalCount = ref(0)
 const page = ref(1)
-const perPage = ref(350)
-const keyword = ref('')
+const perPage = ref(10)
+const keyword = ref('003')
 const showDropZone = ref(false)
-const fields = 'name, filePath, mimetype'
+const fields = 'name, filePath, mimetype, originalFilename'
 let response = ''
 
 const mediaSort = reactive({
   field: 'name',
-  order: '-',
+  order: '',
 })
 const mediaSortOptions = [
   { key: 'sortOrder', name: 'Order' },
@@ -32,9 +32,8 @@ const params = computed(() => {
     page: page.value,
     limit: perPage.value,
     sort: `${mediaSort.order}${mediaSort.field}`,
-    keyword: keyword.value ? keyword.value : null,
+    keyword: keyword.value ? keyword.value : '',
   }
-  if (!params.folder) delete params.folder
   if (!keyword.value) delete params.keyword
   return params
 })
