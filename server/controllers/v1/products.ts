@@ -12,6 +12,9 @@ import { fileURLToPath } from 'url'
 import { extname } from 'path'
 
 import { parse } from 'csv-parse'
+// import { sendError, createError } from 'h3'
+import { handleError } from 'nuxt/dist/app/compat/capi'
+
 // import mongoose from 'mongoose'
 // import { Request, Response, NextFunction } from 'express'
 // import APIFeatures from '../../utils/apiFeatures'
@@ -126,10 +129,13 @@ const createProducts = async (data: any, resolvedMedia: any, event: any) => {
     for (const prop in data) {
       let product: any = {}
       product.name = data[prop].acsPartNumber
+      product.acsPartNumber = data[prop].acsPartNumber
       product.slug = slugify(product.name, { lower: true })
       // product.eligibilities = []
       // product.nextHigherAssemblies = []
       product.price = data[prop].price * 1
+      product.salePrice = data[prop].salePrice * 1
+      product.sortOrder = 0
       product.tbq = data[prop].tbq ? true : false
       // console.log('PRODUCT', product)
       //     product.createdBy = (req as any).user.id
@@ -145,35 +151,43 @@ const createProducts = async (data: any, resolvedMedia: any, event: any) => {
         if (oem && oem.insertedId) product.oem = new ObjectId(oem.insertedId)
       }
 
-      // let oemPartNumber: any = {}
-      // const oemPartNumberName = data[prop].oemPartNumber.trim()
-      // const oemPartNumberSlug = slugify(oemPartNumberName, { lower: true })
-      // found = await mongoClient.db().collection('oempartnumbers').findOne({ name: oemPartNumberName })
-      // if (found) {
-      //   product.oemPartNumber = new ObjectId(found._id)
-      // } else {
-      //   oemPartNumber = await mongoClient
-      //     .db()
-      //     .collection('oempartnumbers')
-      //     .insertOne({ name: oemPartNumberName, slug: oemPartNumberSlug, oem: new ObjectId(oem._id) })
-      //   if (oemPartNumber && oemPartNumber.insertedId) product.oemPartNumber = new ObjectId(oemPartNumber.insertedId)
-      // }
+      let oemPartNumber: any = {}
+      const oemPartNumberName = data[prop].oemPartNumber.trim()
+      const oemPartNumberSlug = slugify(oemPartNumberName, { lower: true })
+      found = await mongoClient.db().collection('oempartnumbers').findOne({ name: oemPartNumberName })
+      if (found) {
+        product.oemPartNumber = new ObjectId(found._id)
+      } else {
+        oemPartNumber = await mongoClient
+          .db()
+          .collection('oempartnumbers')
+          .insertOne({ name: oemPartNumberName, slug: oemPartNumberSlug, oem: new ObjectId(oem._id) })
+        if (oemPartNumber && oemPartNumber.insertedId) product.oemPartNumber = new ObjectId(oemPartNumber.insertedId)
+      }
 
-      // const image = await mongoClient
-      //   .db()
-      //   .collection('media')
-      //   .findOne({ originalFilename: `${product.productImage}.jpg` })
-      // if (image) product.gallery = [new ObjectId(image._id)]
+      const image = await mongoClient
+        .db()
+        .collection('media')
+        .findOne({ originalFilename: `${data[prop].productImage}.jpg` })
+      if (image) product.gallery = [new ObjectId(image._id)]
 
-      // product.eligibilities = await createSubModels('eligibilities', product.eligibilities)
-      // product.nextHigherAssemblies = await createSubModels('nexthigherassemblies', product.nextHigherAssemblies)
+      // const eligibilities = await createSubModels('eligibilities', data[prop].eligibilities)
+      // console.log('ELLLLL', eligibilities)
+      // console.log('E:', eligibilities.length)
+      // if (eligibilities.length === 0) product.eligibilities = []
+      product.eligibilities = await createSubModels('eligibilities', data[prop].eligibilities)
+      product.nextHigherAssemblies = await createSubModels('nexthigherassemblies', data[prop].nextHigherAssemblies)
 
-      console.log('Product', product)
+      // console.log('Product', product)
 
       found = await mongoClient.db().collection('products').findOne({ name: product.name })
+      console.log('FOUND', found)
+
       if (!found) {
         const newProduct = await mongoClient.db().collection('products').insertOne(product)
-        if (!newProduct || newProduct.insertedId) productCreateErr += `Unable to create product ${product.name}`
+        // if (!newProduct) throw new AppError('ERRRRRRRRRRORRR', 404)
+        console.log('NEW', newProduct)
+        // if (!newProduct || newProduct.insertedId) productCreateErr += `Unable to create product ${product.name}`
       }
 
       // await Media.find({ originalName: `${data[prop].productImage}.jpg` })
@@ -319,6 +333,9 @@ const seedProducts = async (event: any) => {
             bsonType: 'array',
             description: 'Product images',
             uniqueItems: true,
+            items: {
+              bsonType: 'objectId',
+            },
           },
           acsPartNumber: {
             bsonType: 'string',
@@ -326,12 +343,12 @@ const seedProducts = async (event: any) => {
             maxLength: 20,
           },
           oemPartNumber: {
-            bsonType: 'string',
+            bsonType: 'objectId',
             description: 'OEM part Number',
             maxLength: 20,
           },
           oem: {
-            bsonType: 'string',
+            bsonType: 'objectId',
             description: 'OEM',
             maxLength: 20,
           },
@@ -343,28 +360,34 @@ const seedProducts = async (event: any) => {
             bsonType: 'array',
             description: 'Product eligibilities',
             uniqueItems: true,
+            items: {
+              bsonType: 'objectId',
+            },
           },
-          categories: {
-            bsonType: 'array',
-            description: 'Product categories',
-            uniqueItems: true,
-          },
+          // categories: {
+          //   bsonType: 'array',
+          //   description: 'Product categories',
+          //   uniqueItems: true,
+          // },
           nextHigherAssemblies: {
             bsonType: 'array',
             description: 'Product nextHigherAssemblies',
             uniqueItems: true,
+            items: {
+              bsonType: 'objectId',
+            },
           },
           price: {
-            bsonType: 'string',
+            bsonType: 'number',
             description: 'Product price',
             maxLength: 500,
           },
           salePrice: {
-            bsonType: 'string',
+            bsonType: 'number',
             description: 'Product sale price',
           },
           sortOrder: {
-            bsonType: 'string',
+            bsonType: 'number',
           },
         },
       },
