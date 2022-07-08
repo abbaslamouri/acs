@@ -5,7 +5,7 @@ import AppError from '~/server/utils/AppError'
 import errorHandler from '~/server/utils/errorHandler'
 
 import mongoClient from '~/mongo'
-import { AnyError, ObjectId } from 'mongodb'
+import { ObjectId } from 'mongodb'
 
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -79,90 +79,102 @@ const setProductAuthor = () => {
 // }
 
 const createSubModels = async (dbTable: any, atrributes: any) => {
-  if (!atrributes) return
+  if (!atrributes) return []
   const attributeIds = []
   const AttributesArr = [...atrributes.split('|')]
-  if (!AttributesArr.length) return
+  if (!AttributesArr || !AttributesArr.length) return []
   for (const prop in AttributesArr) {
-    // AttributesArr[prop] = AttributesArr[prop].trim()
+    if (AttributesArr[prop].includes(':')) {
+      const attrItemsArr = AttributesArr[prop].split(':')
+      const newattrItemsArr = []
+      for (const i in attrItemsArr) {
+        newattrItemsArr.push(attrItemsArr[i].trim())
+      }
+      AttributesArr[prop] = newattrItemsArr.join(':')
+    }
     const attributeName = AttributesArr[prop].trim()
     const attributeSlug = slugify(attributeName, { lower: true })
-    const found = await mongoClient.db().collection(dbTable).findOne({ name })
-    // const found = await Model.find({ name: AttributesArr[prop] })
-    if (found.length) {
-      attributeIds.push(found._id)
+    const found = await mongoClient.db().collection(dbTable).findOne({ name: attributeName })
+    if (found) {
+      attributeIds.push(new ObjectId(found._id))
     } else {
       const attr = await mongoClient.db().collection(dbTable).insertOne({ name: attributeName, slug: attributeSlug })
-      if (attr && attr.insertedId) attributeIds.push(attr.insertedId)
-      // const attribute = await Model.create({ name: AttributesArr[prop] })
-      // if (attribute) product[dbTable].push(attribute.id)
+      if (attr && attr.insertedId) attributeIds.push(new ObjectId(attr.insertedId))
     }
   }
-  console.log('ARRTRRTT', attributeIds)
 
   return attributeIds
 }
 
 const createProducts = async (data: any, resolvedMedia: any, event: any) => {
-  let found: any
-  // console.log('data', data)
-  // console.log('GGGGGGGGGGGG')
-  // try {
-  //   found = await mongoClient.db().collection('oems').find().toArray()
-  //   console.log('FOUNDOEM')
-  //   return
-  // } catch (err) {
-  //   console.log('RRRRRRRR', err)
-  // }
+  try {
+    let found: any
+    let productCreateErr = ''
 
-  await Promise.all(
-    data.map(async (item: any) => {
-      let product = { ...item }
-      product.name = item.acsPartNumber
+    // console.log('data', data)
+    // console.log('GGGGGGGGGGGG')
+    // try {
+    //   found = await mongoClient.db().collection('oems').find().toArray()
+    //   console.log('FOUNDOEM')
+    //   return
+    // } catch (err) {
+    //   console.log('RRRRRRRR', err)
+    // }
+
+    // await Promise.all(
+    // data.map(async (item: any) => {
+    for (const prop in data) {
+      let product: any = {}
+      product.name = data[prop].acsPartNumber
+      product.slug = slugify(product.name, { lower: true })
       // product.eligibilities = []
       // product.nextHigherAssemblies = []
-      product.price = product.price * 1
-      product.tbq = item.tbq ? true : false
-      console.log('PRODUCT', product)
+      product.price = data[prop].price * 1
+      product.tbq = data[prop].tbq ? true : false
+      // console.log('PRODUCT', product)
       //     product.createdBy = (req as any).user.id
       let oem: any = {}
-      const oemName = item.oem.trim()
+      const oemName = data[prop].oem.trim()
       const oemSlug = slugify(oemName, { lower: true })
       found = await mongoClient.db().collection('oems').findOne({ name: oemName })
       if (found) {
         oem = found
-        product.oem = oem._id
+        product.oem = new ObjectId(oem._id)
       } else {
         oem = await mongoClient.db().collection('oems').insertOne({ name: oemName, slug: oemSlug })
-        if (oem && oem.insertedId) product.oem = oem.insertedId
+        if (oem && oem.insertedId) product.oem = new ObjectId(oem.insertedId)
       }
-      console.log('oem', oem)
 
-      let oemPartNumber: any = {}
-      const oemPartNumberName = item.oemPartNumber.trim()
-      const oemPartNumberSlug = slugify(oemPartNumberName, { lower: true })
-      found = await mongoClient.db().collection('oempartnumbers').findOne({ name: oemPartNumberName })
-      if (found) {
-        product.oemPartNumber = found._id
-      } else {
-        oemPartNumber = await mongoClient
-          .db()
-          .collection('oempartnumbers')
-          .insertOne({ name: oemPartNumberName, slug: oemPartNumberSlug, oem: oem._id })
-        if (oemPartNumber && oemPartNumber.insertedId) product.oemPartNumber = oemPartNumber.insertedId
-      }
-      console.log('oemPartNumber', oemPartNumber)
+      // let oemPartNumber: any = {}
+      // const oemPartNumberName = data[prop].oemPartNumber.trim()
+      // const oemPartNumberSlug = slugify(oemPartNumberName, { lower: true })
+      // found = await mongoClient.db().collection('oempartnumbers').findOne({ name: oemPartNumberName })
+      // if (found) {
+      //   product.oemPartNumber = new ObjectId(found._id)
+      // } else {
+      //   oemPartNumber = await mongoClient
+      //     .db()
+      //     .collection('oempartnumbers')
+      //     .insertOne({ name: oemPartNumberName, slug: oemPartNumberSlug, oem: new ObjectId(oem._id) })
+      //   if (oemPartNumber && oemPartNumber.insertedId) product.oemPartNumber = new ObjectId(oemPartNumber.insertedId)
+      // }
 
-      const image = await mongoClient
-        .db()
-        .collection('media')
-        .findOne({ originalFilename: `${product.productImage}.jpg` })
-      // console.log('IMG', image)
-      if (image) product.gallery = [image._id]
+      // const image = await mongoClient
+      //   .db()
+      //   .collection('media')
+      //   .findOne({ originalFilename: `${product.productImage}.jpg` })
+      // if (image) product.gallery = [new ObjectId(image._id)]
 
-      const eligibilities = await createSubModels('eligibilities', product.eligibilities)
+      // product.eligibilities = await createSubModels('eligibilities', product.eligibilities)
+      // product.nextHigherAssemblies = await createSubModels('nexthigherassemblies', product.nextHigherAssemblies)
 
       console.log('Product', product)
+
+      found = await mongoClient.db().collection('products').findOne({ name: product.name })
+      if (!found) {
+        const newProduct = await mongoClient.db().collection('products').insertOne(product)
+        if (!newProduct || newProduct.insertedId) productCreateErr += `Unable to create product ${product.name}`
+      }
 
       // await Media.find({ originalName: `${data[prop].productImage}.jpg` })
 
@@ -173,70 +185,209 @@ const createProducts = async (data: any, resolvedMedia: any, event: any) => {
       //   oemPartNumber = found[0]
       // }
       // product.oemPartNumber = oemPartNumber.id
-    })
-  )
-
-  fs.rename(resolvedMedia.originalPath, `${uploadPath}${resolvedMedia.name}`, async (uploadError) => {
-    try {
-      if (uploadError) throw new AppError(uploadError.message, 400)
-      if (resolvedMedia.size > 1 * 1024 * 1024) throw new AppError('File size must be less than 1 MB', 400)
-      if (!resolvedMedia.mimetype.includes('csv')) throw new AppError('Only csv format allowed!', 400)
-      console.log('ALL is good')
-    } catch (err) {
-      errorHandler(event, err)
     }
-  })
 
-  // for (const prop in data) {
-  // let product = { ...data[prop] }
-  // product.name = data[prop].acsPartNumber
-  // product.gallery = []
-  // product.eligibilities = []
-  // product.nextHigherAssemblies = []
-  // product.price = product.price * 1
-  // product.tbq = data[prop].tbq ? true : false
-  // console.log('PRODUCTxxxx', product)
-  // //     product.createdBy = (req as any).user.id
-  // let oem: any
-  // found = await mongoClient.db().collection('oems').findOne({ name: data[prop].oem.trim() })
-  // console.log('FOUNDOEM', found)
-  // if (!found.length) {
-  // 	// oem = await Oem.create({ name: data[prop].oem.trim() })
-  // } else {
-  // 	// oem = found[0]
-  // }
-  //     product.oem = oem.id
-  //     let oemPartNumber: IOempartnumber
-  //     found = await Oempartnumber.find({ name: data[prop].oemPartNumber.trim() })
-  //     if (!found.length) {
-  //       oemPartNumber = await Oempartnumber.create({ name: data[prop].oemPartNumber.trim(), parent: oem.id })
-  //     } else {
-  //       oemPartNumber = found[0]
-  //     }
-  //     product.oemPartNumber = oemPartNumber.id
-  //     product.oem = oem.id
-  //     const image = await Media.find({ originalName: `${data[prop].productImage}.jpg` })
-  //     if (image.length) product.gallery.push(image[0].id)
-  //     product = await createSubModels(product, 'eligibilities', Eligibility, data[prop].eligibilities)
-  //     product = await createSubModels(
-  //       product,
-  //       'nextHigherAssemblies',
-  //       Nexthigherassembly,
-  //       data[prop].nextHigherAssemblies
-  //     )
-  //     console.log(product)
-  //     await Product.create(product)
-  // }
+    fs.renameSync(resolvedMedia.originalPath, `${uploadPath}${resolvedMedia.name}`)
+    // , async (uploadError) => {
+    //   try {
+    //     if (uploadError) throw new AppError(uploadError.message, 400)
+    //     if (resolvedMedia.size > 1 * 1024 * 1024) throw new AppError('File size must be less than 1 MB', 400)
+    //     if (!resolvedMedia.mimetype.includes('csv')) throw new AppError('Only csv format allowed!', 400)
+    //     console.log('ALL is good')
+    //   } catch (err) {
+    //     errorHandler(event, err)
+    //   }
+    // })
+    if (productCreateErr) return { info: productCreateErr }
+    return { success: true }
+
+    // for (const prop in data) {
+    // let product = { ...data[prop] }
+    // product.name = data[prop].acsPartNumber
+    // product.gallery = []
+    // product.eligibilities = []
+    // product.nextHigherAssemblies = []
+    // product.price = product.price * 1
+    // product.tbq = data[prop].tbq ? true : false
+    // console.log('PRODUCTxxxx', product)
+    // //     product.createdBy = (req as any).user.id
+    // let oem: any
+    // found = await mongoClient.db().collection('oems').findOne({ name: data[prop].oem.trim() })
+    // console.log('FOUNDOEM', found)
+    // if (!found.length) {
+    // 	// oem = await Oem.create({ name: data[prop].oem.trim() })
+    // } else {
+    // 	// oem = found[0]
+    // }
+    //     product.oem = oem.id
+    //     let oemPartNumber: IOempartnumber
+    //     found = await Oempartnumber.find({ name: data[prop].oemPartNumber.trim() })
+    //     if (!found.length) {
+    //       oemPartNumber = await Oempartnumber.create({ name: data[prop].oemPartNumber.trim(), parent: oem.id })
+    //     } else {
+    //       oemPartNumber = found[0]
+    //     }
+    //     product.oemPartNumber = oemPartNumber.id
+    //     product.oem = oem.id
+    //     const image = await Media.find({ originalName: `${data[prop].productImage}.jpg` })
+    //     if (image.length) product.gallery.push(image[0].id)
+    //     product = await createSubModels(product, 'eligibilities', Eligibility, data[prop].eligibilities)
+    //     product = await createSubModels(
+    //       product,
+    //       'nextHigherAssemblies',
+    //       Nexthigherassembly,
+    //       data[prop].nextHigherAssemblies
+    //     )
+    //     console.log(product)
+    //     await Product.create(product)
+    // }
+  } catch (err) {
+    errorHandler(event, err)
+  }
 }
 
 const seedProducts = async (event: any) => {
-  console.log('FFFFFF')
+  let collections = await mongoClient.db().listCollections().toArray()
+  await Promise.all(
+    collections.map(async (item: any) => {
+      if (
+        item.name === 'products' ||
+        item.name === 'oems' ||
+        item.name === 'oempartnumbers' ||
+        item.name === 'eligibilities' ||
+        item.name === 'nexthigherassemblies'
+      )
+        await mongoClient.db().collection(item.name).drop()
+    })
+  )
+
+  const newCollections: string[] = ['oems', 'oempartnumbers', 'eligibilities', 'nexthigherassemblies']
+
+  await Promise.all(
+    newCollections.map(async (item: any) => {
+      if (item === 'oems' || item === 'oempartnumbers' || item === 'eligibilities' || item === 'nexthigherassemblies')
+        await mongoClient.db().createCollection(item, {
+          validator: {
+            $jsonSchema: {
+              required: ['name'],
+              properties: {
+                name: {
+                  bsonType: 'string',
+                  description: 'Product name is required and 50 characters max',
+                  maxLength: 200,
+                },
+                slug: {
+                  bsonType: 'string',
+                  description: 'Product slug is required',
+                },
+                description: {
+                  bsonType: 'string',
+                  description: 'Product description',
+                  maxLength: 2000,
+                },
+                sortOrder: {
+                  bsonType: 'string',
+                },
+              },
+            },
+          },
+        })
+
+      await mongoClient.db().collection(item).createIndex({ name: 1 }, { unique: true })
+    })
+  )
+  await mongoClient.db().createCollection('products', {
+    validator: {
+      $jsonSchema: {
+        required: ['name', 'slug', 'acsPartNumber'],
+        properties: {
+          name: {
+            bsonType: 'string',
+            description: 'Product name is required and 50 characters max',
+            maxLength: 50,
+          },
+          slug: {
+            bsonType: 'string',
+            description: 'Product slug is required',
+          },
+          description: {
+            bsonType: 'string',
+            description: 'Product description',
+            maxLength: 2000,
+          },
+          gallery: {
+            bsonType: 'array',
+            description: 'Product images',
+            uniqueItems: true,
+          },
+          acsPartNumber: {
+            bsonType: 'string',
+            description: 'ACS part Number is required',
+            maxLength: 20,
+          },
+          oemPartNumber: {
+            bsonType: 'string',
+            description: 'OEM part Number',
+            maxLength: 20,
+          },
+          oem: {
+            bsonType: 'string',
+            description: 'OEM',
+            maxLength: 20,
+          },
+          tbq: {
+            bsonType: 'bool',
+            description: 'Whether the product is to be quoted or not',
+          },
+          eligibilities: {
+            bsonType: 'array',
+            description: 'Product eligibilities',
+            uniqueItems: true,
+          },
+          categories: {
+            bsonType: 'array',
+            description: 'Product categories',
+            uniqueItems: true,
+          },
+          nextHigherAssemblies: {
+            bsonType: 'array',
+            description: 'Product nextHigherAssemblies',
+            uniqueItems: true,
+          },
+          price: {
+            bsonType: 'string',
+            description: 'Product price',
+            maxLength: 500,
+          },
+          salePrice: {
+            bsonType: 'string',
+            description: 'Product sale price',
+          },
+          sortOrder: {
+            bsonType: 'string',
+          },
+        },
+      },
+    },
+  })
+  await mongoClient.db().collection('products').createIndex({ name: 1 }, { unique: true })
+  await mongoClient
+    .db()
+    .collection('products')
+    .createIndex(
+      { name: 'text', oemPartNumber: 'text', description: 'text' },
+      { weights: { name: 3, oemPartNumber: 2, decsription: 1 } }
+    )
+
   // console.log('LIST', await mongoClient.db().listCollections().toArray())
   let uploadPromise = new Promise((resolve, reject) => {
     const form = formidable({ multiples: true })
     form.parse(event.req, (err: any, fields: any, files: any) => {
       // console.log('ARAAAA', Array.isArray(files.gallery))
       // console.log('FFFFFFF', files)
+
+      if (files.gallery.size > 1 * 1024 * 1024) reject('File size must be less than 1 MB')
+      if (!files.gallery.mimetype.includes('csv')) reject(new AppError('Only csv format allowed!', 404))
 
       const uploadedMedia = {
         name: `${files.gallery.newFilename}${extname(files.gallery.originalFilename)}`,
@@ -252,8 +403,29 @@ const seedProducts = async (event: any) => {
     })
   })
 
-  const resolvedMedia: any = await uploadPromise
-  console.log('MMMMMMMMMedia', resolvedMedia)
+  try {
+    const resolvedMedia: any = await uploadPromise
+    console.log('MMMMMMMMMedia', resolvedMedia)
+
+    const data: any[] = []
+    fs.createReadStream(`${resolvedMedia.originalPath}`)
+      .pipe(parse({ delimiter: ',', columns: true }))
+      .on('data', function (row) {
+        data.push(row)
+      })
+      .on('end', async function () {
+        await createProducts(data, resolvedMedia, event)
+        return {
+          status: 'succes',
+        }
+      })
+      .on('error', function (error) {
+        console.log(error.message)
+      })
+  } catch (err) {
+    errorHandler(event, err)
+  }
+
   // console.log(uploadPath)
 
   // let found: any
@@ -266,28 +438,6 @@ const seedProducts = async (event: any) => {
   // } catch (err) {
   //   console.log('RRRRRRRR', err)
   // }
-
-  const data: any[] = []
-  fs.createReadStream(`${resolvedMedia.originalPath}`)
-    .pipe(parse({ delimiter: ',', columns: true }))
-    .on('data', function (row) {
-      // console.log(row)
-      data.push(row)
-    })
-    .on('end', async function () {
-      // console.log('DDDDDDD', data)
-      // const found = await mongoClient.db().collection('oems').find().toArray()
-      // console.log('FOUNDOEM', found)
-      await createProducts(data, resolvedMedia, event)
-      return {
-        status: 'succes',
-      }
-    })
-    .on('error', function (error) {
-      console.log(error.message)
-    })
-
-  console.log('DATA', data)
 
   // const db = mongoose.connection.db
   // const collections = await db.listCollections().toArray()

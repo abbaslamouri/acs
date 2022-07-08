@@ -82,11 +82,18 @@ const createMedia = async (event: any) => {
   let uploadPromise = new Promise((resolve, reject) => {
     const form = formidable({ multiples: true })
     form.parse(event.req, (err: any, fields: any, files: any) => {
-      console.log('ARAAAA', Array.isArray(files.gallery))
-      console.log('FFFFFFF', files)
+      // console.log('ARAAAA', Array.isArray(files.gallery))
+      // console.log('FFFFFFF', files)
 
       const uploadedMedia = []
       if (!Array.isArray(files.gallery)) {
+        if (files.gallery.size > 1 * 1024 * 1024) reject(new AppError('File size must be less than 1 MB', 400))
+        if (
+          !files.gallery.mimetype.includes('image') &&
+          !files.gallery.mimetype.includes('pdf') &&
+          !files.gallery.mimetype.includes('csv')
+        )
+          reject(new AppError('Only image, pdf and csv format allowed!', 400))
         uploadedMedia[0] = {
           name: `${files.gallery.newFilename}${extname(files.gallery.originalFilename)}`,
           originalFilename: files.gallery.originalFilename,
@@ -99,6 +106,13 @@ const createMedia = async (event: any) => {
         }
       } else {
         for (const prop in files.gallery) {
+          if (files.gallery[prop].size > 1 * 1024 * 1024) reject(new AppError('File size must be less than 1 MB', 400))
+          if (
+            !files.gallery[prop].mimetype.includes('image') &&
+            !files.gallery[prop].mimetype.includes('pdf') &&
+            !files.gallery[prop].mimetype.includes('csv')
+          )
+            reject(new AppError('Only image, pdf and csv format allowed!', 400))
           uploadedMedia[prop] = {
             name: `${files.gallery[prop].newFilename}${extname(files.gallery[prop].originalFilename)}`,
             originalFilename: files.gallery[prop].originalFilename,
@@ -118,6 +132,24 @@ const createMedia = async (event: any) => {
   try {
     const resolvedMedia: any = await uploadPromise
     console.log('MMMMMMMMMedia', resolvedMedia)
+    let returnError = ''
+    const createdMediaNames = []
+    for (const prop in resolvedMedia) {
+      const found = await mongoClient
+        .db()
+        .collection('media')
+        .findOne({ originalFilename: resolvedMedia[prop].originalFilename })
+      if (found) {
+        console.log('FOUND')
+        returnError += `${resolvedMedia[prop].originalFilename} already exists <br>`
+      } else {
+        const newMedia = await mongoClient.db().collection('media').insertOne(resolvedMedia[prop])
+        console.log('NNNNN', newMedia)
+        if (!newMedia || !newMedia.insertedId)
+          returnError += `Unable to create ${resolvedMedia[prop].originalFilename} already exists <br>`
+        else createdMediaNames.push(resolvedMedia[prop].name)
+      }
+    }
     // console.log('FFFFF', extname(file.originalFilename))
 
     // const media = {
@@ -127,33 +159,36 @@ const createMedia = async (event: any) => {
     //   fileSize: file.size,
     //   filePath: `/uploads/${file.newFilename}${extname(file.originalFilename)}` || '/uploads/placeholder.png',
     // }
-    let found = {}
-    const savedMedia = await mongoClient.db().collection('media').insertMany(resolvedMedia)
-    console.log('SSSSSS', savedMedia)
+    // let found = {}
+    // const savedMedia = await mongoClient.db().collection('media').insertMany(resolvedMedia)
+    // console.log('SSSSSS', savedMedia)
     // if (savedMedia && savedMedia.insertedCount) {
     //   found = await mongoClient.db().collection('media').findOne({ _id: savedMedia.insertedId })
     //   // console.log('SSSSSS', found)
     // }
-
+    console.log('1', createdMediaNames)
     for (const prop in resolvedMedia) {
-      fs.rename(resolvedMedia[prop].originalPath, `${uploadPath}${resolvedMedia[prop].name}`, async (uploadError) => {
-        try {
-          if (uploadError) throw new AppError(uploadError.message, 400)
-          if (resolvedMedia[prop].size > 1 * 1024 * 1024) throw new AppError('File size must be less than 1 MB', 400)
-          if (
-            !resolvedMedia[prop].mimetype.includes('image') &&
-            !resolvedMedia[prop].mimetype.includes('pdf') &&
-            !resolvedMedia[prop].mimetype.includes('csv')
-          )
-            throw new AppError('Only image, pdf and csv format allowed!', 400)
-          console.log('ALL is good')
-        } catch (err) {
-          errorHandler(event, err)
-        }
-      })
+      console.log('2', resolvedMedia[prop].name)
+      if (createdMediaNames.includes(resolvedMedia[prop].name))
+        fs.renameSync(resolvedMedia[prop].originalPath, `${uploadPath}${resolvedMedia[prop].name}`)
+      // , async (uploadError) => {
+      //   try {
+      //     if (uploadError) throw new AppError(uploadError.message, 400)
+      //     if (resolvedMedia[prop].size > 1 * 1024 * 1024) throw new AppError('File size must be less than 1 MB', 400)
+      //     if (
+      //       !resolvedMedia[prop].mimetype.includes('image') &&
+      //       !resolvedMedia[prop].mimetype.includes('pdf') &&
+      //       !resolvedMedia[prop].mimetype.includes('csv')
+      //     )
+      //       throw new AppError('Only image, pdf and csv format allowed!', 400)
+      //     console.log('ALL is good')
+      //   } catch (err) {
+      //     errorHandler(event, err)
+      //   }
+      // })
     }
-
-    return fetchAll(event)
+    if (returnError) return { info: returnError }
+    return true
 
     // return found
 

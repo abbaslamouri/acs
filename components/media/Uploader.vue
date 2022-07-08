@@ -10,14 +10,14 @@ const media = ref([])
 const count = ref(0)
 const totalCount = ref(0)
 const page = ref(1)
-const perPage = ref(10)
+const perPage = ref(100)
 const keyword = ref('003')
 const showDropZone = ref(false)
 const fields = 'name, filePath, mimetype, originalFilename'
 let response = ''
 
 const mediaSort = reactive({
-  field: 'name',
+  field: 'originalFilename',
   order: '',
 })
 const mediaSortOptions = [
@@ -75,15 +75,15 @@ const handleUplodMedia = async (gallery) => {
     }
     response = await $fetch('/api/v1/media', { method: 'POST', body: formData })
     console.log('RES', response)
-    // if (!uploaded) return
+    if (!response) return
+    if (response.info) errorMsg.value = response.info
     // response = await $fetch('/api/v1/media', { method: 'POST', body: uploaded })
     // console.log('RES', response)
 
-    if (!response) return
+    // if (!response) return
     // for (const prop in media.value) {
     //   const i = response.media.findIndex((m) => m.originalName == media.value[prop].originalName)
     //   if
-    console.log('KKKKKKKKKKKKK')
     await fetchMedia()
   } catch (err) {
     console.log('EEEEEE', err.data)

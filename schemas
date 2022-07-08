@@ -1,0 +1,216 @@
+Eligibilitits
+{
+  $jsonSchema: {
+    required: [
+      'name'
+    ],
+    properties: {
+      name: {
+        bsonType: 'string',
+        description: 'Product name is required and 50 characters max',
+        maxLength: 200
+      },
+      slug: {
+        bsonType: 'string',
+        description: 'Product slug is required'
+      },
+      description: {
+        bsonType: 'string',
+        description: 'Product description',
+        maxLength: 2000
+      },
+      sortOrder: {
+        bsonType: 'string'
+      }
+    }
+  }
+}
+
+Media
+{
+  $jsonSchema: {
+    required: [
+      'name',
+      'originalFilename',
+      'mimetype',
+      'fileSize'
+    ],
+    properties: {
+      name: {
+        bsonType: 'string',
+        description: 'Media new filename'
+      },
+      originalFilename: {
+        bsonType: 'string',
+        description: 'Original file name'
+      },
+      altText: {
+        bsonType: 'string',
+        description: 'Media alt text',
+        maxLength: 50
+      },
+      caption: {
+        bsonType: 'string',
+        description: 'Media caption',
+        maxLength: 500
+      },
+      filePath: {
+        bsonType: 'string',
+        description: 'Media file path'
+      },
+      mimetype: {
+        bsonType: 'string',
+        description: 'Media mime type'
+      },
+      fileSize: {
+        bsonType: 'int',
+        description: 'Mediafile size'
+      },
+      sortOrder: {
+        bsonType: 'string'
+      },
+      userAddresses: {
+        bsonType: 'array',
+        description: 'User addresses no more than 10',
+        required: [
+          'name',
+          'addressLine1',
+          'city'
+        ],
+        uniqueItems: true,
+        maxItems: 2
+      }
+    }
+  }
+}
+
+Products
+{
+  $jsonSchema: {
+    required: [
+      'name',
+      'slug',
+      'acsPartNumber'
+    ],
+    properties: {
+      name: {
+        bsonType: 'string',
+        description: 'Product name is required and 50 characters max',
+        maxLength: 50
+      },
+      slug: {
+        bsonType: 'string',
+        description: 'Product slug is required'
+      },
+      description: {
+        bsonType: 'string',
+        description: 'Product description',
+        maxLength: 2000
+      },
+      gallery: {
+        bsonType: 'array',
+        description: 'Product images',
+        uniqueItems: true
+      },
+      acsPartNumber: {
+        bsonType: 'string',
+        description: 'ACS part Number is required',
+        maxLength: 20
+      },
+      oemPartNumber: {
+        bsonType: 'string',
+        description: 'OEM part Number',
+        maxLength: 20
+      },
+      oem: {
+        bsonType: 'string',
+        description: 'OEM',
+        maxLength: 20
+      },
+      tbq: {
+        bsonType: 'bool',
+        description: 'Whether the product is to be quoted or not'
+      },
+      eligibilities: {
+        bsonType: 'array',
+        description: 'Product eligibilities',
+        uniqueItems: true
+      },
+      nextHigherAssemblies: {
+        bsonType: 'array',
+        description: 'Product nextHigherAssemblies',
+        uniqueItems: true
+      },
+      price: {
+        bsonType: 'string',
+        description: 'Product price',
+        maxLength: 500
+      },
+      salePrice: {
+        bsonType: 'string',
+        description: 'Product sale price'
+      },
+      sortOrder: {
+        bsonType: 'string'
+      }
+    }
+  }
+}
+
+users{
+  $jsonSchema: {
+    required: [
+      'name',
+      'email',
+      'password',
+      'role'
+    ],
+    properties: {
+      name: {
+        bsonType: 'string',
+        description: 'Name is required, 2 charaters min and 50 characters maximum',
+        minLength: 2,
+        maxLength: 50
+      },
+      email: {
+        bsonType: 'string',
+        pattern: '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$',
+        description: 'Email is required'
+      },
+      password: {
+        bsonType: 'string',
+        description: 'Password is required, 8 characters minimum',
+        minLength: 8
+      },
+      role: {
+        'enum': [
+          'admin',
+          'shop-manager',
+          'customer',
+          'user'
+        ],
+        description: 'Can only be one of the enum values'
+      },
+      active: {
+        bsonType: 'bool'
+      },
+      verified: {
+        bsonType: 'bool'
+      },
+      sortOrder: {
+        bsonType: 'string'
+      },
+      userAddresses: {
+        bsonType: 'array',
+        description: 'User addresses no more than 10',
+        required: [
+          'name',
+          'addressLine1',
+          'city'
+        ],
+        uniqueItems: true,
+        maxItems: 2
+      }
+    }
+  }
+}
