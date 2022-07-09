@@ -2,23 +2,25 @@
 const config = useRuntimeConfig()
 
 const route = useRoute()
-// const { fetchAll, saveMedia, saveDoc, deleteDoc, deleteDocs } = useHttp()
+const { fetchAll } = useHttp()
 // const { message, errorMsg, showMediaSelector, galleryMedia } = useAppState()
+const errorMsg = useState('errorMsg')
+const message = useState('message')
 const selectedMedia = ref([])
 const toggleSlideout = ref(false)
 const media = ref([])
 const count = ref(0)
 const totalCount = ref(0)
 const page = ref(1)
-const perPage = ref(20)
+const perPage = ref(50)
 const keyword = ref('003')
 const showDropZone = ref(false)
-const fields = 'name, filePath, mimetype, originalFilename'
+// const fields = 'name, filePath, mimetype, originalFilename'
 let response = ''
 
 const mediaSort = reactive({
   field: 'originalFilename',
-  order: '',
+  order: '-',
 })
 const mediaSortOptions = [
   { key: 'sortOrder', name: 'Order' },
@@ -28,13 +30,15 @@ const mediaSortOptions = [
 
 const params = computed(() => {
   const params = {
-    fields,
+    match: '',
+    project: 'name, filePath, mimetype, originalFilename',
+    lookup: '',
     page: page.value,
     limit: perPage.value,
     sort: `${mediaSort.order}${mediaSort.field}`,
     keyword: keyword.value ? keyword.value : '',
   }
-  if (!keyword.value) delete params.keyword
+  // if (!keyword.value) delete params.keyword
   return params
 })
 
@@ -46,8 +50,8 @@ const pages = computed(() =>
 
 const fetchMedia = async () => {
   // selectedMedia.value = []
-  response = await $fetch('/api/v1/media', { params: params.value })
-  console.log('FETCHALLRES', response)
+  response = await fetchAll('media', params.value)
+  // console.log('FETCHALLRES', response)
   if (!response) return
   media.value = response.docs
   count.value = response.results

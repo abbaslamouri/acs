@@ -2,8 +2,8 @@ import formidable from 'formidable'
 import { extname } from 'path'
 import AppError from '~/server/utils/AppError'
 
-export default (event: any) => {
-  new Promise((resolve, reject) => {
+const uploadFile = (event: any) => {
+  return new Promise((resolve, reject) => {
     const form = formidable({ multiples: true })
     form.parse(event.req, (err: any, fields: any, files: any) => {
       if (files.media.size > 1 * 1024 * 1024) reject('File size must be less than 1 MB')
@@ -21,3 +21,5 @@ export default (event: any) => {
     })
   })
 }
+
+export default uploadFile

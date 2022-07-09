@@ -1,9 +1,10 @@
-import { fetchAllMedia, createMedia, deleteMedia } from '~~/server/controllers/v1/media'
+import { createMedia, deleteMedia } from '~~/server/controllers/v1/media'
+import { fetchAll } from '~/server/controllers/v1/factory'
 
 export default defineEventHandler(async (event) => {
   switch (event.req.method) {
     case 'GET':
-      return await fetchAllMedia(event)
+      return await fetchAll(event, 'media')
       break
 
     case 'POST':

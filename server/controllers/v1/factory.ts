@@ -74,7 +74,7 @@ const fetchAll = async (event: any, collection: string) => {
     pipeline.push({ $skip: skip })
     pipeline.push({ $limit: limit })
 
-    console.log('PP', pipeline)
+    // console.log('PP', pipeline)
 
     cursor = mongoClient.db().collection(collection).aggregate(pipeline)
     const docs = await cursor.toArray()

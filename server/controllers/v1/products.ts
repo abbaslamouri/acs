@@ -1,21 +1,69 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { extname } from 'path'
 import { parse } from 'csv-parse'
 import slugify from 'slugify'
-import formidable from 'formidable'
-import AppError from '~/server/utils/AppError'
 import errorHandler from '~/server/utils/errorHandler'
 import mongoClient from '~/server/utils/mongoClient'
 import { ObjectId } from 'mongodb'
 import { defaultSchema, productSchema } from '~/server/utils/mongoSchemas'
+import fileupload from './fileupload'
 
 const runtimeFile = fileURLToPath(new URL('./runtime', import.meta.url))
 const runtimeDir = path.dirname(`${runtimeFile}`)
 const uploadPath = `${path.join(runtimeDir, '../../public')}/uploads/`
 
-const createAttributesModels = async (dbTable: any, atrributes: any) => {
+const resetCollections = async () => {
+  // Drop products, categories, eligibilities, oems, oempartnumbers and nexhighasssemlies cllections
+  let collections = await mongoClient.db().listCollections().toArray()
+  await Promise.all(
+    collections.map(async (item: any) => {
+      if (
+        item.name === 'products' ||
+        item.name === 'oems' ||
+        item.name === 'oempartnumbers' ||
+        item.name === 'eligibilities' ||
+        item.name === 'nexthigherassemblies'
+      )
+        await mongoClient.db().collection(item.name).drop()
+    })
+  )
+
+  // Recreate categories, eligibilities, oems, oempartnumbers and nexhighasssemlies collections and indexes
+  const newCollections: string[] = ['oems', 'oempartnumbers', 'eligibilities', 'nexthigherassemblies']
+  await Promise.all(
+    newCollections.map(async (item: any) => {
+      if (item === 'oems' || item === 'oempartnumbers' || item === 'eligibilities' || item === 'nexthigherassemblies')
+        await mongoClient.db().createCollection(item, defaultSchema)
+      await mongoClient.db().collection(item).createIndex({ name: 1 }, { unique: true })
+    })
+  )
+
+  // Create products colection and indexes
+  await mongoClient.db().createCollection('products', productSchema)
+  await mongoClient.db().collection('products').createIndex({ name: 1 }, { unique: true })
+  await mongoClient
+    .db()
+    .collection('products')
+    .createIndex(
+      { name: 'text', oemPartNumber: 'text', description: 'text' },
+      { weights: { name: 3, oemPartNumber: 2, decsription: 1 } }
+    )
+}
+
+const createObjectAttributeCollection = async (collection: any, attribute: any) => {
+  let newObjectId: any
+  const found = await mongoClient.db().collection(collection).findOne({ name: attribute.name })
+  if (found) {
+    newObjectId = new ObjectId(found._id)
+  } else {
+    const createdAttribute = await mongoClient.db().collection(collection).insertOne(attribute)
+    if (createdAttribute && createdAttribute.insertedId) newObjectId = new ObjectId(createdAttribute.insertedId)
+  }
+  return newObjectId
+}
+
+const createArrayAttributeCollection = async (collection: any, atrributes: any) => {
   if (!atrributes) return []
   const attributeIds = []
   const AttributesArr = [...atrributes.split('|')]
@@ -31,15 +79,14 @@ const createAttributesModels = async (dbTable: any, atrributes: any) => {
     }
     const attributeName = AttributesArr[prop].trim()
     const attributeSlug = slugify(attributeName, { lower: true })
-    const found = await mongoClient.db().collection(dbTable).findOne({ name: attributeName })
+    const found = await mongoClient.db().collection(collection).findOne({ name: attributeName })
     if (found) {
       attributeIds.push(new ObjectId(found._id))
     } else {
-      const attr = await mongoClient.db().collection(dbTable).insertOne({ name: attributeName, slug: attributeSlug })
+      const attr = await mongoClient.db().collection(collection).insertOne({ name: attributeName, slug: attributeSlug })
       if (attr && attr.insertedId) attributeIds.push(new ObjectId(attr.insertedId))
     }
   }
-
   return attributeIds
 }
 
@@ -56,54 +103,47 @@ const createProducts = async (data: any, resolvedMedia: any, event: any) => {
       product.salePrice = data[prop].salePrice * 1
       product.sortOrder = 0
       product.tbq = data[prop].tbq ? true : false
-      let oem: any = {}
+
+      // Create OEMS
       const oemName = data[prop].oem.trim()
       const oemSlug = slugify(oemName, { lower: true })
-      found = await mongoClient.db().collection('oems').findOne({ name: oemName })
-      if (found) {
-        oem = found
-        product.oem = new ObjectId(oem._id)
-      } else {
-        oem = await mongoClient.db().collection('oems').insertOne({ name: oemName, slug: oemSlug })
-        if (oem && oem.insertedId) product.oem = new ObjectId(oem.insertedId)
-      }
+      const oemObjectId = await createObjectAttributeCollection('oems', { name: oemName, slug: oemSlug })
+      product.oem = oemObjectId
 
-      let oemPartNumber: any = {}
+      // Create OEM Part Numbers
       const oemPartNumberName = data[prop].oemPartNumber.trim()
       const oemPartNumberSlug = slugify(oemPartNumberName, { lower: true })
-      found = await mongoClient.db().collection('oempartnumbers').findOne({ name: oemPartNumberName })
-      if (found) {
-        product.oemPartNumber = new ObjectId(found._id)
-      } else {
-        oemPartNumber = await mongoClient
-          .db()
-          .collection('oempartnumbers')
-          .insertOne({ name: oemPartNumberName, slug: oemPartNumberSlug, oem: new ObjectId(oem._id) })
-        if (oemPartNumber && oemPartNumber.insertedId) product.oemPartNumber = new ObjectId(oemPartNumber.insertedId)
-      }
+      const oemPartNumberObjectId = await createObjectAttributeCollection('oempartnumbers', {
+        name: oemPartNumberName,
+        slug: oemPartNumberSlug,
+        oem: oemObjectId,
+      })
+      product.oemPartNumber = oemPartNumberObjectId
 
+      // Create Images
       const image = await mongoClient
         .db()
         .collection('media')
         .findOne({ originalFilename: `${data[prop].productImage}.jpg` })
       if (image) product.media = [new ObjectId(image._id)]
 
-      product.eligibilities = await createAttributesModels('eligibilities', data[prop].eligibilities)
-      product.nextHigherAssemblies = await createAttributesModels(
+      // Create Eligibilities
+      product.eligibilities = await createArrayAttributeCollection('eligibilities', data[prop].eligibilities)
+
+      // Create Next Higher Assembly
+      product.nextHigherAssemblies = await createArrayAttributeCollection(
         'nexthigherassemblies',
         data[prop].nextHigherAssemblies
       )
 
+      // Create product
       found = await mongoClient.db().collection('products').findOne({ name: product.name })
-      console.log('FOUND', found)
-
       if (!found) {
         const newProduct = await mongoClient.db().collection('products').insertOne(product)
         console.log('NEW', newProduct)
       }
     }
 
-    fs.renameSync(resolvedMedia.originalPath, `${uploadPath}${resolvedMedia.name}`)
     if (productCreateErr) return { info: productCreateErr }
     return { success: true }
   } catch (err) {
@@ -113,63 +153,9 @@ const createProducts = async (data: any, resolvedMedia: any, event: any) => {
 
 const seedProducts = async (event: any) => {
   try {
-    // Drop products, categories, eligibilities, oems, oempartnumbers and nexhighasssemlies cllections
-    let collections = await mongoClient.db().listCollections().toArray()
-    await Promise.all(
-      collections.map(async (item: any) => {
-        if (
-          item.name === 'products' ||
-          item.name === 'oems' ||
-          item.name === 'oempartnumbers' ||
-          item.name === 'eligibilities' ||
-          item.name === 'nexthigherassemblies'
-        )
-          await mongoClient.db().collection(item.name).drop()
-      })
-    )
+    await resetCollections()
 
-    // Recreate categories, eligibilities, oems, oempartnumbers and nexhighasssemlies collections and indexes
-    const newCollections: string[] = ['oems', 'oempartnumbers', 'eligibilities', 'nexthigherassemblies']
-    await Promise.all(
-      newCollections.map(async (item: any) => {
-        if (item === 'oems' || item === 'oempartnumbers' || item === 'eligibilities' || item === 'nexthigherassemblies')
-          await mongoClient.db().createCollection(item, defaultSchema)
-        await mongoClient.db().collection(item).createIndex({ name: 1 }, { unique: true })
-      })
-    )
-
-    // Create products colection and indexes
-    await mongoClient.db().createCollection('products', productSchema)
-    await mongoClient.db().collection('products').createIndex({ name: 1 }, { unique: true })
-    await mongoClient
-      .db()
-      .collection('products')
-      .createIndex(
-        { name: 'text', oemPartNumber: 'text', description: 'text' },
-        { weights: { name: 3, oemPartNumber: 2, decsription: 1 } }
-      )
-
-    // Setup formidable fileupload
-    const uploadPromise = new Promise((resolve, reject) => {
-      const form = formidable({ multiples: true })
-      form.parse(event.req, (err: any, fields: any, files: any) => {
-        if (files.media.size > 1 * 1024 * 1024) reject('File size must be less than 1 MB')
-        if (!files.media.mimetype.includes('csv')) reject(new AppError('Only csv format allowed!', 404))
-        const uploadedMedia = {
-          name: `${files.media.newFilename}${extname(files.media.originalFilename)}`,
-          originalFilename: files.media.originalFilename,
-          mimetype: files.media.mimetype,
-          fileSize: files.media.size,
-          originalPath: files.media.filepath,
-          filePath:
-            `/uploads/${files.media.newFilename}${extname(files.media.originalFilename)}` || '/uploads/placeholder.png',
-        }
-        resolve(uploadedMedia)
-      })
-    })
-
-    const resolvedMedia: any = await uploadPromise
-    console.log('MMMMMMMMMedia', resolvedMedia)
+    const resolvedMedia: any = await fileupload(event)
 
     const data: any[] = []
     fs.createReadStream(`${resolvedMedia.originalPath}`)
@@ -179,13 +165,14 @@ const seedProducts = async (event: any) => {
       })
       .on('end', async function () {
         await createProducts(data, resolvedMedia, event)
-        return {
-          status: 'succes',
-        }
+        fs.renameSync(resolvedMedia.originalPath, `${uploadPath}${resolvedMedia.name}`)
+        console.log('Products Created')
       })
       .on('error', function (error) {
         console.log(error.message)
       })
+
+    return 'File Uploaded and productuct creation underway....'
   } catch (err) {
     errorHandler(event, err)
   }
