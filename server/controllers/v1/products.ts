@@ -7,7 +7,7 @@ import errorHandler from '~/server/utils/errorHandler'
 import mongoClient from '~/server/utils/mongoClient'
 import { ObjectId } from 'mongodb'
 import { defaultSchema, productSchema } from '~/server/utils/mongoSchemas'
-import fileupload from './fileupload'
+import fileUpload from './fileupload'
 
 const runtimeFile = fileURLToPath(new URL('./runtime', import.meta.url))
 const runtimeDir = path.dirname(`${runtimeFile}`)
@@ -155,7 +155,7 @@ const seedProducts = async (event: any) => {
   try {
     await resetCollections()
 
-    const resolvedMedia: any = await fileupload(event)
+    const resolvedMedia: any = await fileUpload(event)
 
     const data: any[] = []
     fs.createReadStream(`${resolvedMedia.originalPath}`)
