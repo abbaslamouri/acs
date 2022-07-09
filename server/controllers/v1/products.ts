@@ -7,7 +7,7 @@ import errorHandler from '~/server/utils/errorHandler'
 import mongoClient from '~/server/utils/mongoClient'
 import { ObjectId } from 'mongodb'
 import { defaultSchema, productSchema } from '~/server/utils/mongoSchemas'
-import fileUpload from '~/server/controllers/v1/fileupload'
+import fileUpload from '~/server/controllers/v1/fileUpload'
 
 const runtimeFile = fileURLToPath(new URL('./runtime', import.meta.url))
 const runtimeDir = path.dirname(`${runtimeFile}`)

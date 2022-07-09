@@ -2,7 +2,7 @@ import formidable from 'formidable'
 import { extname } from 'path'
 import AppError from '~/server/utils/AppError'
 
-const uploadFile = (event: any) => {
+const fileUpload = (event: any) => {
   return new Promise((resolve, reject) => {
     const form = formidable({ multiples: true })
     form.parse(event.req, (err: any, fields: any, files: any) => {
@@ -22,4 +22,4 @@ const uploadFile = (event: any) => {
   })
 }
 
-export default uploadFile
+export default fileUpload
