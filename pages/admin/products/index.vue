@@ -14,10 +14,10 @@ const totalCount = ref(null) // Total item count in the database
 const count = ref(null) // item count taking into account params
 const page = ref(1)
 const perPage = ref(10)
-const fields = '-updatedAt'
+const fields = 'name, acsPartNumber, gallery, eligibilities'
 const keyword = ref('')
 const sort = reactive({
-  field: 'createdAt',
+  field: 'acsPartNumber',
   order: '-',
 })
 
@@ -33,7 +33,7 @@ const params = computed(() => {
     fields,
     page: page.value,
     limit: perPage.value,
-    sort: `${sort.order}${sort.field}, _id `,
+    sort: `${sort.order}${sort.field}`,
     keyword: keyword.value ? keyword.value : null,
   }
   if (!keyword.value) delete params.keyword
@@ -124,7 +124,7 @@ await fetchAllProducts()
             />
             <Search class="flex-1" @searchKeywordSelected="handleSearch" v-if="totalCount && products.length > 1" />
           </div>
-          <!-- <AdminEcommerceProductsList :products="products" :totalCount="totalCount" @deleteProduct="deleteProduct" /> -->
+          <!-- <AdminProductsList :products="products" :totalCount="totalCount" @deleteProduct="deleteProduct" /> -->
         </div>
       </main>
       <footer class="w-full max-width-130">

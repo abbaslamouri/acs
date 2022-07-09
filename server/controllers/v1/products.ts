@@ -489,7 +489,63 @@ const seedProducts = async (event: any) => {
   //   })
 }
 
-export { setProductAuthor, seedProducts }
+const fetchAllProducts = async (event: any) => {
+  const query: any = useQuery(event)
+  console.log('Query', query)
+
+  const fieldsArr = query.fields ? query.fields.split(',') : []
+  const fieldsObj = {}
+  for (const prop in fieldsArr) {
+    console.log(fieldsArr[prop])
+    fieldsObj[fieldsArr[prop].trim()] = 1
+  }
+
+  // if(query.sort.startsWith("-")) sortObject= {}
+  const sortArr = query.sort.split('-')
+  console.log('SPLIT', sortArr)
+  const sortObj = {}
+  if (sortArr.length === 1) sortObj[sortArr[0]] = 1
+  else sortObj[sortArr[1]] = -1
+
+  const page = query.page && query.page * 1 >= 1 ? query.page * 1 : 1
+  const limit = query.limit && query.limit * 1 >= 1 ? query.limit * 1 : 1000
+  const skip = (page - 1) * limit
+
+  try {
+    let docs: any
+    let cursor: any
+    const totalCount = await mongoClient.db().collection('products').countDocuments()
+    const aggregation: any = [
+      { $lookup: { from: 'media', localField: 'gallery', foreignField: '_id', as: 'gallery' } },
+      { $lookup: { from: 'eligibilities', localField: 'eligibilities', foreignField: '_id', as: 'eligibilities' } },
+      { $skip: skip },
+      { $limit: limit },
+    ]
+    if (sortObj) aggregation.push({ $sort: sortObj })
+    if (fieldsObj) aggregation.push({ $project: { ...fieldsObj } })
+    console.log('AGGGG', aggregation)
+    cursor = mongoClient.db().collection('products').aggregate(aggregation)
+    // cursor = mongoClient.db().collection('products').find()
+    // if (fieldsObj) cursor = cursor.project({ ...fieldsObj })
+    // if (sortObj) cursor = cursor.sort(sortObj)
+    // cursor = cursor.skip(skip).limit(limit)
+
+    docs = await cursor.toArray()
+
+    // const docs = await mongoClient.db().collection('media').find().toArray()
+    // const cursor = mongoClient.db().collection('media').find()
+    if (!docs) throw new AppError('We were not able to fetch media', 400)
+    return {
+      docs,
+      totalCount,
+      count: docs.length,
+    }
+  } catch (err) {
+    errorHandler(event, err)
+  }
+}
+
+export { setProductAuthor, seedProducts, fetchAllProducts }
 
 // import AppError from '~/server/utils/AppError'
 // import mongoClient from '~/mongo'
