@@ -5,7 +5,7 @@ definePageMeta({
 const title = ref('Users | YRL')
 
 // const config = useRuntimeConfig()
-const { errorMsg, message } = useAppState()
+// const { errorMsg, message } = useAppState()
 // const { fetchAll, fetchDoc, saveDoc, deleteDoc, deleteDocs } = useHttp()
 
 const users = ref([])

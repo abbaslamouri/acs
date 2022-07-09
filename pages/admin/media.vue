@@ -6,7 +6,7 @@ const title = ref('Media | YRL')
 </script>
 
 <template>
-  <div class="overflow-auto w-full">
+  <div class="overflow-auto w-full h-full">
     <MediaUploader />
   </div>
 </template>

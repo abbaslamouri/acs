@@ -1,6 +1,6 @@
 // modules/module.mjs
 // import mongoose from 'mongoose'
-import mongoClient from '../mongo'
+import mongoClient from '../server/utils/mongoClient'
 
 // import { MongomongoClient } from 'mongodb'
 

@@ -1,7 +1,7 @@
 <script setup>
 const product = useState('product')
-const { saveDoc, deleteDoc } = useHttp()
-const { message } = useAppState()
+// const { saveDoc, deleteDoc } = useHttp()
+// const { message } = useAppState()
 
 const newEligibility = ref({ name: '' })
 const eligibilityInputRef = ref('')

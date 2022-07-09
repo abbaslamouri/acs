@@ -1,9 +1,9 @@
 <script setup>
 const emit = defineEmits(['saveAttributes', 'updateAttributes', 'toggleAttributesSlideout'])
 
-const { fetchAll } = useHttp()
+// const { fetchAll } = useHttp()
 const product = useState('product')
-const { errorMsg, alert } = useAppState()
+// const { errorMsg, alert } = useAppState()
 const allAttributes = ref([])
 const attributeToDelteIndex = ref(null)
 const attributeIndex = ref(null)

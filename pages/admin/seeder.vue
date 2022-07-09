@@ -5,9 +5,9 @@ definePageMeta({
 const title = ref('Seeder | YRL')
 
 const config = useRuntimeConfig()
-const { errorMsg, message } = useAppState()
-const { fetchAll, deleteDoc, deleteDocs } = useHttp()
-const { seedProducts, seedCountries, seedStates } = useHttp()
+// const { errorMsg, message } = useAppState()
+// const { fetchAll, deleteDoc, deleteDocs } = useHttp()
+const { productSeeder } = useHttp()
 
 const showDropZone = ref(false)
 
@@ -79,20 +79,19 @@ const uploadFile = async (files) => {
     const formData = new FormData()
 
     if (fileToUpload.value === 'products') {
-      console.log('HHHHHHHH')
-      formData.append('gallery', files[0])
-      const response = await $fetch('/api/v1/products/seeder', { method: 'POST', body: formData })
-      console.log('FETCHALLRES', response)
+      formData.append('media', files[0])
+      const response = await productSeeder(formData)
+      console.log('SEEDER', response)
     }
 
     if (fileToUpload.value === 'countries') {
-      formData.append('gallery', files[0])
+      formData.append('media', files[0])
       const response = await seedCountries(formData)
       console.log('RES', response)
     }
 
     if (fileToUpload.value === 'states') {
-      formData.append('gallery', files[0])
+      formData.append('media', files[0])
       const response = await seedStates(formData)
       console.log('RES', response)
     }

@@ -59,7 +59,7 @@ const deleteUser = (userId) => {
               v-if="
                 user.gallery && user.gallery.length && user.gallery[0] && user.gallery[0].mimetype.includes('image')
               "
-              :src="`${config.backendUrl}/${user.gallery[0].path}`"
+              :src="`${config.siteUrl}/${user.gallery[0].path}`"
             />
             <img v-else class="w-full hfull contain" :src="`/placeholder.png`" />
           </div>

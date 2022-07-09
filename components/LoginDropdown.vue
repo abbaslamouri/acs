@@ -2,8 +2,8 @@
 const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
-const { loggedInUser, token, isAuthenticated, signin } = useAuth()
-const { errorMsg, message } = useAppState()
+// const { loggedInUser, token, isAuthenticated, signin } = useAuth()
+// const { errorMsg, message } = useAppState()
 const showAuthDropdown = ref(false)
 const formUser = reactive({
   email: '',

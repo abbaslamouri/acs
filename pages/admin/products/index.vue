@@ -1,27 +1,27 @@
 <script setup>
-import ListFallback from '~~/components/admin/ListFallback.vue'
 definePageMeta({
   layout: 'admin',
 })
 const title = ref('Products | YRL')
 
 const config = useRuntimeConfig()
-const { errorMsg, message } = useAppState()
-const { fetchAll, deleteDoc, deleteDocs } = useHttp()
+// const { errorMsg, message } = useAppState()
+const { fetchAll } = useHttp()
 
 const products = ref([])
-const totalCount = ref(null) // Total item count in the database
+const totalCount = ref(0) // Total item count in the database
 const count = ref(null) // item count taking into account params
 const page = ref(1)
 const perPage = ref(10)
-const fields = 'name, acsPartNumber, gallery, eligibilities'
+// const project = 'name, acsPartNumber, gallery, eligibilities'
+// const lookup = 'gallery, eligibilities'
 const keyword = ref('')
 const sort = reactive({
   field: 'acsPartNumber',
   order: '-',
 })
 
-let response = null
+let response
 const sortOptions = [
   { key: 'sortOrder', name: 'Order' },
   { key: 'name', name: 'Name' },
@@ -30,13 +30,15 @@ const sortOptions = [
 
 const params = computed(() => {
   const params = {
-    fields,
+    match: '',
+    project: 'name, acsPartNumber, price, media, eligibilities',
+    lookup: 'media, eligibilities',
     page: page.value,
     limit: perPage.value,
     sort: `${sort.order}${sort.field}`,
-    keyword: keyword.value ? keyword.value : null,
+    keyword: keyword.value ? keyword.value : '',
   }
-  if (!keyword.value) delete params.keyword
+  // if (!keyword.value) delete params.keyword
   return params
 })
 
@@ -47,19 +49,11 @@ const pages = computed(() => {
 })
 
 const fetchAllProducts = async () => {
-  // selectedMedia.value = []
-  response = await $fetch('/api/v1/products', { params: params.value })
-  console.log('FETCHALLRES', response)
+  response = await fetchAll('products', params.value)
   if (!response) return
   products.value = response.docs
   count.value = response.results
   totalCount.value = response.totalCount
-
-  // response = await fetchAll('products', params.value)
-  // console.log(response)
-  // products.value = response.docs
-  // count.value = response.results
-  // totalCount.value = response.totalCount
 }
 
 const handleSearch = async (searchKeyword) => {
@@ -100,7 +94,7 @@ await fetchAllProducts()
 </script>
 
 <template>
-  <div class="flex-1 flex flex-col p-6">
+  <div class="h-full flex flex-col p-6 border-6">
     <Title>{{ title }}</Title>
     <div class="flex-1 flex flex-col justify-between gap-3" v-if="totalCount">
       <header class="flex flex-row items-center justify-between w-full">
@@ -124,14 +118,14 @@ await fetchAllProducts()
             />
             <Search class="flex-1" @searchKeywordSelected="handleSearch" v-if="totalCount && products.length > 1" />
           </div>
-          <!-- <AdminProductsList :products="products" :totalCount="totalCount" @deleteProduct="deleteProduct" /> -->
+          <AdminProductsList :products="products" :totalCount="totalCount" @deleteProduct="deleteProduct" />
         </div>
       </main>
       <footer class="w-full max-width-130">
-        <!-- <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1 && !keyword" /> -->
+        <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1 && !keyword" />
       </footer>
     </div>
-    <ListFallback v-else>
+    <AdminListFallback v-else>
       <template #header>Add your first physical or digital product</template>
       <template #default>
         <div class="">Add your product and variants. Products must have at least a name and a price</div>
@@ -142,7 +136,7 @@ await fetchAllProducts()
           <span>Add</span>
         </NuxtLink>
       </template>
-    </ListFallback>
+    </AdminListFallback>
   </div>
 </template>
 

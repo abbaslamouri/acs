@@ -27,26 +27,26 @@ const setCurrentPage = async (p) => {
 </script>
 
 <template>
-  <nav class="flex-row justify-center items-center gap-4">
-    <div class="pagination flex-row justify-center gap-05">
+  <nav class="flex flex-row justify-center items-center gap-4">
+    <div class="pagination flex bg-currentflex-row justify-center gap-1">
       <span class="page" @click="setCurrentPage(1)" :class="{ disabled: page == 1 }">
-        <IconsDoubleArrowLeft />
+        <IconsChevronsLeft class="w-5 h-5" />
       </span>
       <span class="page" @click="setCurrentPage(page - 1)" :class="{ disabled: page == 1 }">
-        <IconsChevronLeft />
+        <IconsChevronLeft class="w-4 h-4" />
       </span>
-      <div class="pagination flex-row justify-center gap-05" v-if="pages <= 5">
+      <div class="pagination flex flex-row justify-center gap-1" v-if="pages <= 5">
         <span v-for="p in pages" class="page" @click="setCurrentPage(p)" :class="{ active: active == p }">
           {{ p }}
         </span>
       </div>
-      <div class="pagination flex-row justify-center gap-05" v-else>
-        <div class="pagination flex-row justify-center gap-05" v-if="page <= 3">
+      <div class="pagination flex flex-row justify-center gap-1" v-else>
+        <div class="pagination flex-row justify-center gap-1" v-if="page <= 3">
           <span v-for="p in 5" class="page" @click="setCurrentPage(p)" :class="{ active: active == p }">
             {{ p }}
           </span>
         </div>
-        <div class="pagination flex-row justify-center gap-05" v-else-if="page > 3 && page < pages - 3">
+        <div class="pagination flex flex-row justify-center gap-1" v-else-if="page > 3 && page < pages - 3">
           <span
             v-for="p in 5"
             class="page"
@@ -56,7 +56,7 @@ const setCurrentPage = async (p) => {
             {{ page - 3 + p }}
           </span>
         </div>
-        <div class="pagination flex-row justify-center gap-05" v-else>
+        <div class="pagination flex flex-row justify-center gap-05" v-else>
           <span
             v-for="p in 5"
             class="page"
@@ -68,16 +68,16 @@ const setCurrentPage = async (p) => {
         </div>
       </div>
       <span class="page" @click="setCurrentPage(page + 1)" :class="{ disabled: page >= pages }">
-        <IconsChevronRight />
+        <IconsChevronRight class="w-4 h-4" />
       </span>
       <span class="page" @click="setCurrentPage(pages)" :class="{ disabled: page >= pages }">
-        <IconsDoubleArrowRight />
+        <IconsChevronsRight class="w-5 h-5" />
       </span>
     </div>
-    <div class="flex-row items-center gap-1 text-sm">
+    <div class="flex flex-row items-center gap-2 text-sm">
       <span class="">Go&nbsp;to&nbsp;page</span>
-      <label class="base-select min-w-6">
-        <select class="select min-h-20" v-model="page" @change="setCurrentPage(parseInt($event.target.value))">
+      <label class="base-select border-2 rounded px-2">
+        <select class="min-h-8 min-w-20" v-model="page" @change="setCurrentPage(parseInt($event.target.value))">
           <option v-for="p in pages" :key="p" :value="p">{{ p }}</option>
         </select>
       </label>
@@ -91,8 +91,8 @@ const setCurrentPage = async (p) => {
 
 .base-select {
   select {
-    min-height: 3.1rem;
-    padding: 0 1rem;
+    // min-height: 3.1rem;
+    // padding: 0 1rem;
   }
   &::after {
     content: '';
@@ -105,10 +105,10 @@ const setCurrentPage = async (p) => {
   align-items: center;
   justify-content: center;
   border: 1px solid $slate-400;
-  width: 3rem;
-  height: 3rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 2px;
-  font-size: 1.2rem;
+  font-size: 1rem;
   cursor: pointer;
 
   svg {

@@ -2,15 +2,15 @@
 const config = useRuntimeConfig()
 
 const route = useRoute()
-const { fetchAll, saveMedia, saveDoc, deleteDoc, deleteDocs } = useHttp()
-const { message, errorMsg, showMediaSelector, galleryMedia } = useAppState()
+// const { fetchAll, saveMedia, saveDoc, deleteDoc, deleteDocs } = useHttp()
+// const { message, errorMsg, showMediaSelector, galleryMedia } = useAppState()
 const selectedMedia = ref([])
 const toggleSlideout = ref(false)
 const media = ref([])
 const count = ref(0)
 const totalCount = ref(0)
 const page = ref(1)
-const perPage = ref(100)
+const perPage = ref(20)
 const keyword = ref('003')
 const showDropZone = ref(false)
 const fields = 'name, filePath, mimetype, originalFilename'
@@ -168,7 +168,7 @@ await fetchMedia()
 </script>
 
 <template>
-  <div class="media-uploader flex-col h-full">
+  <div class="media-uploader flex flex-col justify-between h-full border-6">
     <div class="top">
       <div class="file-actions">
         <MediaFileActions
@@ -205,7 +205,7 @@ await fetchMedia()
         />
       </div>
       <div class="pagination">
-        <!-- <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1 && !keyword" /> -->
+        <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1" />
       </div>
     </div>
     <div class="actions bg-slate-300 py-2 px-4 flex-row gap-2 justify-end" v-if="route.name !== 'admin-media'">
@@ -221,7 +221,7 @@ await fetchMedia()
           <div class="w-20 h-20">
             <!-- <img
               class="w-full h-full contain"
-              :src="`${config.backendUrl}/${selectedMedia[0].path}`"
+              :src="`${config.siteUrl}/${selectedMedia[0].path}`"
               :alt="`${selectedMedia[0].originalName} Photo`"
             /> -->
           </div>

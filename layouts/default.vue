@@ -1,5 +1,5 @@
 <script setup>
-const { isAuthenticated } = useAuth()
+// const { isAuthenticated } = useAuth()
 // const { showCartSlideout } = useAppState()
 </script>
 

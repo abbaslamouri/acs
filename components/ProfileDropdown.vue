@@ -1,6 +1,6 @@
 <script setup>
-const { loggedInUser, token, isAuthenticated, signout } = useAuth()
-const { errorMsg, message } = useAppState()
+// const { loggedInUser, token, isAuthenticated, signout } = useAuth()
+// const { errorMsg, message } = useAppState()
 const showProfileDropdown = ref(false)
 
 const lougout = async () => {

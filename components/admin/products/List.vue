@@ -44,32 +44,38 @@ const deleteProduct = (productId) => {
         <th class="w-6">Image</th>
         <th>Name</th>
         <th>Price</th>
-        <th>Sale Price</th>
-        <th>Stock Qty.</th>
-        <th>Orders</th>
-        <th>Sales</th>
+        <!-- <th>Sale Price</th> -->
+        <!-- <th>Stock Qty.</th> -->
+        <!-- <th>Orders</th> -->
+        <!-- <th>Sales</th> -->
         <th class="text-right min-w-12">actions</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="(product, index) in products" :key="product._id">
-        <td class="w-10 flex-row justify-center items-center">
-          <div class="w-8 h-8 justify-center items-center">
+        <td class="flex-row justify-center items-center">
+          <div class="justify-center items-center w-16 h-16">
             <img
               class="w-full h-full cover"
-              v-if="product.gallery.length && product.gallery[0] && product.gallery[0].mimetype.includes('image')"
-              :src="`${config.backendUrl}/${product.gallery[0].path}`"
+              v-if="
+                product.media &&
+                product.media.length &&
+                product.media[0] &&
+                product.media[0].mimetype &&
+                product.media[0].mimetype.includes('image')
+              "
+              :src="`${config.siteUrl}/${product.media[0].filePath}`"
             />
-            <img v-else class="w-full hfull contain" :src="`/placeholder.png`" />
+            <img v-else class="w-full hfull contain" src="/placeholder.png" />
           </div>
         </td>
         <td class="text-center font-bold">{{ product.name }}</td>
-        <td class="w-12 text-center">{{ product.price }}</td>
-        <td class="w-12 text-center">{{ product.salePrice }}</td>
-        <td class="w-12 text-center">{{ product.stockQty }}</td>
-        <td class="w-12 text-center">{{ product.orders }}</td>
-        <td class="w-12 text-center">{{ product.sales }}</td>
-        <td class="w-12">
+        <td class="text-center">{{ product.price }}</td>
+        <!-- <td class="text-center">{{ product.salePrice }}</td> -->
+        <!-- <td class="w-12 text-center">{{ product.stockQty }}</td> -->
+        <!-- <td class="w-12 text-center">{{ product.orders }}</td> -->
+        <!-- <td class="w-12 text-center">{{ product.sales }}</td> -->
+        <td class="w-[10rem]">
           <AdminRowActions
             :showAction="showActionKeys[index]"
             :showEdit="true"
@@ -91,10 +97,10 @@ tr {
   border-bottom: 1px solid $slate-300;
 }
 th {
-  padding: 2rem;
+  padding: 1rem;
 }
 td {
-  padding: 1rem;
+  padding: .5rem;
 
   // border: 1px solid red;
 }

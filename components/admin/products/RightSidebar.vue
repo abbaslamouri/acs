@@ -2,7 +2,7 @@
 defineEmits(['saveProduct'])
 
 const product = useState('product')
-const { fetchAll } = useHttp()
+// const { fetchAll } = useHttp()
 
 const selectedCategoryIds = ref([])
 

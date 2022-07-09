@@ -1,9 +1,9 @@
-import { fetchAllProducts } from '~/server/controllers/v1/products'
+import { fetchAll } from '~/server/controllers/v1/factory'
 
 export default defineEventHandler(async (event) => {
   switch (event.req.method) {
     case 'GET':
-      return await fetchAllProducts(event)
+      return await fetchAll(event, 'products')
       break
 
     case 'POST':

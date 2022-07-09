@@ -1,5 +1,5 @@
 const useCart = () => {
-  const { errorMsg, message } = useAppState()
+  // const { errorMsg, message } = useAppState()
   const config = useRuntimeConfig()
   const cart = useState('cart', () => {
     return {}

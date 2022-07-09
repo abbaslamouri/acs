@@ -1,7 +1,9 @@
 const useHttp = () => {
   const config = useRuntimeConfig()
-  const { errorMsg, message } = useAppState()
+  // const { errorMsg, message } = useAppState()
   const { token } = useAuth()
+  const errorMsg = useState('errorMsg')
+  const message = useState('errorMsg')
 
   const getErrorStr = (errors) => {
     console.log('MYERROR', errors)
@@ -12,28 +14,22 @@ const useHttp = () => {
     return `<ul>${errorStr}</ul>`
   }
 
-  const fetchAll = async (resource, params = {}) => {
-    errorMsg.value = null
-    message.value = null
+  const fetchAll = async (collection, params = {}) => {
+    errorMsg.value = ''
+    message.value = ''
     try {
-      const esc = encodeURIComponent
-      const query = Object.keys(params)
-        .map((k) => esc(k) + '=' + esc(params[k]))
-        .join('&')
-      const response = await fetch(`${config.apiUrl}/${resource}?${query}`, {
+      const response = await $fetch(`/api/v1/${collection}`, {
         method: 'GET',
-        headers: new Headers({
-          'Content-Type': 'application/json',
+        params,
+        headers: {
           Authorization: `Bearer ${token.value}`,
-        }),
+        },
       })
-      // console.log(response)
-      if (response.ok) return await response.json()
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
+      console.log(response)
+      return response
     } catch (err) {
       console.log('MYERROR', err)
-      errorMsg.value = err
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
       return { docs: [], count: 0, totalCount: 0 }
     }
   }
@@ -328,6 +324,26 @@ const useHttp = () => {
     }
   }
 
+  const productSeeder = async (body) => {
+    errorMsg.value = ''
+    message.value = ''
+    try {
+      const response = await $fetch(`/api/v1/products/seeder`, {
+        method: 'POST',
+        body,
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      })
+      console.log(response)
+      return response
+    } catch (err) {
+      console.log('MYERROR', err)
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
+      return false
+    }
+  }
+
   // const productsSearchAll = async (params = {}) => {
   // 	errorMsg.value = null
   // 	message.value = null
@@ -365,6 +381,7 @@ const useHttp = () => {
     seedCountries,
     seedStates,
     saveOrder,
+    productSeeder,
   }
 }
 

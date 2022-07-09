@@ -1,6 +1,6 @@
 const useAuth = () => {
   const config = useRuntimeConfig()
-  const { errorMsg, message } = useAppState()
+  // const { errorMsg, message } = useAppState()
 
   const loggedInUser = useState('loggedInUser', () =>
     useCookie('loggedInUser') && useCookie('loggedInUser').value ? useCookie('loggedInUser').value : {}

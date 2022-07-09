@@ -1,5 +1,5 @@
 import AppError from '~/server/utils/AppError'
-import mongoClient from '~/mongo'
+import mongoClient from '~~/server/utils/mongoClient'
 import errorHandler from '~/server/utils/errorHandler'
 
 const fetchAllUsers = async (event: any) => {

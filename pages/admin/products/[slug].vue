@@ -5,8 +5,8 @@ definePageMeta({
 const pageTitle = ref('Product | YRL')
 
 const config = useRuntimeConfig()
-const { errorMsg, message, galleryMedia, mediaReference, showMediaSelector } = useAppState()
-const { fetchAll, saveMedia, saveDoc, deleteDocs } = useHttp()
+// const { errorMsg, message, galleryMedia, mediaReference, showMediaSelector } = useAppState()
+// const { fetchAll, saveMedia, saveDoc, deleteDocs } = useHttp()
 const route = useRoute()
 const router = useRouter()
 
