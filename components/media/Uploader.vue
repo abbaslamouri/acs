@@ -1,5 +1,6 @@
 <script setup>
 const config = useRuntimeConfig()
+// console.log(config)
 
 const route = useRoute()
 const { fetchAll } = useHttp()
@@ -59,11 +60,9 @@ const fetchMedia = async () => {
 }
 
 const handleUplodMedia = async (gallery) => {
-  console.log('GGGGG', gallery)
   try {
     showDropZone.value = false
-    console.log(gallery)
-    if (gallery.length > 2000) return (errorMsg.value = '200 files maximum')
+    // if (gallery.length > config.maxFileUploads) return (errorMsg.value = '200 files maximum')
     for (const prop in gallery) {
       media.value.unshift({
         name: 'spinner.gif',

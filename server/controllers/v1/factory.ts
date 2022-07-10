@@ -5,7 +5,7 @@ import mongoClient from '~/server/utils/mongoClient'
 
 const fetchAll = async (event: any, collection: string) => {
   const query: any = useQuery(event)
-  console.log('Query', query)
+  // console.log('Query', query)
 
   let cursor: any
 

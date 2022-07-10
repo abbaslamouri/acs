@@ -7,7 +7,7 @@ defineProps({
 })
 const config = useRuntimeConfig()
 // const router = useRouter()
-// console.log(config)
+// console.log('DDDD', config)
 </script>
 
 <template>
@@ -20,10 +20,14 @@ const config = useRuntimeConfig()
       <img
         v-if="file.name === 'spinner.gif'"
         class="w-full h-full object-contain"
-        :src="`${config.siteUrl}/spinner.gif`"
+        :src="`${config.doSpaceEndpoint}/assets/spinner.gif`"
       />
-      <img v-else-if="file.filePath" class="w-full h-full object-contain" :src="`${config.siteUrl}${file.filePath}`" />
-      <img v-else class="w-full h-full object-contain" :src="`${config.siteUrl}/placeholder.png`" />
+      <img
+        v-else-if="file.originalFilename"
+        class="w-full h-full object-contain"
+        :src="`${config.doSpaceEndpoint}/uploads/${file.originalFilename}`"
+      />
+      <img v-else class="w-full h-full object-contain" :src="`${config.doSpaceEndpoint}/assets/placeholder.png`" />
     </div>
     <div class="w-[10rem] h-[10rem] p-4 border border-gray-500" v-else>
       <IconsPdf v-if="file.mimetype && file.mimetype.includes('pdf')" class="w-full h-full" />

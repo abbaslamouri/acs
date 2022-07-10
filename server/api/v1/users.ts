@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   switch (event.req.method) {
     case 'GET':
       const query = useQuery(event)
-      console.log('Query', query)
+      // console.log('Query', query)
       return await fetchAllUsers(event)
       break
 

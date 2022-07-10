@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     [
       './modules/mongo',
       {
-        dbUrl: process.env.MONGODB_URI,
+        dbUrl: process.env.NUXT_DB_URL,
       },
     ],
 
@@ -31,6 +31,9 @@ export default defineNuxtConfig({
     public: {
       apiUrl: '',
       siteUrl: '',
+      doSpaceEndpoint: '',
+      maxFileUploads: '',
+      // NUXT_PUBLIC_MAX_FILE_UPLOADS
     },
   },
 })

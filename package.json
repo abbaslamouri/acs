@@ -13,6 +13,7 @@
     "sass-loader": "^13.0.2"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.121.0",
     "@types/formidable": "^2.0.5",
     "colors": "^1.4.0",
     "csv-parse": "^5.2.2",
