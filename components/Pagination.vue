@@ -56,7 +56,7 @@ const setCurrentPage = async (p) => {
             {{ page - 3 + p }}
           </span>
         </div>
-        <div class="pagination flex flex-row justify-center gap-05" v-else>
+        <div class="pagination flex flex-row justify-center gap-1" v-else>
           <span
             v-for="p in 5"
             class="page"
