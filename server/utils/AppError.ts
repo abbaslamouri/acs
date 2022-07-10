@@ -16,7 +16,6 @@ class AppError extends Error {
     this.statusCode = statusCode
     this.custom = true
     this.name = 'CustomAPIError'
-    // !statusCode || !`${statusCode}`.startsWith('4') ? 'error' : 'fail'
     // this.custom = true
     // this.code = code
     // this.keyValue = keyValue

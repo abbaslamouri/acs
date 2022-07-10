@@ -27,7 +27,6 @@ const fetchAll = async (event: any) => {
     fieldsObj[fieldsArr[prop].trim()] = 1
   }
 
-  // if(query.sort.startsWith("-")) sortObject= {}
   const sortArr = query.sort.split('-')
   console.log('SPLIT', sortArr)
   const sortObj = {}
