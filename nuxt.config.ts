@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     [
       './modules/mongo',
       {
-        dbUrl: process.env.NUXT_DB_URL,
+        dbUrl: process.env.MONGODB_URI,
       },
     ],
 
