@@ -41,7 +41,7 @@ const setCurrentPage = async (p) => {
         </span>
       </div>
       <div class="pagination flex flex-row justify-center gap-1" v-else>
-        <div class="pagination flex-row justify-center gap-1" v-if="page <= 3">
+        <div class="pagination flex flex-row justify-center gap-1" v-if="page <= 3">
           <span v-for="p in 5" class="page" @click="setCurrentPage(p)" :class="{ active: active == p }">
             {{ p }}
           </span>
