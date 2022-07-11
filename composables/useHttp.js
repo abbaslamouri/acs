@@ -180,63 +180,81 @@ const useHttp = () => {
     }
   }
 
-  const saveMedia = async (payload) => {
-    console.log('here')
-    errorMsg.value = null
-    message.value = null
-    let response = null
-    // const token =
-    //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
-    //     ? useCookie('auth').value.token
-    //     : null
+  const saveMedia = async (body) => {
+    errorMsg.value = ''
+    message.value = ''
     try {
-      response = await fetch(`${config.apiUrl}/media`, {
+      const response = await $fetch(`/api/v1/media`, {
         method: 'POST',
-        body: payload,
-        headers: new Headers({
-          // 'Content-Type': 'application/json',
+        body,
+        headers: {
           Authorization: `Bearer ${token.value}`,
-        }),
+        },
       })
-      console.log(response)
-      if (response.ok) return await response.json()
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
+      // console.log(response)
+      return response
     } catch (err) {
       console.log('MYERROR', err)
-      errorMsg.value = err
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
       return false
     }
+
+    // console.log('here')
+    // errorMsg.value = null
+    // message.value = null
+    // let response = null
+    // // const token =
+    // //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
+    // //     ? useCookie('auth').value.token
+    // //     : null
+    // try {
+    //   response = await fetch(`${config.apiUrl}/media`, {
+    //     method: 'POST',
+    //     body: payload,
+    //     headers: new Headers({
+    //       // 'Content-Type': 'application/json',
+    //       Authorization: `Bearer ${token.value}`,
+    //     }),
+    //   })
+    //   console.log(response)
+    //   if (response.ok) return await response.json()
+    //   if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+    //   throw getErrorStr((await response.json()).errors)
+    // } catch (err) {
+    //   console.log('MYERROR', err)
+    //   errorMsg.value = err
+    //   return false
+    // }
   }
 
-  const seedProducts = async (payload) => {
-    console.log('here')
-    errorMsg.value = null
-    message.value = null
-    let response = null
-    // const token =
-    //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
-    //     ? useCookie('auth').value.token
-    //     : null
-    try {
-      response = await fetch(`${config.apiUrl}/products/seeder`, {
-        method: 'POST',
-        body: payload,
-        headers: new Headers({
-          // 'Content-Type': 'application/json',
-          Authorization: `Bearer ${token.value}`,
-        }),
-      })
-      console.log(response)
-      if (response.ok) return await response.json()
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
-    } catch (err) {
-      console.log('MYERROR', err)
-      errorMsg.value = err
-      return false
-    }
-  }
+  // const seedProducts = async (payload) => {
+  //   console.log('here')
+  //   errorMsg.value = null
+  //   message.value = null
+  //   let response = null
+  //   // const token =
+  //   //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
+  //   //     ? useCookie('auth').value.token
+  //   //     : null
+  //   try {
+  //     response = await fetch(`${config.apiUrl}/products/seeder`, {
+  //       method: 'POST',
+  //       body: payload,
+  //       headers: new Headers({
+  //         // 'Content-Type': 'application/json',
+  //         Authorization: `Bearer ${token.value}`,
+  //       }),
+  //     })
+  //     console.log(response)
+  //     if (response.ok) return await response.json()
+  //     if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+  //     throw getErrorStr((await response.json()).errors)
+  //   } catch (err) {
+  //     console.log('MYERROR', err)
+  //     errorMsg.value = err
+  //     return false
+  //   }
+  // }
 
   const seedCountries = async (payload) => {
     console.log('here')
@@ -377,7 +395,6 @@ const useHttp = () => {
     deleteDoc,
     deleteDocs,
     saveMedia,
-    seedProducts,
     seedCountries,
     seedStates,
     saveOrder,

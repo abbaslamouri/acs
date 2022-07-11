@@ -23,7 +23,6 @@ const createMedia = async (event: any) => {
       }
       await uploadFile(`uploads/${resolvedMedia[prop].originalFilename}`, resolvedMedia[prop].originalPath)
     }
-
     return true
   } catch (err) {
     errorHandler(event, err)
@@ -39,10 +38,8 @@ const deleteMedia = async (event: any) => {
           .db()
           .collection('media')
           .deleteOne({ _id: new ObjectId(item._id) })
-        console.log('deletedS', deletedDoc)
         if (deletedDoc && deletedDoc.deletedCount) {
           const deletedFile = await deleteFile(`uploads/${item.name}`)
-          console.log('Delete', deletedFile)
         }
       })
     )

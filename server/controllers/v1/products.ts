@@ -7,7 +7,7 @@ import errorHandler from '~/server/utils/errorHandler'
 import mongoClient from '~/server/utils/mongoClient'
 import { ObjectId } from 'mongodb'
 import { defaultSchema, productSchema } from '~/server/utils/mongoSchemas'
-import { resolveFiles } from '~/server/controllers/v1/fileUpload'
+import { resolveFiles, uploadFile, deleteFile } from '~/server/controllers/v1/fileUpload'
 
 const runtimeFile = fileURLToPath(new URL('./runtime', import.meta.url))
 const runtimeDir = path.dirname(`${runtimeFile}`)
@@ -156,17 +156,21 @@ const seedProducts = async (event: any) => {
     await resetCollections()
 
     const resolvedMedia: any = await resolveFiles(event)
+    console.log('RM', resolvedMedia)
+    await uploadFile(`uploads/${resolvedMedia[0].originalFilename}`, resolvedMedia[0].originalPath)
 
     const data: any[] = []
-    fs.createReadStream(`${resolvedMedia.originalPath}`)
+    fs.createReadStream(`${resolvedMedia[0].originalPath}`)
       .pipe(parse({ delimiter: ',', columns: true }))
       .on('data', function (row) {
+        console.log(row)
         data.push(row)
       })
       .on('end', async function () {
         await createProducts(data, resolvedMedia, event)
-        fs.renameSync(resolvedMedia.originalPath, `${uploadPath}${resolvedMedia.name}`)
+        // fs.renameSync(resolvedMedia.originalPath, `${uploadPath}${resolvedMedia.name}`)
         console.log('Products Created')
+        // return 'product created'
       })
       .on('error', function (error) {
         console.log(error.message)

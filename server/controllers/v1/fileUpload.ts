@@ -4,6 +4,10 @@ import { extname } from 'path'
 import { S3, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import AppError from '~/server/utils/AppError'
 
+const config = useRuntimeConfig()
+// console.log('CCCCC', config.public.maxFileUploads)
+// console.log('CCCCC', { ...config })
+
 // const config = useRuntimeConfig()
 // console.log('CCCCC', config)
 
@@ -13,43 +17,46 @@ import AppError from '~/server/utils/AppError'
 
 const resolveFiles = (event: any) => {
   return new Promise((resolve, reject) => {
+    // console.log('CCCCC', config.public.maxFileUploads)
+
     const form = formidable({ multiples: true })
     form.parse(event.req, (err: any, fields: any, files: any) => {
       const uploadedMedia = []
-      if (!Array.isArray(files.gallery)) {
-        if (files.gallery.size > 1 * 1024 * 1024) reject(new AppError('File size must be less than 1 MB', 400))
+      // console.log('FIles', files)
+      if (!Array.isArray(files.media)) {
+        if (files.media.size > 1 * 1024 * 1024) reject(new AppError('File size must be less than 1 MB', 400))
         if (
-          !files.gallery.mimetype.includes('image') &&
-          !files.gallery.mimetype.includes('pdf') &&
-          !files.gallery.mimetype.includes('csv')
+          !files.media.mimetype.includes('image') &&
+          !files.media.mimetype.includes('pdf') &&
+          !files.media.mimetype.includes('csv')
         )
           reject(new AppError('Only image, pdf and csv format allowed!', 400))
         uploadedMedia[0] = {
-          name: `${files.gallery.originalFilename}`,
-          originalFilename: files.gallery.originalFilename,
-          mimetype: files.gallery.mimetype,
-          fileSize: files.gallery.size,
-          originalPath: files.gallery.filepath,
-          filePath: `uploads/${files.gallery.originalFilename}`,
+          name: `${files.media.originalFilename}`,
+          originalFilename: files.media.originalFilename,
+          mimetype: files.media.mimetype,
+          fileSize: files.media.size,
+          originalPath: files.media.filepath,
+          filePath: `uploads/${files.media.originalFilename}`,
         }
       } else {
-        if (files.gallery.length > process.env.NUXT_PUBLIC_MAX_FILE_UPLOADS)
-          reject(new AppError(`${process.env.NUXT_PUBLIC_MAX_FILE_UPLOADS} files max`, 400))
-        for (const prop in files.gallery) {
-          if (files.gallery[prop].size > 1 * 1024 * 1024) reject(new AppError('File size must be less than 1 MB', 400))
+        if (files.media.length > config.public.maxFileUploads)
+          reject(new AppError(`${config.public.maxFileUploads} files max`, 400))
+        for (const prop in files.media) {
+          if (files.media[prop].size > 1 * 1024 * 1024) reject(new AppError('File size must be less than 1 MB', 400))
           if (
-            !files.gallery[prop].mimetype.includes('image') &&
-            !files.gallery[prop].mimetype.includes('pdf') &&
-            !files.gallery[prop].mimetype.includes('csv')
+            !files.media[prop].mimetype.includes('image') &&
+            !files.media[prop].mimetype.includes('pdf') &&
+            !files.media[prop].mimetype.includes('csv')
           )
             reject(new AppError('Only image, pdf and csv format allowed!', 400))
           uploadedMedia[prop] = {
-            name: `${files.gallery[prop].originalFilename}`,
-            originalFilename: files.gallery[prop].originalFilename,
-            mimetype: files.gallery[prop].mimetype,
-            fileSize: files.gallery[prop].size,
-            originalPath: files.gallery[prop].filepath,
-            filePath: `uploads/${files.gallery[prop].originalFilename}`,
+            name: `${files.media[prop].originalFilename}`,
+            originalFilename: files.media[prop].originalFilename,
+            mimetype: files.media[prop].mimetype,
+            fileSize: files.media[prop].size,
+            originalPath: files.media[prop].filepath,
+            filePath: `uploads/${files.media[prop].originalFilename}`,
           }
         }
       }

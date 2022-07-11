@@ -50,6 +50,7 @@ const deleteProduct = (productId) => {
         <!-- <th>Sales</th> -->
         <th class="text-right min-w-12">actions</th>
       </tr>
+      <!-- ${config.doSpaceEndpoint}/uploads/${file.originalFilename} -->
     </thead>
     <tbody>
       <tr v-for="(product, index) in products" :key="product._id">
@@ -64,7 +65,7 @@ const deleteProduct = (productId) => {
                 product.media[0].mimetype &&
                 product.media[0].mimetype.includes('image')
               "
-              :src="`${config.siteUrl}/${product.media[0].filePath}`"
+              :src="`${config.doSpaceEndpoint}/uploads/${product.media[0].originalFilename}`"
             />
             <img v-else class="w-full hfull contain" src="/placeholder.png" />
           </div>
@@ -100,7 +101,7 @@ th {
   padding: 1rem;
 }
 td {
-  padding: .5rem;
+  padding: 0.5rem;
 
   // border: 1px solid red;
 }

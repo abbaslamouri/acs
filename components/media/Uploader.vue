@@ -3,7 +3,7 @@ const config = useRuntimeConfig()
 // console.log(config)
 
 const route = useRoute()
-const { fetchAll } = useHttp()
+const { fetchAll, saveMedia } = useHttp()
 // const { message, errorMsg, showMediaSelector, galleryMedia } = useAppState()
 const errorMsg = useState('errorMsg')
 const message = useState('message')
@@ -59,37 +59,26 @@ const fetchMedia = async () => {
   totalCount.value = response.totalCount
 }
 
-const handleUplodMedia = async (gallery) => {
-  try {
-    showDropZone.value = false
-    // if (gallery.length > config.maxFileUploads) return (errorMsg.value = '200 files maximum')
-    for (const prop in gallery) {
-      media.value.unshift({
-        name: 'spinner.gif',
-        originalName: gallery[prop].name,
-        path: '',
-        mimetype: gallery[prop].type,
-      })
-    }
-    if (!gallery.length) return
-    const formData = new FormData()
-    for (const prop in gallery) {
-      formData.append('gallery', gallery[prop])
-    }
-    response = await $fetch('/api/v1/media', { method: 'POST', body: formData })
-    console.log('RES', response)
-    if (!response) return
-    if (response.info) errorMsg.value = response.info
-    // response = await $fetch('/api/v1/media', { method: 'POST', body: uploaded })
-    // console.log('RES', response)
-
-    // if (!response) return
-    // for (const prop in media.value) {
-    //   const i = response.media.findIndex((m) => m.originalName == media.value[prop].originalName)
-    //   if
+const uplodMedia = async (files) => {
+  showDropZone.value = false
+  if (files.length > config.maxFileUploads) return (errorMsg.value = '1000 files maximum')
+  for (const prop in files) {
+    media.value.unshift({
+      name: 'spinner.gif',
+      mimetype: files[prop].type,
+    })
+  }
+  if (!files.length) return
+  const formData = new FormData()
+  for (const prop in files) {
+    formData.append('media', files[prop])
+  }
+  response = await saveMedia(formData)
+  console.log('RES', response)
+  if (!response) {
+    media.value = media.value.filter((m) => m.name !== 'spinner.gif')
+  } else {
     await fetchMedia()
-  } catch (err) {
-    console.log('EEEEEE', err.data)
   }
 }
 
@@ -191,7 +180,7 @@ await fetchMedia()
             v-show="showDropZone"
             :fileTypes="['image/*', 'text/csv', 'application/pdf']"
             @cancelFileUpload="showDropZone = !showDropZone"
-            @uploadItemsSelected="handleUplodMedia"
+            @uploadItemsSelected="uplodMedia"
           />
         </transition>
       </div>
