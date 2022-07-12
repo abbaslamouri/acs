@@ -3,6 +3,24 @@ import errorHandler from '~/server/utils/errorHandler'
 
 import mongoClient from '~/server/utils/mongoClient'
 
+const createDoc = async (event: any, collection: string) => {
+  try {
+    const body = await useBody(event)
+    console.log('Body', body)
+    // const doc = { ...body, name: body.name.trim() }
+    // doc.slug = slugify(oemName, { lower: true }
+    // user.role = user.role || 'user'
+    const savedDoc = await mongoClient.db().collection(collection).insertOne(body)
+    if (!savedDoc || !savedDoc.insertedId) throw new AppError('We were not able to insert document into database', 404)
+    const found = await mongoClient.db().collection(collection).findOne({ _id: savedDoc.insertedId })
+    return {
+      doc: found,
+    }
+  } catch (err) {
+    errorHandler(event, err)
+  }
+}
+
 const fetchAll = async (event: any, collection: string) => {
   const query: any = useQuery(event)
   // console.log('Query', query)
@@ -89,4 +107,4 @@ const fetchAll = async (event: any, collection: string) => {
   }
 }
 
-export { fetchAll }
+export { fetchAll, createDoc }

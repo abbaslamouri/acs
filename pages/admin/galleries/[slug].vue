@@ -1,4 +1,5 @@
 <script setup>
+import slugify from 'slugify'
 definePageMeta({
   layout: 'admin',
 })
@@ -6,8 +7,9 @@ const pageTitle = ref('Slider | YRL')
 
 const config = useRuntimeConfig()
 // const mediaReference = useState('mediaReference')
+const errorMsg = useState('errorMsg')
 
-const { errorMsg, message, galleryMedia } = useAppState()
+// const { errorMsg, message, galleryMedia } = useAppState()
 const { fetchAll, saveMedia, saveDoc } = useHttp()
 const route = useRoute()
 const router = useRouter()
@@ -18,14 +20,18 @@ const showDropZone = ref(false)
 const galleryIntro = ref('This image gallery contains all images associated with this gallery.')
 
 let response = null
-const gallery = useState('gallery', () => {
-  return { sortOrder: 0, media: [] }
-})
+const gallery = ref({ sortOrder: 0, media: [] })
+// useState('gallery', () => {
+//   return { sortOrder: 0, media: [] }
+// })
 const slug = route.params.slug === '_' ? null : route.params.slug
+console.log('slug', slug)
 
-response = await fetchAll('galleries', { slug })
-console.log(response)
-if (response.docs.length) gallery.value = response.docs[0]
+if (slug) {
+  response = await fetchAll('galleries', { slug })
+  console.log(response)
+  if (response.docs.length) gallery.value = response.docs[0]
+}
 // else gallery.value = { sortOrder: 0, gallery: [] }
 
 // response = await fetchAll('sliders')
@@ -43,6 +49,7 @@ const addImagesToGallery = async (images) => {
 
 const saveGallery = async () => {
   if (!gallery.value.name) return (errorMsg.value = 'Gallery name is required')
+  gallery.value.slug = slugify(gallery.value.name, { lower: true })
   response = await saveDoc('galleries', gallery.value)
   console.log(response)
   if (!response) return
@@ -51,7 +58,11 @@ const saveGallery = async () => {
 
 const setSelectedMedia = (event) => {
   console.log('EE', event)
-  gallery.value.media = event
+  for (const prop in event) {
+    gallery.value.media[prop] = event[prop]._id
+  }
+
+  console.log('M', media.value)
 }
 
 // watch(

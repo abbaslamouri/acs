@@ -1,4 +1,4 @@
-import { fetchAll } from '~/server/controllers/v1/factory'
+import { fetchAll, createDoc } from '~/server/controllers/v1/factory'
 
 export default defineEventHandler(async (event) => {
   switch (event.req.method) {
@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
       break
 
     case 'POST':
-      // return await createProduct(event)
+      return await createDoc(event, 'galleries')
 
       break
 

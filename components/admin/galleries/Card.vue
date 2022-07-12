@@ -26,7 +26,7 @@ const config = useRuntimeConfig()
           <img
             class="w-full h-full contain"
             v-if="image && image.mimetype.includes('image')"
-            :src="`${config.backendUrl}/${image.path}`"
+            :src="`${config.doSpaceEndpoint}/uploads/${image.originalFilename}`"
           />
           <!-- <img v-else class="w-full h-full contain" :src="`/placeholder.png`" /> -->
         </div>

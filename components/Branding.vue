@@ -4,7 +4,7 @@ defineProps({
 })
 defineEmits(['toggleAdminNav'])
 const route = useRoute()
-console.log(route)
+// console.log(route)
 </script>
 
 <template>

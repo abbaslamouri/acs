@@ -29,3 +29,20 @@
 .admin-section-header {
   @apply uppercase border border-transparent border-b-gray-400 font-bold inline-block mb-5;
 }
+
+.slideout-enter-from,
+.slideout-leave-to {
+  transform: translateX(100%);
+  /* opacity: 0; */
+}
+
+.slideout-enter-to,
+.slideout-leave-from {
+  transform: translateX(0);
+  /* opacity: 1; */
+}
+
+.slideout-enter-active,
+.slideout-leave-active {
+  transition: all 0.3s ease;
+}

@@ -81,7 +81,7 @@ const handleDrop = async (event, index) => {
 }
 
 const setFeaturedImage = (event) => {
-  console.log(event.target, pickIndex.value)
+  // console.log(event.target, pickIndex.value)
   // state.selectedItem.featuredImage = currentGallery.value[pickIndex.value]
 }
 
@@ -100,7 +100,7 @@ const setFeaturedImage = (event) => {
     <div class="image-name rounded h-2 flex flex-row items-center">
       <span class="px-3 text-xs" v-if="hoveredImage">{{ hoveredImage.originalName }}</span>
     </div>
-    <div class="gallery flex flex-row gap-1 flex-wrap justify-center" v-if="gallery.length">
+    <div class="flex flex-row gap-3 flex-wrap justify-center" v-if="gallery.length">
       <div
         class="thumb relative w-24 h-24 shadow-md border border-slate-200 p-1 rounded cursor-pointer"
         :class="{ product: galleryType === 'product' || galleryType == 'variant' }"
@@ -113,11 +113,11 @@ const setFeaturedImage = (event) => {
         @mouseenter="mouseEnter($event, index)"
         @mouseleave="mouseLeave($event, index)"
       >
-        <div class="thumb__move absolute top-[50%] left-[50%] transform translate-x-1/2">
+        <div class="move absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2">
           <IconsMove class="fill-white" />
         </div>
         <div
-          class="thumb__index absolute top-0 left-0 bg-slate-600 text-white w-4 h-4 rounded-1/2 text-xs flex flex-row items-center justify-center"
+          class="index absolute top-0 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-slate-600 text-white w-4 h-4 rounded-1/2 text-xs flex flex-row items-center justify-center"
         >
           {{ index + 1 }}
         </div>
@@ -136,8 +136,8 @@ const setFeaturedImage = (event) => {
             draggable="false"
           />
         </div>
-        <span class="thumb__delete absolute top-1 right-1 hidden" @click.prevent="$emit('removeGalleryImage', index)"
-          ><IconsDelete
+        <span class="delete absolute top-2 right-2" @click.prevent="$emit('removeGalleryImage', index)"
+          ><IconsDelete class="w-5 h-5"
         /></span>
       </div>
     </div>
@@ -147,151 +147,167 @@ const setFeaturedImage = (event) => {
 <style lang="scss" scoped>
 @import '@/assets/styles/variables';
 
-.gallery {
-  .thumb {
-    svg {
-      fill: $slate-50;
+// .gallery {
+.thumb {
+  svg {
+    fill: $slate-50;
+  }
+
+  .move,
+  .delete {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  &.hovered {
+    background-color: $slate-500;
+
+    img {
+      opacity: 0.1;
     }
 
-
-
-    // &__imageTitle {
-    //   position: absolute;
-    //   top: 0;
-    //   left: 50%;
-    //   transform: translate(-50%, -50%);
-
-    //   span {
-    //     background-color: $slate-600;
-    //     color: $slate-50;
-    //     padding: 0.5rem 1rem;
-    //     font-size: 1rem;
-    //     border-radius: 3px;
-    //   }
-    // }
-
-    // &__tooltip {
-    //   grid-column: 1 / 4;
-    //   grid-row: 1 / 2;
-    //   opacity: 0;
-    // }
-
-    // &:first-child {
-    // 	grid-column: span 2 / span 2;
-    // 	grid-row: span 2 / span 2;
-    // }
-
-    // &__delete {
-    //   // position: absolute;
-    //   top: 1rem;
-    //   right: 1rem;
-    //   opacity: 0;
-    //   visibility: hidden;
-
-    //   svg {
-    //     fill: $slate-50;
-    //   }
-    // }
-
-    &__move {
-      // position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      opacity: 0;
-      visibility: hidden;
-
-    //   svg {
-    //     fill: $slate-50;
-    //   }
-    // }
-
-    // &__index {
-    //   // position: absolute;
-    //   top: 2%;
-    //   left: 2%;
-    //   transform: translate(-50%, -50%);
-    //   background-color: $slate-600;
-    //   width: 1.5rem;
-    //   height: 1.5rem;
-    //   color: $slate-50;
-    //   border-radius: 50%;
-    //   font-size: x-small;
-    //   display: flex;
-    //   justify-content: center;
-    //   align-items: center;
-    // }
-
-    // &__tooltip {
-    //   position: absolute;
-    //   top: -1.5rem;
-    //   left: 50%;
-    //   transform: translate(-50%, -100%);
-    //   background-color: $slate-600;
-    //   display: grid;
-    //   grid-template-columns: minmax(max-content, 40rem);
-    //   color: white;
-    //   padding: 1rem 2rem;
-    //   border-radius: 5px;
-    //   font-weight: 500;
-    //   opacity: 0;
-    //   visibility: hidden;
-
-    //   &::after {
-    //     content: '';
-    //     position: absolute;
-    //     top: 100%;
-    //     left: 50%;
-    //     margin-left: -5px;
-    //     border-width: 5px;
-    //     border-style: solid;
-    //     border-color: $slate-600 transparent transparent transparent;
-    //   }
-    // }
-
-
-
-    &.hovered {
-      background-color: $slate-500;
-
-      img {
-        opacity: 0.1;
-      }
-
-      .thumb__tooltip,
-      .thumb__delete,
-      .thumb__move {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .thumb__delete {
-        z-index: 1;
-      }
-    }
-
-    &.over {
-      opacity: 0.3;
-      border: 2px dashed $slate-600;
-    }
-
-    &.featured-image,
-    &.body-bg-image,
-    &.attributes-image,
-    &.recipe-image,
-    &.thumb-image {
-      // border: 1px solid red;
-      min-width: 10rem;
-      min-height: 10rem;
+    .move,
+    .delete {
+      opacity: 1;
+      visibility: visible;
     }
   }
+
+  &.over {
+    opacity: 0.3;
+    border: 2px dashed $slate-600;
+  }
+
+  // &__imageTitle {
+  //   position: absolute;
+  //   top: 0;
+  //   left: 50%;
+  //   transform: translate(-50%, -50%);
+
+  //   span {
+  //     background-color: $slate-600;
+  //     color: $slate-50;
+  //     padding: 0.5rem 1rem;
+  //     font-size: 1rem;
+  //     border-radius: 3px;
+  //   }
+  // }
+
+  // &__tooltip {
+  //   grid-column: 1 / 4;
+  //   grid-row: 1 / 2;
+  //   opacity: 0;
+  // }
+
+  // &:first-child {
+  // 	grid-column: span 2 / span 2;
+  // 	grid-row: span 2 / span 2;
+  // }
+
+  // &__delete {
+  //   // position: absolute;
+  //   top: 1rem;
+  //   right: 1rem;
+  //   opacity: 0;
+  //   visibility: hidden;
+
+  //   svg {
+  //     fill: $slate-50;
+  //   }
+  // }
+
+  // .move {
+  // position: absolute;
+  // top: 50%;
+  // left: 50%;
+  // transform: translate(-50%, -50%);
+  // opacity: 0;
+  // visibility: hidden;
+
+  //   svg {
+  //     fill: $slate-50;
+  //   }
+  // }
+
+  // &__index {
+  //   // position: absolute;
+  //   top: 2%;
+  //   left: 2%;
+  //   transform: translate(-50%, -50%);
+  //   background-color: $slate-600;
+  //   width: 1.5rem;
+  //   height: 1.5rem;
+  //   color: $slate-50;
+  //   border-radius: 50%;
+  //   font-size: x-small;
+  //   display: flex;
+  //   justify-content: center;
+  //   align-items: center;
+  // }
+
+  // &__tooltip {
+  //   position: absolute;
+  //   top: -1.5rem;
+  //   left: 50%;
+  //   transform: translate(-50%, -100%);
+  //   background-color: $slate-600;
+  //   display: grid;
+  //   grid-template-columns: minmax(max-content, 40rem);
+  //   color: white;
+  //   padding: 1rem 2rem;
+  //   border-radius: 5px;
+  //   font-weight: 500;
+  //   opacity: 0;
+  //   visibility: hidden;
+
+  //   &::after {
+  //     content: '';
+  //     position: absolute;
+  //     top: 100%;
+  //     left: 50%;
+  //     margin-left: -5px;
+  //     border-width: 5px;
+  //     border-style: solid;
+  //     border-color: $slate-600 transparent transparent transparent;
+  //   }
+  // }
+
+  &.hoveredx {
+    // background-color: $slate-500;
+
+    img {
+      // opacity: 0.1;
+    }
+
+    .thumb__tooltip,
+      // .thumb__delete,
+      // .thumb__move {
+      //   opacity: 1;
+      //   visibility: visible;
+      // }
+
+      .thumb__delete {
+      // z-index: 1;
+    }
+  }
+
+  // &.featured-image,
+  // &.body-bg-image,
+  // &.attributes-image,
+  // &.recipe-image,
+  // &.thumb-image {
+  //   // border: 1px solid red;
+  //   min-width: 10rem;
+  //   min-height: 10rem;
+  // }
 }
 // }
+// }
 
-.image-select-actions {
-  display: flex;
-  gap: 3rem;
-}
+// .image-select-actions {
+//   display: flex;
+//   gap: 3rem;
+// }
 // }
 
 // .featured-image {

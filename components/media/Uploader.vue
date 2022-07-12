@@ -201,53 +201,56 @@ await fetchMedia()
         <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1" />
       </div>
     </div>
-    <div class="actions bg-slate-300 py-2 px-4 flex-row gap-2 justify-end" v-if="route.name !== 'admin-media'">
-      <button class="btn btn__secondary cancel px-2 py-1" @click="$emit('mediaSelectCancel')">Cancel</button>
-      <button class="btn btn__primary px-2 py-1" @click="$emit('setSelectedMedia', selectedMedia)">Select</button>
+    <div class="actions bg-slate-300 py-2 px-4 flex flex-row gap-2 justify-end" v-if="route.name !== 'admin-media'">
+      <button class="btn btn-secondary text-xs px-4 py-1" @click="$emit('mediaSelectCancel')">Cancel</button>
+      <button class="btn btn-primary text-xs px-4 py-1" @click="$emit('setSelectedMedia', selectedMedia)">
+        Select
+      </button>
     </div>
-    <Slideout v-if="toggleSlideout" @closeSlideout="toggleSlideout = false">
-      <template #header>
-        <h3>Edit Image</h3>
-      </template>
-      <template #default>
-        <div class="flex-row gap-2 p-4">
-          <div class="w-20 h-20">
-            <!-- <img
-              class="w-full h-full contain"
-              :src="`${config.siteUrl}/${selectedMedia[0].path}`"
-              :alt="`${selectedMedia[0].originalName} Photo`"
-            /> -->
+    <transition name="slideout">
+      <Slideout v-if="toggleSlideout" @closeSlideout="toggleSlideout = false">
+        <template #header>
+          <h3>Edit Image</h3>
+        </template>
+        <template #default>
+          <div class="flex flex-row gap-4 p-4">
+            <div class="w-sm h-sm">
+              <img
+                class="w-full h-full contain"
+                :src="`${config.doSpaceEndpoint}/uploads/${selectedMedia[0].originalFilename}`"
+                :alt="`${selectedMedia[0].originalFilename} Photo`"
+              />
+            </div>
+            <div class="flex-1 flex flex-col gap-4 mt-5">
+              <div class="">
+                <FormsBaseInput
+                  label="Alt Text"
+                  placeholder="Alt Text"
+                  :required="true"
+                  v-model="selectedMedia[0].altText"
+                />
+              </div>
+              <div class="">
+                <FormsBaseInput
+                  label="Caption"
+                  placeholder="Caption"
+                  :required="true"
+                  v-model="selectedMedia[0].caption"
+                />
+              </div>
+            </div>
           </div>
-          <div class="flex-1">
-            <div class="">
-              <!-- <FormsBaseInput label="Name" placeholder="Name" :required="true" v-model="selectedMedia[0].name" /> -->
-            </div>
-            <div class="flex-1">
-              <!-- <FormsBaseInput
-                label="Alt Text"
-                placeholder="Alt Text"
-                :required="true"
-                v-model="selectedMedia[0].altText"
-              /> -->
-            </div>
-            <div class="flex-1">
-              <!-- <FormsBaseInput
-                label="Caption"
-                placeholder="Caption"
-                :required="true"
-                v-model="selectedMedia[0].caption"
-              /> -->
-            </div>
+        </template>
+        <template #footer>
+          <div class="flex flex-row gap-2 justify-end">
+            <button class="btn btn-secondary text-xs px-4 py-1" @click="toggleSlideout = !toggleSlideout">
+              Cancel
+            </button>
+            <button class="btn btn-primary text-xs px-4 py-1" @click="saveSelectedImage">Save</button>
           </div>
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex-row gap-2 justify-end">
-          <button class="btn btn__secondary px-2 py-1" @click="toggleSlideout = !toggleSlideout">Cancel</button>
-          <button class="btn btn__primary px-2 py-1" @click="saveSelectedImage">Save</button>
-        </div>
-      </template>
-    </Slideout>
+        </template>
+      </Slideout>
+    </transition>
   </div>
 </template>
 

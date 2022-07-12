@@ -84,40 +84,57 @@ const useHttp = () => {
     // }
   }
 
-  const saveDoc = async (resource, payload) => {
-    errorMsg.value = null
-    message.value = null
-    let response = null
+  const saveDoc = async (collection, body) => {
+    errorMsg.value = ''
+    message.value = ''
+    let response
+    let method
     try {
-      if (payload.id) {
-        response = await fetch(`${config.apiUrl}/${resource}/${payload.id}`, {
-          method: 'PATCH',
-          body: JSON.stringify(payload),
-          headers: new Headers({
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token.value}`,
-          }),
-        })
-      } else {
-        response = await fetch(`${config.apiUrl}/${resource}`, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          headers: new Headers({
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token.value}`,
-          }),
-        })
-      }
-      // console.log(response)
-      if (response.ok) {
-        const jsonRes = await response.json()
-        return jsonRes.doc ? jsonRes.doc : {}
-      }
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
+      if (body.id) method = 'PATCH'
+      else method = 'POST'
+      response = await $fetch(`/api/v1/${collection}`, {
+        method,
+        body,
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      })
+      // response = await fetch(`${config.apiUrl}/${resource}/${payload.id}`, {
+      //   method: 'PATCH',
+      //   body: JSON.stringify(payload),
+      //   headers: new Headers({
+      //     'Content-Type': 'application/json',
+      //     Authorization: `Bearer ${token.value}`,
+      //   }),
+      // })
+      // } else {
+      //   esponse = await $fetch(`${config.apiUrl}/${resource}`, {
+      //     method: 'P',
+      //     body,
+      //     headers: {
+      //       Authorization: `Bearer ${token.value}`,
+      //     },
+      //   })
+      //   response = await fetch(`${config.apiUrl}/${resource}`, {
+      //     method: 'POST',
+      //     body: JSON.stringify(payload),
+      //     headers: new Headers({
+      //       'Content-Type': 'application/json',
+      //       Authorization: `Bearer ${token.value}`,
+      //     }),
+      //   })
+      // }
+      console.log(response)
+      return response
+      // if (response.ok) {
+      //   const jsonRes = await response.json()
+      //   return jsonRes.doc ? jsonRes.doc : {}
+      // }
+      // if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+      // throw getErrorStr((await response.json()).errors)
     } catch (err) {
       console.log('MYERROR', err)
-      errorMsg.value = err
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
       return false
     }
   }

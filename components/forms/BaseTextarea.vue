@@ -35,9 +35,10 @@
 </script>
 
 <template>
-	<div class="base-textarea">
+	<div class="base-textarea border-2 border-gray-300 rounded relative">
 		<!-- <label :for="`base-input-${uuid}`" v-if="label">{{ label }}</label> -->
 		<textarea
+    class="w-full"
 			ref="inputRef"
 			v-bind="$attrs"
 			:value="modelValue"
@@ -50,7 +51,7 @@
 			:rows="rows"
 			:cols="cols"
 		/>
-		<span class="placeholder">{{ label }}</span>
+		<span class="placeholder absolute left-3 top-0 transform -translate-y-2 text-xs bg-[#ffffff] px-2">{{ label }}</span>
 	</div>
 </template>
 
