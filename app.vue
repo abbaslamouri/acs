@@ -1,6 +1,8 @@
 <script setup>
 const errorMsg = useState('errorMsg', () => '')
 const message = useState('message', () => '')
+const showCart = useState('showCart', () => false)
+// const mediaReference = useState('mediaReference', () => '')
 // const { message, errorMsg, showMediaSelector, showCartSlideout } = useAppState()
 const hideSnackbar = () => {
   errorMsg.value = ''

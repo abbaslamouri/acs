@@ -1,5 +1,5 @@
 .btn {
-  @apply flex items-center gap-1 bg-transparent rounded cursor-pointer transition duration-400 shadow-none;
+  @apply flex items-center gap-1 rounded cursor-pointer transition duration-400 shadow-none;
 }
 
 .btn-primary {
@@ -16,6 +16,10 @@
 
 .btn-new-media {
   @apply rounded px-4 py-1 border border-sky-600  hover:(border-sky-200 );
+}
+
+.btn-checkout {
+  @apply rounded px-4 py-2 border border-sky-600 bg-green-600 text-white  hover:(bg-green-300 text-green-900 );
 }
 
 .admin-section {

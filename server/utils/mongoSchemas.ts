@@ -18,7 +18,7 @@ const defaultSchema = {
           maxLength: 2000,
         },
         sortOrder: {
-          bsonType: 'string',
+          bsonType: 'int',
         },
       },
     },
@@ -102,11 +102,41 @@ const productSchema = {
           description: 'Product sale price',
         },
         sortOrder: {
-          bsonType: 'number',
+          bsonType: 'int',
         },
       },
     },
   },
 }
 
-export { defaultSchema, productSchema }
+const galleriesSchema = {
+  validator: {
+    $jsonSchema: {
+      required: ['name'],
+      properties: {
+        name: {
+          bsonType: 'string',
+          description: 'Gallery name is required and 50 characters max',
+          maxLength: 200,
+        },
+        slug: {
+          bsonType: 'string',
+          description: 'Gallery slug is required',
+        },
+        description: {
+          bsonType: 'string',
+          description: 'Galery description',
+          maxLength: 2000,
+        },
+        media: {
+          bsonType: 'objectId',
+        },
+        sortOrder: {
+          bsonType: 'int',
+        },
+      },
+    },
+  },
+}
+
+export { defaultSchema, productSchema, galleriesSchema }

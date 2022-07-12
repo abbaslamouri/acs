@@ -1,4 +1,5 @@
 <script setup>
+defineEmits(['setSelectedMedia'])
 const config = useRuntimeConfig()
 // console.log(config)
 
@@ -202,7 +203,7 @@ await fetchMedia()
     </div>
     <div class="actions bg-slate-300 py-2 px-4 flex-row gap-2 justify-end" v-if="route.name !== 'admin-media'">
       <button class="btn btn__secondary cancel px-2 py-1" @click="$emit('mediaSelectCancel')">Cancel</button>
-      <button class="btn btn__primary px-2 py-1" @click="setSelectedMedia">Select</button>
+      <button class="btn btn__primary px-2 py-1" @click="$emit('setSelectedMedia', selectedMedia)">Select</button>
     </div>
     <Slideout v-if="toggleSlideout" @closeSlideout="toggleSlideout = false">
       <template #header>

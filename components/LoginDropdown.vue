@@ -1,4 +1,9 @@
 <script setup lang="">
+defineProps({
+  theme: {
+    type: String,
+  },
+})
 const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
@@ -47,7 +52,7 @@ const forgotPassword = async () => {
 </script>
 
 <template>
-  <div class="relative flex items-center text-white">
+  <div class="relative flex items-center text-xs">
     <div
       class="fixed inset-0 w-full h-full opacity-50 bg-slate-900 z-9"
       v-if="showAuthDropdown"
@@ -56,11 +61,11 @@ const forgotPassword = async () => {
     <div class="z-10">
       <a
         href="#"
-        class="header flex flex-row items-center gap-2 px-4 py-2 border rounded-sm z-30 hover:(bg-white text-slate-900 )"
+        class="header flex flex-row items-center gap-2 px-4 py-2 border border-gray-400 rounded-sm z-30 hover:(bg-white text-slate-900 )"
         :class="{ selected: showAuthDropdown }"
         @click="showAuthDropdown = !showAuthDropdown"
       >
-        <IconsUser class="w-4 h-4 fill-white" />
+        <IconsUser class="w-4 h-4" />
         <h3 class="font-light uppercase">Sign in / Create acount</h3>
       </a>
       <form class="shadow-md flex flex-col gap-4 bg-slate-50 p-2 absolute z-20 text-slate-800" v-if="showAuthDropdown">
@@ -93,6 +98,9 @@ const forgotPassword = async () => {
 
 <style lang="scss" scoped>
 .header {
+  &.dark {
+    color: red;
+  }
   &:hover,
   &.selected {
     background-color: white;

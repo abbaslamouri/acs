@@ -3,34 +3,28 @@ defineProps({
   toggleAdminNav: Boolean,
 })
 defineEmits(['toggleAdminNav'])
-const config = useRuntimeConfig()
 const route = useRoute()
-// const { fetchAll } = useHttp()
-
-// const { isAuthenticated } = useAuth()
-const logo = ref('')
-// const response = await fetchAll('media', { originalName: 'ACS-Logo-150x45.jpeg' })
-// if (response) logo.value = response.docs[0]
+console.log(route)
 </script>
 
 <template>
-  <div class="branding h-14 flex flex-row justify-between items-center px-2" :class="{ active: !toggleAdminNav }">
-    <NuxtLink class="" :to="{ name: `index` }" v-if="toggleAdminNav">
-      <div class="">ACS</div>
-      <!-- <div class="h-4 br-3"> -->
-      <!-- <img class="w-full h-full contain" :src="`${config.siteUrl}/${logo.path}`" /> -->
-      <!-- </div> -->
-    </NuxtLink>
-    <IconsMenu class="fill-white cursor-pointer" @click="$emit('toggleAdminNav')" />
+  <div class="">
+    <div class="flex flex-row justify-between items-center p-2" v-if="route.name.includes('admin')">
+      <NuxtLink class="w-24" :to="{ name: `index` }">
+        <div class="" v-if="toggleAdminNav">ACS</div>
+      </NuxtLink>
+      <IconsMenu
+        class="fill-white cursor-pointer"
+        @click="$emit('toggleAdminNav')"
+        v-if="route.name.includes('admin')"
+      />
+    </div>
+    <div v-else>
+      <NuxtLink class="w-24" :to="{ name: `index` }">
+        <img class="w-full h-full object-contain" src="/acs-logo.jpeg" />
+      </NuxtLink>
+    </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
-.branding {
-  &.active {
-    justify-content: center;
-  }
-}
-</style>
-
-<!-- flex-row items-center gap-1 uppercase font-bold h-6 cursor-pointer px-1 text-sm tracking-wide -->
+<style lang="scss" scoped></style>
