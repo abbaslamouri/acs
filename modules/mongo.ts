@@ -1,6 +1,7 @@
 // modules/module.mjs
 // import mongoose from 'mongoose'
 import mongoClient from '../server/utils/mongoClient'
+import { galleriesSchema, mediaSchema } from '../server/utils/mongoSchemas'
 
 // import { MongomongoClient } from 'mongodb'
 
@@ -20,6 +21,32 @@ export default async (inlineOptions: any, nuxt: any) => {
     try {
       // console.log('DB', inlineOptions)
       await mongoClient.connect()
+      const collections = await mongoClient.db().listCollections().toArray()
+      // console.log('Collections', collections)
+
+      // Create media collection if it does not exist
+      const media = collections.find((c) => c.name === 'media')
+      // console.log('G', media)
+      if (!media) {
+        await mongoClient.db().createCollection('media', mediaSchema)
+        await mongoClient.db().collection('media').createIndex({ name: 1 }, { unique: true })
+        await mongoClient
+          .db()
+          .collection('media')
+          .createIndex({ name: 'text', mimetype: 'text' }, { weights: { name: 2, mimetype: 1 } })
+      }
+
+      // Create galleries collection if it does not exist
+      const galleries = collections.find((c) => c.name === 'galleries')
+      // console.log('G', galleries)
+      if (!galleries) {
+        await mongoClient.db().createCollection('galleries', galleriesSchema)
+        await mongoClient.db().collection('galleries').createIndex({ name: 1 }, { unique: true })
+        await mongoClient
+          .db()
+          .collection('galleries')
+          .createIndex({ name: 'text', description: 'text' }, { weights: { name: 2, decsription: 1 } })
+      }
 
       // await mongoose.connect(inlineOptions.dbUrl)
       console.log(colors.magenta.bold(`Database connection succesfull`))

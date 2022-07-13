@@ -62,6 +62,7 @@ const mediaToDisplay = ref('all')
               { key: 'all', name: 'All Media Items' },
               { key: 'image', name: 'Images' },
               { key: 'pdf', name: 'PDF' },
+              { key: 'csv', name: 'CSV' },
             ]"
           />
         </div>

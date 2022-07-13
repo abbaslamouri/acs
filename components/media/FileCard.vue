@@ -6,8 +6,6 @@ defineProps({
   },
 })
 const config = useRuntimeConfig()
-// const router = useRouter()
-// console.log('DDDD', config)
 </script>
 
 <template>
@@ -32,8 +30,17 @@ const config = useRuntimeConfig()
       />
       <img v-else class="w-full h-full object-contain" :src="`${config.doSpaceEndpoint}/assets/placeholder.png`" />
     </div>
-    <div class="w-[10rem] h-[10rem] p-4 border border-gray-500" v-else>
-      <IconsPdf v-if="file.mimetype && file.mimetype.includes('pdf')" class="w-full h-full" />
+    <div
+      class="w-[10rem] h-[10rem] p-4 border border-gray-500"
+      v-else-if="file && file.mimetype && file.mimetype.includes('pdf')"
+    >
+      <IconsPdf class="w-full h-full" />
+    </div>
+    <div
+      class="w-[10rem] h-[10rem] p-4 border border-gray-500"
+      v-else-if="file && file.mimetype && file.mimetype.includes('csv')"
+    >
+      <IconsSpreadsheet  class="w-full h-full" />
     </div>
     <div class="tooltip absolute top-[25%] left-[50%] p-1 rounded text-xs">{{ file.originalFilename }}</div>
   </div>
@@ -50,7 +57,7 @@ const config = useRuntimeConfig()
     grid-template-columns: minmax(max-content, 40rem);
     color: white;
     opacity: 0;
-    visibility: hidden;
+    // visibility: hidden;
 
     &::after {
       content: '';

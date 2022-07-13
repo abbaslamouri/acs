@@ -139,34 +139,54 @@ const useHttp = () => {
     }
   }
 
-  const deleteDoc = async (resource, id) => {
+  const deleteDoc = async (collection, id) => {
     errorMsg.value = ''
     message.value = ''
-    let response
-    // const token =
-    //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
-    //     ? useCookie('auth').value.token
-    //     : null
     try {
-      response = await fetch(`${config.apiUrl}/${resource}/${id}`, {
+      const response = await $fetch(`/api/v1/${collection}`, {
         method: 'DELETE',
-        headers: new Headers({
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token && token.value ? token.value : ''}`,
-        }),
+        params: { id },
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
       })
-
-      // console.log(response)
-      if (response.ok) return true
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
+      console.log(response)
+      return response
     } catch (err) {
       console.log('MYERROR', err)
-      errorMsg.value = err
-      console.log(errorMsg.value)
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
       return false
     }
   }
+
+  // const deleteDoc = async (resource, id) => {
+  //   errorMsg.value = ''
+  //   message.value = ''
+  //   let response
+  //   // const token =
+  //   //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
+  //   //     ? useCookie('auth').value.token
+  //   //     : null
+  //   try {
+  //     response = await fetch(`${config.apiUrl}/${resource}/${id}`, {
+  //       method: 'DELETE',
+  //       headers: new Headers({
+  //         'Content-Type': 'application/json',
+  //         Authorization: `Bearer ${token && token.value ? token.value : ''}`,
+  //       }),
+  //     })
+
+  //     // console.log(response)
+  //     if (response.ok) return true
+  //     if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+  //     throw getErrorStr((await response.json()).errors)
+  //   } catch (err) {
+  //     console.log('MYERROR', err)
+  //     errorMsg.value = err
+  //     console.log(errorMsg.value)
+  //     return false
+  //   }
+  // }
 
   const deleteDocs = async (resource, payload) => {
     errorMsg.value = null

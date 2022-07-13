@@ -3,33 +3,27 @@ definePageMeta({
   layout: 'admin',
 })
 const title = ref('Galleries | YRL')
-
-const config = useRuntimeConfig()
-// const { errorMsg, message } = useAppState()
+const message = useState('message')
 const { fetchAll, deleteDoc, deleteDocs } = useHttp()
-
 const galleries = ref([])
 const totalCount = ref(null) // Total item count in the database
 const count = ref(null) // item count taking into account params
-const showActionKeys = ref([])
 const page = ref(1)
 const perPage = ref(25)
-const fields = '-updatedAt'
 const keyword = ref('')
 const sort = reactive({
-  field: 'name',
-  order: '-',
+  field: 'sortOrder',
+  order: '',
 })
 
 let response = null
 const sortOptions = [
   { key: 'sortOrder', name: 'Order' },
   { key: 'name', name: 'Name' },
-  { key: 'createdAt', name: 'Date Created' },
 ]
 
 const params = computed(() => {
-  const params = {
+  return {
     match: '',
     project: 'name, media, slug, sortOrder',
     lookup: 'media',
@@ -38,21 +32,7 @@ const params = computed(() => {
     sort: `${sort.order}${sort.field}`,
     keyword: keyword.value ? keyword.value : '',
   }
-  // if (!keyword.value) delete params.keyword
-  return params
 })
-
-// const params = computed(() => {
-//   const params = {
-//     fields,
-//     page: page.value,
-//     limit: perPage.value,
-//     sort: `${sort.order}${sort.field}, _id `,
-//     keyword: keyword.value ? keyword.value : null,
-//   }
-//   if (!keyword.value) delete params.keyword
-//   return params
-// })
 
 const pages = computed(() => {
   return totalCount.value % perPage.value
@@ -63,12 +43,6 @@ const pages = computed(() => {
 const fetchAllGalleries = async () => {
   response = await fetchAll('galleries', params.value)
   if (!response) return
-  // products.value = response.docs
-  // count.value = response.results
-  // totalCount.value = response.totalCount
-
-  // response = await fetchAll('galleries', params.value)
-  // console.log(response)
   galleries.value = response.docs
   count.value = response.results
   totalCount.value = response.totalCount
@@ -93,10 +67,9 @@ const setPage = async (currentPage) => {
 
 const deleteGallery = async (galleryId) => {
   if (!confirm('Are you sure you want to delete this gallery?')) return
-  if (!(await deleteDoc('categories', galleryId))) return
-  const gallery = galleries.value.find((c) => c.id == galleryId)
+  if (!(await deleteDoc('galleries', galleryId))) return
   fetchAllGalleries()
-  message.value = `gallery ${gallery.name} deleted succesfully`
+  message.value = `gallery deleted succesfully`
 }
 
 await fetchAllGalleries()

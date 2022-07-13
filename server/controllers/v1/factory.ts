@@ -35,6 +35,21 @@ const updateDoc = async (event: any, body: any, collection: string) => {
   }
 }
 
+const deleteDoc = async (event: any, query: any, collection: string) => {
+  try {
+    const deletedDoc = await mongoClient
+      .db()
+      .collection(collection)
+      .deleteOne({ _id: new ObjectId(query.id) })
+    if (!deletedDoc || !deletedDoc.deletedCount) throw new AppError('We were not able to delete document', 404)
+    return {
+      deletedCount: deletedDoc.deletedCount,
+    }
+  } catch (err) {
+    errorHandler(event, err)
+  }
+}
+
 const createDoc = async (event: any, collection: string) => {
   try {
     const body = await useBody(event)
@@ -53,10 +68,7 @@ const createDoc = async (event: any, collection: string) => {
   }
 }
 
-const fetchAll = async (event: any, collection: string) => {
-  const query: any = useQuery(event)
-  // console.log('Query', query)
-
+const fetchAll = async (event: any, query: any, collection: string) => {
   let cursor: any
 
   try {
@@ -65,22 +77,28 @@ const fetchAll = async (event: any, collection: string) => {
     const pipeline: any = []
 
     // Match stage
-    if (query.match) {
-      const queryStr = query.match.replace(/\b(eq|gte|gt|lte|lt)\b/g, (match: any) => `$${match}`)
-      const queryStrArr = queryStr.split(',')
-      const matchObj = {}
-      for (const prop in queryStrArr) {
-        const fieldParts = queryStrArr[prop].trim().split(']=')
-        const valueParts = fieldParts[0].split('[')
-        const field = valueParts[0]
-        const operator = valueParts[1]
-        let value = fieldParts[1]
-        const typeCheckObj = {}
-        typeCheckObj[field] = { $type: 'number' }
-        const found = await mongoClient.db().collection(collection).find(typeCheckObj).toArray()
-        if (found.length) value = value * 1
-        matchObj[field] = {}
-        matchObj[field][operator] = value
+    if (query.keyword || query.match) {
+      let matchObj: any = {}
+
+      if (query.keyword) {
+        matchObj = { $text: { $search: query.keyword } }
+      } else if (query.match) {
+        const queryStr = query.match.replace(/\b(eq|gte|gt|lte|lt)\b/g, (match: any) => `$${match}`)
+        const queryStrArr = queryStr.split(',')
+        // matchObj = {}
+        for (const prop in queryStrArr) {
+          const fieldParts = queryStrArr[prop].trim().split(']=')
+          const valueParts = fieldParts[0].split('[')
+          const field = valueParts[0]
+          const operator = valueParts[1]
+          let value = fieldParts[1]
+          const typeCheckObj = {}
+          typeCheckObj[field] = { $type: 'number' }
+          const found = await mongoClient.db().collection(collection).find(typeCheckObj).toArray()
+          if (found.length) value = value * 1
+          matchObj[field] = {}
+          matchObj[field][operator] = value
+        }
       }
       pipeline.push({ $match: { ...matchObj } })
     }
@@ -139,4 +157,4 @@ const fetchAll = async (event: any, collection: string) => {
   }
 }
 
-export { fetchAll, insertDoc, updateDoc, createDoc }
+export { fetchAll, insertDoc, updateDoc, createDoc, deleteDoc }

@@ -28,13 +28,12 @@ const setKeyword = (event) => {
         @keyup.enter="setKeyword"
       />
     </form>
-    <div class="text-xs p-1 flex-row gap-1 items-center" v-if="keyword">
+    <div class="text-xs p-1 flex flex-row gap-2 items-center" v-if="keyword">
       <div class="uppercase text-slate-400 font-bold">Filter</div>
-      <div class="bg-slate-50 p-05 br-3 bg-white shadow-md flex-row items-center gap-1">
+      <div class="bg-slate-50 pl-2py-1 rounded bg-slate-200 shadow-md flex flex-row items-center gap-1">
         Text Search: {{ keyword }}
-        <IconsClose class="w-12p h-12p bg-slate-600 fill-slate-50 br-50per cursor-pointer" @click="setKeyword('')" />
+        <IconsClose class="w-5 h-5 bg-slate-600 fill-slate-50 cursor-pointer" @click="setKeyword('')" />
       </div>
-      <button class="btn btn__primary py-02 px-1 text-xs cursor-pointer" @click="setKeyword('')">Clear</button>
     </div>
   </div>
 </template>

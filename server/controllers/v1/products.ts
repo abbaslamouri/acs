@@ -15,7 +15,7 @@ const uploadPath = `${path.join(runtimeDir, '../../public')}/uploads/`
 
 const resetCollections = async () => {
   // Drop products, categories, eligibilities, oems, oempartnumbers and nexhighasssemlies cllections
-  let collections = await mongoClient.db().listCollections().toArray()
+  const collections = await mongoClient.db().listCollections().toArray()
   await Promise.all(
     collections.map(async (item: any) => {
       if (

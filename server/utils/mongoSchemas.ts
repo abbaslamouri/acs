@@ -1,3 +1,36 @@
+const mediaSchema = {
+  validator: {
+    $jsonSchema: {
+      required: ['name', 'originalFilename', 'mimetype', 'fileSize', 'filePath'],
+      properties: {
+        name: {
+          bsonType: 'string',
+          description: 'Filename is required and 200 characters max',
+          maxLength: 200,
+        },
+        originalFilename: {
+          bsonType: 'string',
+          description: 'Original filename is required and 200 characters max',
+        },
+        mimetype: {
+          bsonType: 'string',
+          description: 'File mimetype is required',
+          maxLength: 2000,
+        },
+        fileSize: {
+          bsonType: 'int',
+          description: 'File size is required',
+        },
+        filePath: {
+          bsonType: 'string',
+          description: 'File path is required',
+          maxLength: 2000,
+        },
+      },
+    },
+  },
+}
+
 const defaultSchema = {
   validator: {
     $jsonSchema: {
@@ -121,11 +154,11 @@ const galleriesSchema = {
         },
         slug: {
           bsonType: 'string',
-          description: 'Gallery slug is required',
+          description: 'Gallery slug',
         },
         description: {
           bsonType: 'string',
-          description: 'Galery description',
+          description: 'Gallery description',
           maxLength: 2000,
         },
         media: {
@@ -133,8 +166,8 @@ const galleriesSchema = {
           description: 'Gallery images',
           uniqueItems: true,
           items: {
-            bsonType: 'objectId'
-          }
+            bsonType: 'objectId',
+          },
         },
         sortOrder: {
           bsonType: 'int',
@@ -144,4 +177,4 @@ const galleriesSchema = {
   },
 }
 
-export { defaultSchema, productSchema, galleriesSchema }
+export { mediaSchema, defaultSchema, productSchema, galleriesSchema }

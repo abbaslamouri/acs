@@ -18,9 +18,9 @@ const config = useRuntimeConfig()
 </script>
 
 <template lang="">
-  <tr class="">
+  <tr class="border-2">
     <td class="w-4 text-center">{{ gallery.sortOrder }}</td>
-    <td class="flex flex-row gap-1 wrap items-center p-1">
+    <td class="flex flex-row gap-1 flex-wrap items-center py-3">
       <div class="w-12" v-for="image in gallery.media">
         <!-- <div class="w-12"> -->
         <img
@@ -35,13 +35,13 @@ const config = useRuntimeConfig()
     <td class="w-[10rem]">
       <div class="">{{ gallery.name }}</div>
     </td>
-    <td class="w-[7rem]">
+    <td class="w-[8rem] px-4">
       <AdminRowActions
         :showAction="showAction"
         showEdit
         @moreHoriz="$emit('setActions', { index: index, action: !showAction })"
         @editAction="$emit('editGallery', gallery.slug)"
-        @deleteAction="$emit('deleteGallery', gallery.id)"
+        @deleteAction="$emit('deleteGallery', gallery._id)"
         @cancel="$emit('setActions', { index: index, action: false })"
       />
     </td>

@@ -94,7 +94,7 @@ const saveGallery = async () => {
         </NuxtLink>
       </div>
       <h3 class="header">Edit Gallery</h3>
-      {{ gallery }}
+      <!-- {{ gallery }} -->
     </header>
     <main class="w-full flex flex-row gap-4">
       <div class="flex-1 flex flex-col gap-2">

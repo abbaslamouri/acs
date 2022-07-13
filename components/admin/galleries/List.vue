@@ -41,7 +41,7 @@ const deleteGallery = (galleryId) => {
         <th class="py-4 px-2">Order</th>
         <th class="py-4 px-2 text-left">Images</th>
         <th class="py-4 px-2 text-left">Name</th>
-        <th class="text-right py-4 px-2">actions</th>
+        <th class="text-right py-4 px-4">actions</th>
       </tr>
     </thead>
     <tbody class="bg-white">

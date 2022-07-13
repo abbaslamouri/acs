@@ -1,11 +1,8 @@
 <script setup>
 defineEmits(['setSelectedMedia'])
 const config = useRuntimeConfig()
-// console.log(config)
-
 const route = useRoute()
 const { fetchAll, saveMedia } = useHttp()
-// const { message, errorMsg, showMediaSelector, galleryMedia } = useAppState()
 const errorMsg = useState('errorMsg')
 const message = useState('message')
 const selectedMedia = ref([])
@@ -14,24 +11,23 @@ const media = ref([])
 const count = ref(0)
 const totalCount = ref(0)
 const page = ref(1)
-const perPage = ref(50)
-const keyword = ref('003')
+const perPage = ref(15)
+const keyword = ref('')
 const showDropZone = ref(false)
-// const fields = 'name, filePath, mimetype, originalFilename'
 let response = ''
 
 const mediaSort = reactive({
-  field: 'originalFilename',
+  field: 'name',
   order: '-',
 })
 const mediaSortOptions = [
   { key: 'sortOrder', name: 'Order' },
   { key: 'name', name: 'Name' },
-  { key: 'createdAt', name: 'Date Created' },
+  { key: 'mimetype', name: 'Mimetype' },
 ]
 
 const params = computed(() => {
-  const params = {
+  return {
     match: '',
     project: 'name, filePath, mimetype, originalFilename',
     lookup: '',
@@ -40,8 +36,6 @@ const params = computed(() => {
     sort: `${mediaSort.order}${mediaSort.field}`,
     keyword: keyword.value ? keyword.value : '',
   }
-  // if (!keyword.value) delete params.keyword
-  return params
 })
 
 const pages = computed(() =>
@@ -51,9 +45,8 @@ const pages = computed(() =>
 )
 
 const fetchMedia = async () => {
-  // selectedMedia.value = []
+  selectedMedia.value = []
   response = await fetchAll('media', params.value)
-  // console.log('FETCHALLRES', response)
   if (!response) return
   media.value = response.docs
   count.value = response.results
@@ -75,7 +68,6 @@ const uplodMedia = async (files) => {
     formData.append('media', files[prop])
   }
   response = await saveMedia(formData)
-  console.log('RES', response)
   if (!response) {
     media.value = media.value.filter((m) => m.name !== 'spinner.gif')
   } else {
@@ -105,27 +97,13 @@ const removeFromSelectedMedia = (file) => {
 }
 
 const deleteMedia = async () => {
-  // console.log('E1', errorMsg.value)
-  // const deltetedMedia = []
   if (!confirm('Are you sure you want to delete these files?')) return
-  // await Promise.all(
-  // selectedMedia.value.map(async (item) => {
-  // response = await deleteDoc('media', item.id)
   response = await $fetch('/api/v1/media', { method: 'DELETE', body: selectedMedia.value })
   console.log('RES', response)
-  // if (response) deleteMedia = response
-  // })
-  // )
-  // response = await $fetch('/api/v1/media', { method: 'POST', body: { id: item._id } })
-  // console.log('RES', response)
-  // if (response) deleteMedia = response
-  if (!errorMsg.value) {
-    // console.log('E2', errorMsg.value)
-
-    await fetchMedia()
-    message.value = 'Media deleted succesfully asdsdassad sadsdaasddsa adsdasads'
-    selectedMedia.value = []
-  }
+  if (!response) return
+  await fetchMedia()
+  message.value = 'Media deleted succesfully asdsdassad sadsdaasddsa adsdasads'
+  selectedMedia.value = []
 }
 
 const saveSelectedImage = async () => {
@@ -138,18 +116,20 @@ const saveSelectedImage = async () => {
 }
 
 const handleSearch = async (searchKeyword) => {
+  console.log(searchKeyword)
   page.value = 1
   keyword.value = searchKeyword
   await fetchMedia()
 }
 
-const setSelectedMedia = () => {
-  galleryMedia.value = selectedMedia.value
-  showMediaSelector.value = false
-}
+// const setSelectedMedia = () => {
+//   galleryMedia.value = selectedMedia.value
+//   showMediaSelector.value = false
+// }
 
 const selectMediaType = async (event) => {
-  params.value.keyword = event
+  if (event === 'all') params.value.keyword = ''
+  else params.value.keyword = event
   response = await fetchMedia()
 }
 
