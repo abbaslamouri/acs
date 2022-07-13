@@ -1,5 +1,4 @@
 <script setup>
-import ListFallback from '~~/components/admin/ListFallback.vue'
 definePageMeta({
   layout: 'admin',
 })
@@ -32,7 +31,7 @@ const sortOptions = [
 const params = computed(() => {
   const params = {
     match: '',
-    project: 'name,  media',
+    project: 'name, media, slug, sortOrder',
     lookup: 'media',
     page: page.value,
     limit: perPage.value,
@@ -104,22 +103,22 @@ await fetchAllGalleries()
 </script>
 
 <template>
-  <div class="flex-1 flex-col p-3">
+  <div class="flex-1 p-4">
     <Title>{{ title }}</Title>
-    <div class="flex-1 flex-col justify-between gap-3" v-if="totalCount">
-      <header class="flex-row items-center justify-between w-full">
-        <h3 class="title">Galleries</h3>
+    <div class="flex flex-col justify-between gap-3" v-if="totalCount">
+      <header class="flex flex-row items-center justify-between w-full">
+        <h3 class="title text-xl">Galleries</h3>
         <NuxtLink :to="{ name: 'admin-galleries-slug', params: { slug: '_' } }">
-          <button class="btn btn__primary btn__pill px-2 py-05">
-            <IconsPlus />
+          <button class="btn btn-primary px-4 py-1 text-sm">
+            <IconsPlus class="w-5 h-5 fill-white" />
             <span>Add</span>
           </button>
         </NuxtLink>
       </header>
-      <main class="flex-1 max-width-130 w-full flex-col gap-3">
-        <div class="flex-col gap-3 flex-col br-5">
-          <div class="flex-row gap-3" v-if="totalCount">
-            <Search class="flex-1" @searchKeywordSelected="handleSearch" />
+      <main class="w-full flex flex-col gap-3">
+        <div class="flex flex-col gap-3 flex-col br-5">
+          <div class="flex flex-row gap-3" v-if="totalCount">
+            <Search class="w-md" @searchKeywordSelected="handleSearch" />
             <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="toggleSort" />
           </div>
           <AdminGalleriesList :galleries="galleries" :totalCount="totalCount" @deleteGallery="deleteGallery" />
@@ -129,7 +128,7 @@ await fetchAllGalleries()
         <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1 && !keyword" />
       </footer>
     </div>
-    <ListFallback v-else>
+    <AdminListFallback v-else>
       <template #header>Add Gallery</template>
       <template #default>
         <div class="">Create as many galleries with as many images per gallery as you wish</div>
@@ -141,7 +140,7 @@ await fetchAllGalleries()
           <span>Add</span>
         </NuxtLink>
       </template>
-    </ListFallback>
+    </AdminListFallback>
   </div>
 </template>
 

@@ -1,7 +1,17 @@
 <script setup>
-const gallery = useState('gallery')
+const props = defineProps({
+  gallery: {
+    type: Object,
+  },
+})
+// const gallery = useState('gallery')
 
 const emit = defineEmits(['updateDetails'])
+const localDetails = ref({
+  name: props.gallery.name,
+  sortOrder: props.gallery.sortOrder,
+  description: props.gallery.description,
+})
 
 // const details = reactive({
 //   name: props.slider.name ? props.slider.name : '',
@@ -14,14 +24,15 @@ const emit = defineEmits(['updateDetails'])
 //   emit('updateDetails', details)
 // }
 
-// watch(
-//   () => details,
-//   (currentVal) => {
-//     // updateDetails()
-//     emit('updateDetails', details)
-//   },
-//   { deep: true }
-// )
+watch(
+  () => localDetails.value,
+  (currentVal) => {
+    // console.log(currentVal)
+    // updateDetails()
+    emit('updateDetails', currentVal)
+  },
+  { deep: true }
+)
 </script>
 
 <template>
@@ -32,13 +43,13 @@ const emit = defineEmits(['updateDetails'])
     <div class="flex flex-col gap-2">
       <div class="flex flex-row gap-2">
         <div class="flex-1">
-          <FormsBaseInput label="Name" placeholder="Name" required v-model="gallery.name" />
+          <FormsBaseInput label="Name" placeholder="Name" required v-model="localDetails.name" />
         </div>
         <div class="flex-1">
-          <FormsBaseInput label="Order" placeholder="Order" v-model="gallery.sortOrder" />
+          <FormsBaseInput label="Order" placeholder="Order" v-model="localDetails.sortOrder" />
         </div>
       </div>
-      <FormsBaseTextarea label="Description" placeholder="Description" v-model="gallery.description" />
+      <FormsBaseTextarea label="Description" placeholder="Description" v-model="localDetails.description" />
     </div>
   </section>
 </template>

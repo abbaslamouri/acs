@@ -90,7 +90,7 @@ const useHttp = () => {
     let response
     let method
     try {
-      if (body.id) method = 'PATCH'
+      if (body._id) method = 'PATCH'
       else method = 'POST'
       response = await $fetch(`/api/v1/${collection}`, {
         method,

@@ -1,7 +1,39 @@
+import { ObjectId } from 'mongodb'
 import AppError from '~/server/utils/AppError'
 import errorHandler from '~/server/utils/errorHandler'
 
 import mongoClient from '~/server/utils/mongoClient'
+
+const insertDoc = async (event: any, body: any, collection: string) => {
+  try {
+    const insertedDoc = await mongoClient.db().collection(collection).insertOne(body)
+    if (!insertedDoc || !insertedDoc.insertedId)
+      throw new AppError('We were not able to insert document into database', 404)
+    return {
+      insertedId: insertedDoc.insertedId,
+    }
+  } catch (err) {
+    errorHandler(event, err)
+  }
+}
+
+const updateDoc = async (event: any, body: any, collection: string) => {
+  try {
+    const _id = new ObjectId(body._id)
+    delete body._id
+    const updatedDoc = await mongoClient
+      .db()
+      .collection(collection)
+      .updateOne({ _id }, { $set: { ...body } })
+    console.log('UPDATExx', updatedDoc)
+    if (!updatedDoc || !updatedDoc.modifiedCount) throw new AppError('We were not able to update document', 404)
+    return {
+      modifiedCount: updatedDoc.modifiedCount,
+    }
+  } catch (err) {
+    errorHandler(event, err)
+  }
+}
 
 const createDoc = async (event: any, collection: string) => {
   try {
@@ -92,7 +124,7 @@ const fetchAll = async (event: any, collection: string) => {
     pipeline.push({ $skip: skip })
     pipeline.push({ $limit: limit })
 
-    // console.log('PP', pipeline)
+    console.log('Pipeline', pipeline)
 
     cursor = mongoClient.db().collection(collection).aggregate(pipeline)
     const docs = await cursor.toArray()
@@ -107,4 +139,4 @@ const fetchAll = async (event: any, collection: string) => {
   }
 }
 
-export { fetchAll, createDoc }
+export { fetchAll, insertDoc, updateDoc, createDoc }

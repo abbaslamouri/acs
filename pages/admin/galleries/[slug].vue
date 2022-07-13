@@ -17,27 +17,39 @@ const router = useRouter()
 // const sliders = ref([])
 // const gallery = ref()
 const showDropZone = ref(false)
+const gallery = ref({ sortOrder: 0, media: [] })
+
 const galleryIntro = ref('This image gallery contains all images associated with this gallery.')
 
 let response = null
-const gallery = ref({ sortOrder: 0, media: [] })
 // useState('gallery', () => {
 //   return { sortOrder: 0, media: [] }
 // })
 const slug = route.params.slug === '_' ? null : route.params.slug
+const params = {
+  match: `slug[eq]=${slug}`,
+  project: '',
+  lookup: 'media',
+}
+// if (!keyword.value) delete params.keyword
+
 console.log('slug', slug)
 
-if (slug) {
-  response = await fetchAll('galleries', { slug })
-  console.log(response)
-  if (response.docs.length) gallery.value = response.docs[0]
-}
+// if (route.params.slug && route.params.slug !== "_") {
+response = await fetchAll('galleries', params)
+console.log(response)
+if (response.docs.length) gallery.value = response.docs[0]
+// }
 // else gallery.value = { sortOrder: 0, gallery: [] }
 
 // response = await fetchAll('sliders')
 // sliders.value = response.docs
 
-console.log(gallery.value)
+const updateDetails = (details) => {
+  gallery.value.name = details.name
+  gallery.value.description = details.description
+  gallery.value.sortOrder = details.sortOrder
+}
 
 const addImagesToGallery = async (images) => {
   if (!images.length) return
@@ -50,20 +62,17 @@ const addImagesToGallery = async (images) => {
 const saveGallery = async () => {
   if (!gallery.value.name) return (errorMsg.value = 'Gallery name is required')
   gallery.value.slug = slugify(gallery.value.name, { lower: true })
+  console.log('GGGG', gallery.value)
   response = await saveDoc('galleries', gallery.value)
   console.log(response)
   if (!response) return
   router.push({ name: 'admin-galleries' })
 }
 
-const setSelectedMedia = (event) => {
-  console.log('EE', event)
-  for (const prop in event) {
-    gallery.value.media[prop] = event[prop]._id
-  }
-
-  console.log('M', media.value)
-}
+// const setSelectedMedia = (event) => {
+//   console.log('EE', event)
+//   gallery.value.media = event
+// }
 
 // watch(
 //   () => galleryMedia.value,
@@ -89,14 +98,14 @@ const setSelectedMedia = (event) => {
     </header>
     <main class="w-full flex flex-row gap-4">
       <div class="flex-1 flex flex-col gap-2">
-        <AdminGalleriesDetails />
+        <AdminGalleriesDetails :gallery="gallery" @updateDetails="updateDetails" />
         <section class="shadow-lg p-2 flex-col gap-2 bg-white" id="image-gallery">
           <AdminImageGallery
             :gallery="gallery.media"
             :galleryIntro="galleryIntro"
             @removeGalleryImage="gallery.media.splice($event, 1)"
             @setGalleryImage="gallery.media[$event.index] = $event.value"
-            @setSelectedMedia="setSelectedMedia"
+            @setSelectedMedia="gallery.media = $event"
           />
         </section>
       </div>

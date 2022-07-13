@@ -39,7 +39,7 @@ if (process.client) {
 
 <template>
 	<div class="flex flex-row justify-end">
-		<div class="shadow-md p-2 border border-slate-300 flex-col gap-1" v-show="showAction">
+		<div class="shadow-md border border-slate-300 flex-col gap-1 p-2" v-show="showAction">
 			<a href="#" class=" text-gray-800 font-bold" @click.prevent="$emit('editAction')" v-if="showEdit">
 				<div class="">Edit</div>
 			</a>
@@ -52,7 +52,7 @@ if (process.client) {
 			</a>
 			<a href="#" class="delete-action text-xs text-red-700" @click.prevent="$emit('deleteAction')"> Delete </a>
 		</div>
-		<button class="btn btn__close p-05" @click.prevent="$emit('moreHoriz')">
+		<button class="btn btn__close p-1" @click.prevent="$emit('moreHoriz')">
 			<IconsDotHorizontal />
 		</button>
 	</div>

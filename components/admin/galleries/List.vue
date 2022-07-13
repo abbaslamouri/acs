@@ -35,13 +35,13 @@ const deleteGallery = (galleryId) => {
 </script>
 
 <template>
-  <table class="text-xs shadow-md m-0-auto">
+  <table class="text-xs shadow-md">
     <thead>
       <tr class="bg-slate-200">
-        <th>Order</th>
-        <th>Image</th>
-        <th>Name</th>
-        <th class="text-right min-w-12">actions</th>
+        <th class="py-4 px-2">Order</th>
+        <th class="py-4 px-2 text-left">Images</th>
+        <th class="py-4 px-2 text-left">Name</th>
+        <th class="text-right py-4 px-2">actions</th>
       </tr>
     </thead>
     <tbody class="bg-white">
@@ -61,9 +61,8 @@ const deleteGallery = (galleryId) => {
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables';
+
 th {
-  // border-bottom: 1px solid $stone-300;
-  padding: 2rem;
-  text-align: center;
+  // border: 1px solid red
 }
 </style>

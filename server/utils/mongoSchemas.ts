@@ -129,7 +129,12 @@ const galleriesSchema = {
           maxLength: 2000,
         },
         media: {
-          bsonType: 'objectId',
+          bsonType: 'array',
+          description: 'Gallery images',
+          uniqueItems: true,
+          items: {
+            bsonType: 'objectId'
+          }
         },
         sortOrder: {
           bsonType: 'int',

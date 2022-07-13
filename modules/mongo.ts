@@ -18,7 +18,7 @@ export default async (inlineOptions: any, nuxt: any) => {
   // console.log(nuxt.options.dev) // `true` or `false`
   nuxt.hook('listen', async (nuxt: any) => {
     try {
-      console.log('DB', inlineOptions)
+      // console.log('DB', inlineOptions)
       await mongoClient.connect()
 
       // await mongoose.connect(inlineOptions.dbUrl)

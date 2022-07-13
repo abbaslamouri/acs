@@ -18,24 +18,24 @@ const config = useRuntimeConfig()
 </script>
 
 <template lang="">
-  <tr class="border border-b-stone-300 py-05">
-    <td class="w-4">{{ gallery.sortOrder }}</td>
-    <td class="flex-row justify-center wrap">
-      <div v-for="image in gallery.gallery">
-        <div class="w-4 h-4">
-          <img
-            class="w-full h-full contain"
-            v-if="image && image.mimetype.includes('image')"
-            :src="`${config.doSpaceEndpoint}/uploads/${image.originalFilename}`"
-          />
-          <!-- <img v-else class="w-full h-full contain" :src="`/placeholder.png`" /> -->
-        </div>
+  <tr class="">
+    <td class="w-4 text-center">{{ gallery.sortOrder }}</td>
+    <td class="flex flex-row gap-1 wrap items-center p-1">
+      <div class="w-12" v-for="image in gallery.media">
+        <!-- <div class="w-12"> -->
+        <img
+          class="w-full h-full contain"
+          v-if="image && image.mimetype && image.mimetype.includes('image')"
+          :src="`${config.doSpaceEndpoint}/uploads/${image.originalFilename}`"
+        />
+        <img v-else class="w-full h-full contain" :src="`/placeholder.png`" />
+        <!-- </div> -->
       </div>
     </td>
-    <td>
-      <div class="w-10">{{ gallery.name }}</div>
+    <td class="w-[10rem]">
+      <div class="">{{ gallery.name }}</div>
     </td>
-    <td class="w-14">
+    <td class="w-[7rem]">
       <AdminRowActions
         :showAction="showAction"
         showEdit
@@ -50,9 +50,7 @@ const config = useRuntimeConfig()
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables';
-
 td {
-  padding: 2rem;
-  text-align: center;
+  // border: 1px solid red;
 }
 </style>
