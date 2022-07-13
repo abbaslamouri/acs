@@ -97,7 +97,8 @@ const fetchAll = async (event: any, query: any, collection: string) => {
           const found = await mongoClient.db().collection(collection).find(typeCheckObj).toArray()
           if (found.length) value = value * 1
           matchObj[field] = {}
-          matchObj[field][operator] = value
+          if (field === '_id') matchObj[field][operator] = new ObjectId(value)
+          else matchObj[field][operator] = value
         }
       }
       pipeline.push({ $match: { ...matchObj } })

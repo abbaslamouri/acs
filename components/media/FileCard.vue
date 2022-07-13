@@ -40,9 +40,13 @@ const config = useRuntimeConfig()
       class="w-[10rem] h-[10rem] p-4 border border-gray-500"
       v-else-if="file && file.mimetype && file.mimetype.includes('csv')"
     >
-      <IconsSpreadsheet  class="w-full h-full" />
+      <IconsSpreadsheet class="w-full h-full" />
     </div>
-    <div class="tooltip absolute top-[25%] left-[50%] p-1 rounded text-xs">{{ file.originalFilename }}</div>
+    <div
+      class="tooltip absolute w-full p-1 rounded text-xs top-[5%] left-[50%] transform -translate-x-1/2 bg-gray-600 text-white px-1"
+    >
+      {{ file.originalFilename }}
+    </div>
   </div>
 </template>
 
@@ -51,16 +55,11 @@ const config = useRuntimeConfig()
 
 .card {
   .tooltip {
-    transform: translate(-50%, -100%);
-    background-color: $slate-600;
-    display: grid;
-    grid-template-columns: minmax(max-content, 40rem);
-    color: white;
     opacity: 0;
-    // visibility: hidden;
+    visibility: hidden;
 
     &::after {
-      content: '';
+      // content: '';
       position: absolute;
       top: 100%;
       left: 50%;

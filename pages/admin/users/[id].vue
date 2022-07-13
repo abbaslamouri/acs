@@ -6,42 +6,63 @@ const pageTitle = ref('User | YRL')
 
 // const config = useRuntimeConfig()
 // const { errorMsg, message, galleryMedia, mediaReference, showMediaSelector } = useAppState()
-// const { fetchAll, fetchDoc, saveMedia, saveDoc, deleteDocs } = useHttp()
+const { fetchAll, saveDoc } = useHttp()
 const route = useRoute()
-// const router = useRouter()
-// const addressToEditIndex = ref('')
-// const showAddressFormModal = ref(false)
-// const countries = ref([])
-// const states = ref([])
-// let response
-const user = ref({ name: 'Abbas Lamouri', email: 'abbaslamouri@yrlus.com', password: 'adrar0714' })
+const router = useRouter()
+const addressToEditIndex = ref('')
+const showAddressFormModal = ref(false)
+const countries = ref([])
+const states = ref([])
+let response
+const user = ref({
+  name: 'Abbas Lamouri',
+  email: '    AbbasLamouri@yrlus.com',
+  password: 'adrar0714',
+  userAddresses: [],
+  media: [],
+})
 // const user = useState('user', () => {
 //   return { userAddresses: [] }
 // })
 
-const id = route.params.id === '_' ? undefined : route.params.id
+const id = route.params.id === '_' ? null : route.params.id
 
-// response = await fetchAll('countries', { sort: 'countryName' })
-// if (response) countries.value = response.docs
-// provide('countries', countries)
+const params = {
+  match: `_id[eq]=${id}`,
+  project: '',
+  lookup: 'media',
+}
+// if (!keyword.value) delete params.keyword
 
-// response = await fetchAll('states', { sort: 'name' })
-// if (response) states.value = response.docs
-// provide('states', states)
+console.log('ID', id)
+
+// if (route.params.slug && route.params.slug !== "_") {
+response = await fetchAll('users', params)
+console.log(response)
+if (response.docs.length) user.value = response.docs[0]
+// }
+
+response = await fetchAll('countries', { sort: 'countryName' })
+if (response.docs.length) countries.value = response.docs
+provide('countries', countries)
+
+response = await fetchAll('states', { sort: 'name' })
+if (response.docs.length) states.value = response.docs
+provide('states', states)
 
 if (id) {
   // response = await fetchAll('users', { id, populate: 'userAddresses gallery' })
   // if (response && response.docs && response.docs[0]) user.value = response.docs[0]
   // else router.push({ name: 'admin-users' })
 }
-console.log(user.value)
+// console.log(user.value)
 
-// const blankPhoneNumber = {
-//   phoneType: 'Cell',
-//   phoneNumber: '2165026378',
-//   phoneCountryCode: countries.value.find((c) => c.threeLetterCountryCode == 'USA'),
-// }
-// provide('blankPhoneNumber', blankPhoneNumber)
+const blankPhoneNumber = {
+  phoneType: 'Cell',
+  phoneNumber: '2165026378',
+  phoneCountryCode: countries.value.find((c) => c.threeLetterCountryCode == 'USA'),
+}
+provide('blankPhoneNumber', blankPhoneNumber)
 
 // user.value.name = 'Abbas Lamouri'
 // user.value.email = 'abbaslamouri@yrlus.com'
@@ -55,31 +76,31 @@ console.log(user.value)
 //   console.log(user.value)
 // }
 
-// const insertNewAddress = () => {
-//   user.value.userAddresses.push({
-//     addressType: 'Residential',
-//     // // email: 'abbaslamnouri1@yrlus.com',
-//     title: 'Ms',
-//     name: 'Nelly Vileikis',
-//     company: 'YRL Consulting LLC',
-//     addressLine1: '599 Deep Woods Dr.',
-//     addressLine2: 'Room 101',
-//     city: 'Aurora',
-//     postalCode: '44202',
-//     state: states.value.find((c) => c.name === 'Alaska'),
-//     country: countries.value.find((c) => c.threeLetterCountryCode === 'USA'),
-//     phoneNumbers: [{ ...blankPhoneNumber, default: true }],
-//     // deliveryInstructions: 'Some delivery instructions1',
-//   })
-//   if (user.value.userAddresses.length == 1) {
-//     user.value.userAddresses[0].defaultShippingAddress = true
-//     user.value.userAddresses[0].defaultBillingAddress = true
-//   }
-//   addressToEditIndex.value = user.value.userAddresses.length - 1
-//   showAddressFormModal.value = true
-//   // displayStatus.value = 'editing'
-//   // editAction.value = 'add'
-// }
+const insertNewAddress = () => {
+  user.value.userAddresses.push({
+    addressType: 'Residential',
+    // // email: 'abbaslamnouri1@yrlus.com',
+    title: 'Ms',
+    name: 'Nelly Vileikis',
+    company: 'YRL Consulting LLC',
+    addressLine1: '599 Deep Woods Dr.',
+    addressLine2: 'Room 101',
+    city: 'Aurora',
+    postalCode: '44202',
+    state: states.value.find((c) => c.name === 'Alaska'),
+    country: countries.value.find((c) => c.threeLetterCountryCode === 'USA'),
+    phoneNumbers: [{ ...blankPhoneNumber, default: true }],
+    // deliveryInstructions: 'Some delivery instructions1',
+  })
+  if (user.value.userAddresses.length == 1) {
+    user.value.userAddresses[0].defaultShippingAddress = true
+    user.value.userAddresses[0].defaultBillingAddress = true
+  }
+  addressToEditIndex.value = user.value.userAddresses.length - 1
+  showAddressFormModal.value = true
+  // displayStatus.value = 'editing'
+  // editAction.value = 'add'
+}
 
 // const updatePhoneNumber = (payload) => {
 //   user.value.userAddresses[addressToEditIndex.value].phoneNumbers[payload.index] = payload.phoneNumber
@@ -145,30 +166,30 @@ console.log(user.value)
 //   user.value.userAddresses[addressToEditIndex.value].phoneNumbers[event].isDefault = true
 // }
 
-// const closeModal = () => {
-//   if (currentUserAddress !== JSON.stringify(user.value.userAddresses))
-//     return alert('You have unsaved changes, please save your chnages or click cancel to discard your changes')
-//   showAddressFormModal.value = false
-// }
+const closeModal = () => {
+  if (currentUserAddress !== JSON.stringify(user.value.userAddresses))
+    return alert('You have unsaved changes, please save your chnages or click cancel to discard your changes')
+  showAddressFormModal.value = false
+}
 
 // const cancelAddressUpdate = () => {
 //   user.value.userAddresses = JSON.parse(currentUserAddress)
 //   showAddressFormModal.value = false
 // }
 
-// const setDefaultShippingAddress = () => {
-//   for (const prop in user.value.userAddresses) {
-//     user.value.userAddresses[prop].defaultShippingAddress = false
-//   }
-//   user.value.userAddresses[addressToEditIndex.value].defaultShippingAddress = true
-// }
+const setDefaultShippingAddress = () => {
+  for (const prop in user.value.userAddresses) {
+    user.value.userAddresses[prop].defaultShippingAddress = false
+  }
+  user.value.userAddresses[addressToEditIndex.value].defaultShippingAddress = true
+}
 
-// const setDefaultBillingAddress = () => {
-//   for (const prop in user.value.userAddresses) {
-//     user.value.userAddresses[prop].defaultBillingAddress = false
-//   }
-//   user.value.userAddresses[addressToEditIndex.value].defaultBillingAddress = true
-// }
+const setDefaultBillingAddress = () => {
+  for (const prop in user.value.userAddresses) {
+    user.value.userAddresses[prop].defaultBillingAddress = false
+  }
+  user.value.userAddresses[addressToEditIndex.value].defaultBillingAddress = true
+}
 
 // const updateUserAddress = (event) => {
 // user.userAddresses[addressToEditIndex] = $event
@@ -176,12 +197,22 @@ console.log(user.value)
 
 const saveUserInfo = async () => {
   console.log(user.value)
-  const { pending, error, data } = await useFetch('/api/v1/users', {
-    method: 'POST',
-    body: user.value,
-  })
-  if (error.value) errorMsg.value = error.value.data.statusMessage
-  console.log('D', data.value)
+  if (!user.value.name) return (errorMsg.value = 'User name is required')
+  if (!user.value.email) return (errorMsg.value = 'User email is required')
+  if (!user.value.password) return (errorMsg.value = 'User [password] is required')
+  response = await saveDoc('users', user.value)
+  console.log('SAVE', response)
+  if (!response || !response.insertedId) return
+  router.push({ name: 'admin-users-id', params: { id: response.insertedId } })
+  // params.match = `_id[eq]=${response.insertedId}`,
+  // router.push({ name: 'admin-galleries' })
+
+  // const { pending, error, data } = await useFetch('/api/v1/users', {
+  //   method: 'POST',
+  //   body: user.value,
+  // })
+  // if (error.value) errorMsg.value = error.value.data.statusMessage
+  // console.log('D', data.value)
 
   //   const newUser = await saveDoc('users', {
   //     id: user.value.id,
@@ -306,144 +337,155 @@ const saveUserInfo = async () => {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col items-center p-3">
+  <div class="h-full w-full flex flex-col gap-4 p-4">
     <Title>{{ pageTitle }}</Title>
-    <div class="w-full max-w-screen-xl">
-      <header class="flex flex-col gap-2 w-full">
-        <div class="go-back" id="product-go-back">
-          <NuxtLink class="flex flex-row gap-2 text-yellow-700" :to="{ name: 'admin-users' }">
-            <IconsArrowWest class="fill-yellow-700" />
-            <span>Users</span>
-          </NuxtLink>
-        </div>
-        <h3 class="header">Edit User</h3>
-      </header>
-      <main class="main flex-1 max-width-130 w-full">
-        <!-- <div class="left-sidebar shadow-md">
-        <EcommerceAdminProductLeftSidebar :product="product" />
-      </div> -->
-        <div class="flex-col gap-2">
-          <AdminUsersUserInfo :user="user" @updateUser="user = { ...user, ...$event }" @saveUserInfo="saveUserInfo" />
-
-          <section class="shadow-md w-full p-2" id="general-info">
-            <div class="flex-row items-center justify-between mb-1">
-              <div class="uppercase border border-b-gray-400 font-bold inline-block">User Addresses</div>
-              <div></div>
-            </div>
-            <div class="flex-col gap-2">
-              <div v-if="!user.id">Please save user information before adding userAddresses</div>
-              <div v-else>
+    <!-- <div class="w-full max-w-screen-xl border-5"> -->
+    <header class="flex flex-col gap-2 w-full">
+      <div class="go-back" id="product-go-back">
+        <NuxtLink class="flex flex-row gap-2 text-yellow-700" :to="{ name: 'admin-users' }">
+          <IconsArrowWest class="fill-yellow-700" />
+          <span>Users</span>
+        </NuxtLink>
+      </div>
+      <h3 class="">Edit User</h3>
+    </header>
+    <main class="w-full flex flex-row gap-4">
+      <div class="flex-1 flex flex-col gap-4">
+        <AdminUsersUserInfo :user="user" @updateUser="user = { ...user, ...$event }" @saveUserInfo="saveUserInfo" />
+        <section class="border-1 rounded p-2" id="user-addresses">
+          <div class="admin-section-header">User Addresses</div>
+          <div class="flex flex-col gap-5">
+            <div class="flex flex-col gap-4">
+              <div v-if="!user._id">Please save user information before adding userAddresses</div>
+              <div class="flex flex-col gap-4" v-else>
                 <div
-                  class="customer-address flex-col items-start gap-2 p-2 border border-slate-200 br-3"
+                  class="customer-address flex flex-row items-start justify-between p-4 border border-slate-500 rounded"
                   v-for="(userAddress, i) in user.userAddresses"
                   :key="userAddress.id"
                 >
-                  <h3>Address</h3>
-
-                  <!-- <AdminUsersUserAddress :userAddress="userAddress" /> -->
-                  <div class="flex-col">
-                    <h3>Phone Numbers</h3>
-                    <!-- <div class="flex-row" v-for="userPhoneNumber in userAddress.phoneNumbers">
-                    <AdminUsersUserPhoneNumber :userPhoneNumber="userPhoneNumber" />
-                  </div> -->
+                  <div>
+                    <div class="flex flex-col gap-3 text-xs">
+                      <h3 class="text-xl">Address</h3>
+                      <AdminUsersUserAddress :userAddress="userAddress" />
+                      <div>
+                        <div
+                          class="text-green-700 flex flex-row items-center gap-2"
+                          v-if="userAddress.defaultShippingAddress"
+                        >
+                          <IconsCheck class="w-5 h-5 fill-green-700" /> <span>Default shipping address</span>
+                        </div>
+                        <div
+                          class="text-green-700 flex flex-row items-center gap-2"
+                          v-if="userAddress.defaultBillingAddress"
+                        >
+                          <IconsCheck class="w-5 h-5 fill-green-700" /> <span>Default billing address</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex flex-row gap-1">
+                      <button class="btn btn-secondary px-4 py-2 text-xs rounded" @click="editAddress(i)">
+                        Edit Address
+                      </button>
+                      <button
+                        class="btn btn-secondary px-2 py-2 text-sm br-3"
+                        v-if="!userAddress.defaultBillingAddress && !userAddress.defaultShippingAddress"
+                        @click="deleteAddress(i)"
+                      >
+                        Delete Address
+                      </button>
+                    </div>
                   </div>
-                  <div class="flex-col gap-05">
-                    <!-- <div class="text-green-700 flex-row items-center gap-05" v-if="userAddress.defaultShippingAddress">
-                    <IconsCheck class="w-16px h-16px fill-green-700" /> <span>Default shipping address</span>
-                  </div> -->
-                    <!-- <div class="flex-row items-center" v-if="userAddress.defaultBillingAddress">
-                    <IconsCheck class="w-16px h-16px fill-green-700" /> <span>Default billing address</span>
-                  </div> -->
-                  </div>
-                  <div class="flex-row gap-1">
-                    <!-- <button class="btn btn__secondary px-2 py-05 text-xs br-3" @click="editAddress(i)">
-                    Edit Address
-                  </button> -->
-                    <!-- <button
-                    class="btn btn__secondary px-2 py-05 text-sm br-3"
-                    v-if="!userAddress.defaultBillingAddress && !userAddress.defaultShippingAddress"
-                    @click="deleteAddress(i)"
-                  >
-                    Delete Address
-                  </button> -->
+                  <div class="flex flex-col text-xs">
+                    <h3 class="text-lg">Phone Numbers</h3>
+                    <div class="" v-for="userPhoneNumber in userAddress.phoneNumbers">
+                      <AdminUsersUserPhoneNumber :userPhoneNumber="userPhoneNumber" />
+                    </div>
                   </div>
                 </div>
               </div>
-              <!-- <button
-              class="btn btn__secondary px-2 py-05 items-self-end text-xs"
-              :class="{ disabled: !user.id }"
-              @click="insertNewAddress"
-            >
-              Add Address
-            </button> -->
+              <button
+                class="btn btn-secondary px-4 py-1 self-end text-xs"
+                :class="{ disabled: !user.id }"
+                @click="insertNewAddress"
+              >
+                Add Address
+              </button>
             </div>
-            <!-- <Modal :outerBoxWidth="75" :outerBoxHeight="90" @closeModal="closeModal" v-if="showAddressFormModal">
-            <template v-slot:header>
-              <h3>Edit User Address</h3>
-            </template>
-            <template v-slot:default>
-              <AdminUsersUserAddressForm
-                :userAddress="user.userAddresses[addressToEditIndex]"
-                @updateUserAddress="user.userAddresses[addressToEditIndex] = $event"
-                @setDefaultShippingAddress="setDefaultShippingAddress"
-                @setDefaultBillingAddress="setDefaultBillingAddress"
-              />
-            </template>
-            <template v-slot:footer>
-              <section class="flex-row gap-2 justify-end px-3">
-                <button class="btn btn__secondary px-2 py-1" @click="cancelAddressUpdate">Cancel</button>
-                <button class="btn btn__primary px-2 py-1" @click="saveAddress">Save Address</button>
-              </section>
-            </template>
-          </Modal> -->
-          </section>
-          <!-- <EcommerceAdminProductPrice :product="product" @updatePrice="product.value = { ...product.value, ...$event }" /> -->
-          <!-- <EcommerceAdminProductEligibility /> -->
-          <!-- <EcommerceAdminProductNextHigherAssembly /> -->
-          <!-- <EcommerceAdminProductStockManagement
+          </div>
+        </section>
+
+        <!-- <section class="" id="user-addresses"> -->
+        <!-- <div class="flex-row items-center justify-between mb-1">
+            <div class="uppercase border border-b-gray-400 font-bold inline-block">User Addresses</div>
+          </div> -->
+
+        <Modal :outerBoxWidth="75" :outerBoxHeight="90" @closeModal="closeModal" v-if="showAddressFormModal">
+          <template v-slot:header>
+            <h3>Edit User Address</h3>
+          </template>
+          <template v-slot:default>
+            <AdminUsersUserAddressForm
+              :userAddress="user.userAddresses[addressToEditIndex]"
+              @updateUserAddress="user.userAddresses[addressToEditIndex] = $event"
+              @setDefaultShippingAddress="setDefaultShippingAddress"
+              @setDefaultBillingAddress="setDefaultBillingAddress"
+            />
+          </template>
+          <template v-slot:footer>
+            <section class="flex-row gap-2 justify-end px-3">
+              <button class="btn btn__secondary px-2 py-1" @click="cancelAddressUpdate">Cancel</button>
+              <button class="btn btn__primary px-2 py-1" @click="saveAddress">Save Address</button>
+            </section>
+          </template>
+        </Modal>
+        <!-- </section> -->
+        <!-- <EcommerceAdminProductPrice :product="product" @updatePrice="product.value = { ...product.value, ...$event }" /> -->
+        <!-- <EcommerceAdminProductEligibility /> -->
+        <!-- <EcommerceAdminProductNextHigherAssembly /> -->
+        <!-- <EcommerceAdminProductStockManagement
           :product="product"
           @updateStock="product.value = { ...product.value, ...$event }"
         /> -->
 
-          <!-- <EcommerceAdminProductAttributesContent
+        <!-- <EcommerceAdminProductAttributesContent
           v-if="product.id && product.productType === 'variable'"
           @toggleAttributesSlideout="showAttributesSlideout = $event"
         /> -->
-          <!-- <EcommerceAdminProductAttributesSlideout
+        <!-- <EcommerceAdminProductAttributesSlideout
           v-if="showAttributesSlideout"
           @toggleAttributesSlideout="showAttributesSlideout = $event"
           @saveAttributes="saveProduct"
         /> -->
 
-          <!-- <EcommerceAdminProductVariantsContent
+        <!-- <EcommerceAdminProductVariantsContent
           @toggleVariantsSlideout="showVariantsSlideout = $event"
           v-if="product.id && product.productType === 'variable' && product.attributes.length"
         /> -->
-          <!-- <EcommerceAdminProductVariantsSlideout
+        <!-- <EcommerceAdminProductVariantsSlideout
           v-if="showVariantsSlideout"
           @toggleVariantsSlideout="showVariantsSlideout = $event"
           @saveVariants="saveProduct"
         /> -->
-          <!-- <EcommerceProductDetails :product="product" @updateDetails="product.value = { ...product.value, ...$event }" /> -->
+        <!-- <EcommerceProductDetails :product="product" @updateDetails="product.value = { ...product.value, ...$event }" /> -->
 
-          <!-- <EcommerceProductShippingOptions :product="product" /> -->
-          <!-- <EcommerceProductDigitalDelivery :product="product" /> -->
-          <!-- <EcommerceProductExtraFields :product="product" /> -->
-          <!-- <EcommerceProductSeo :product="product" /> -->
-          <!-- <EcommerceProductMisc :product="product" /> -->
-        </div>
-        <div class="right-sidebar">
-          <!-- <AdminUsersRightSidebar /> -->
-          <section class="admin-image-gallery shadow-md p-2 flex-col gap-2 bg-white" id="image-gallery">
-            <!-- <AdminImageGallery :gallery="user.gallery" mediaReference="userMedia" /> -->
-          </section>
-        </div>
-      </main>
-      <div class="w-full flex-row justify-end px-4 sticky bottom-4 go-to-top">
-        <a href="#product-go-back" class="btn btn__secondary px-2 py-1">Go To Top</a>
+        <!-- <EcommerceProductShippingOptions :product="product" /> -->
+        <!-- <EcommerceProductDigitalDelivery :product="product" /> -->
+        <!-- <EcommerceProductExtraFields :product="product" /> -->
+        <!-- <EcommerceProductSeo :product="product" /> -->
+        <!-- <EcommerceProductMisc :product="product" /> -->
       </div>
-      <!-- <footer class="w-full max-width-130 bg-slate-300 px-2 py-1 br-5 flex-row justify-center text-2xl">Footer</footer> -->
+      <div class="w-[16rem] -1">
+        <AdminUsersRightSidebar />
+        <section class="admin-image-gallery shadow-md p-2 flex-col gap-2 bg-white" id="image-gallery">
+          <!-- <AdminImageGallery :gallery="user.gallery" mediaReference="userMedia" /> -->
+        </section>
+      </div>
+    </main>
+    <div class="self-end px-4 sticky bottom-4">
+      <a href="#product-go-back" class="btn px-2 py-1">Go To Top</a>
     </div>
+    <!-- <footer class="w-full max-width-130 bg-slate-300 px-2 py-1 br-5 flex-row justify-center text-2xl">Footer</footer> -->
+    <!-- </div> -->
   </div>
 </template>
 

@@ -1,3 +1,5 @@
+import slugify from 'slugify'
+
 import { ObjectId } from 'mongodb'
 
 import { fetchAll, insertDoc, updateDoc, deleteDoc } from '~/server/controllers/v1/factory'
@@ -21,6 +23,7 @@ export default defineEventHandler(async (event) => {
         body.media[prop] = new ObjectId(body.media[prop]._id)
       }
       body.sortOrder = body.sortOrder * 1
+      body.slug = slugify(body.name, { lower: true })
       if (event.req.method === 'POST') return await insertDoc(event, body, 'galleries')
       else return await updateDoc(event, body, 'galleries')
       break

@@ -1,5 +1,4 @@
 <script setup>
-import slugify from 'slugify'
 definePageMeta({
   layout: 'admin',
 })
@@ -61,8 +60,6 @@ const addImagesToGallery = async (images) => {
 
 const saveGallery = async () => {
   if (!gallery.value.name) return (errorMsg.value = 'Gallery name is required')
-  gallery.value.slug = slugify(gallery.value.name, { lower: true })
-  console.log('GGGG', gallery.value)
   response = await saveDoc('galleries', gallery.value)
   console.log(response)
   if (!response) return

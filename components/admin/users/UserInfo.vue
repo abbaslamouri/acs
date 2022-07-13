@@ -22,10 +22,8 @@ watch(
 </script>
 
 <template>
-  <section class="admin-section" id="general-info">
-    <div class="admin-section-header">
-      User Information
-    </div>
+  <section class="border-1 rounded p-2" id="user-info">
+    <div class="admin-section-header">User Information</div>
     <div class="flex flex-col gap-5">
       <div class="flex flex-row gap-2">
         <div class="flex-1">
@@ -65,11 +63,11 @@ watch(
           <FormsBaseToggle label="Active" v-model="localUser.active" />
         </div>
       </div>
-      <button class="btn btn-secondary px-4 py-1 self-end text-sm" @click="$emit('saveUserInfo')">
+      <button class="btn btn-primary px-4 py-1 self-end text-sm" @click="$emit('saveUserInfo')">
         Save User Information
       </button>
     </div>
   </section>
 </template>
 
-<style lang="" scoped></style>
+<style lang="scss" scoped></style>

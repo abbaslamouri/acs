@@ -6,12 +6,53 @@ const title = ref('Users | YRL')
 
 // const config = useRuntimeConfig()
 // const { errorMsg, message } = useAppState()
-// const { fetchAll, fetchDoc, saveDoc, deleteDoc, deleteDocs } = useHttp()
+const { fetchAll } = useHttp()
 
 const users = ref([])
 const totalCount = ref(0) // Total item count in the database
-const count = ref(null) // item count taking into account params
+const count = ref(0) // item count taking into account params
 const page = ref(1)
+const perPage = ref(25)
+const keyword = ref('')
+const sort = reactive({
+  field: 'name',
+  order: '',
+})
+
+let response = null
+const sortOptions = [
+  { key: 'sortOrder', name: 'Order' },
+  { key: 'name', name: 'Name' },
+]
+
+const params = computed(() => {
+  return {
+    match: '',
+    project: 'name, email, slug, sortOrder',
+    lookup: 'media',
+    page: page.value,
+    limit: perPage.value,
+    sort: `${sort.order}${sort.field}`,
+    keyword: keyword.value ? keyword.value : '',
+  }
+})
+
+const pages = computed(() => {
+  return totalCount.value % perPage.value
+    ? parseInt(totalCount.value / perPage.value) + 1
+    : parseInt(totalCount.value / perPage.value)
+})
+
+const fetchAllUsers = async () => {
+  response = await fetchAll('users', params.value)
+  if (!response) return
+  users.value = response.users
+  count.value = response.count
+  totalCount.value = response.totalCount
+}
+// const totalCount = ref(0) // Total item count in the database
+// const count = ref(null) // item count taking into account params
+// const page = ref(1)
 // const perPage = ref(10)
 // const fields = '-updatedAt'
 // const keyword = ref('')
@@ -44,18 +85,6 @@ const page = ref(1)
 //     ? parseInt(totalCount.value / perPage.value) + 1
 //     : parseInt(totalCount.value / perPage.value)
 // })
-
-const fetchAllUsers = async () => {
-  const { pending, error, data } = await useFetch('/api/v1/users', { method: 'GET' })
-  console.log('EEEEEEE', error.value)
-  if (error.value) {
-    if (process.client) errorMsg.value = 'We were not able to fetch users'
-    return
-  }
-  users.value = data.value.users
-  count.value = data.value.count
-  totalCount.value = data.value.totalCount
-}
 
 // const handleSearch = async (searchKeyword) => {
 //   keyword.value = searchKeyword
