@@ -32,9 +32,6 @@ const params = {
   project: '',
   lookup: 'media',
 }
-// if (!keyword.value) delete params.keyword
-
-console.log('ID', id)
 
 // if (route.params.slug && route.params.slug !== "_") {
 response = await fetchAll('users', params)
@@ -42,11 +39,11 @@ console.log(response)
 if (response.docs.length) user.value = response.docs[0]
 // }
 
-response = await fetchAll('countries', { sort: 'countryName' })
+response = await fetchAll('countries', { sort: 'countryName', limit: 300 })
 if (response.docs.length) countries.value = response.docs
 provide('countries', countries)
 
-response = await fetchAll('states', { sort: 'name' })
+response = await fetchAll('states', { sort: 'name', limit: 100 })
 if (response.docs.length) states.value = response.docs
 provide('states', states)
 
@@ -97,6 +94,7 @@ const insertNewAddress = () => {
     user.value.userAddresses[0].defaultBillingAddress = true
   }
   addressToEditIndex.value = user.value.userAddresses.length - 1
+  // console.log(user.value)
   showAddressFormModal.value = true
   // displayStatus.value = 'editing'
   // editAction.value = 'add'
@@ -432,9 +430,9 @@ const saveUserInfo = async () => {
             />
           </template>
           <template v-slot:footer>
-            <section class="flex-row gap-2 justify-end px-3">
-              <button class="btn btn__secondary px-2 py-1" @click="cancelAddressUpdate">Cancel</button>
-              <button class="btn btn__primary px-2 py-1" @click="saveAddress">Save Address</button>
+            <section class="flex gap-2 justify-end px-3 py-1">
+              <button class="btn btn-secondary px-4 py-1 text-xs" @click="cancelAddressUpdate">Cancel</button>
+              <button class="btn btn-primary px-4 py-1 text-xs" @click="saveAddress">Save Address</button>
             </section>
           </template>
         </Modal>

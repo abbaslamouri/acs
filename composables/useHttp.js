@@ -25,7 +25,7 @@ const useHttp = () => {
           Authorization: `Bearer ${token.value}`,
         },
       })
-      console.log(response)
+      // console.log(response)
       return response
     } catch (err) {
       console.log('MYERROR', err)

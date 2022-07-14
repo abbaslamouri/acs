@@ -153,8 +153,8 @@ watch(
   <!-- {{ phoneIndex }} -->
   <!-- {{ user.userAddresses[addressIndex].phoneNumbers[phoneIndex] }} -->
 
-  <div class="flex-col gap-2">
-    <div class="flex-row items-center gap-2" v-for="(phoneNbr, j) in localPhoneNumbers" :key="`phone-number-${j}`">
+  <div class="flex flex-col gap-2">
+    <div class="flex flex-row items-center gap-2" v-for="(phoneNbr, j) in localPhoneNumbers" :key="`phone-number-${j}`">
       <!-- {{ user.userAddresses[addressIndex].phoneNumbers[j] }} -->
       <div class="min-w-14">
         <!-- <label class="base-select">

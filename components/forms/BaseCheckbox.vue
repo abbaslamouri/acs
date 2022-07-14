@@ -20,18 +20,18 @@ export default {
 </script>
 
 <template>
-  <div class="base-checkbox flex-row items-center gap-1">
-    <label class="cursor-pointer flex-row gap-1" :for="$attrs.id" v-if="label">
-      <input
-        class=""
-        type="checkbox"
-        :checked="modelValue"
-        v-bind="$attrs"
-        @change="$emit('update:modelValue', $event.target.checked)"
-      />
-      <span> {{ label }} </span>
-    </label>
-  </div>
+  <!-- <div class="base-checkbox flex items-center gap-4 border-5"> -->
+  <label class="cursor-pointer flex gap-2" :for="$attrs.id" v-if="label">
+    <input
+      class=""
+      type="checkbox"
+      :checked="modelValue"
+      v-bind="$attrs"
+      @change="$emit('update:modelValue', $event.target.checked)"
+    />
+    <span> {{ label }} </span>
+  </label>
+  <!-- </div> -->
 </template>
 
 <style scoped lang=""></style>

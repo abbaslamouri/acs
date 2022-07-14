@@ -22,7 +22,7 @@ const handleChange = (event) => {
 </script>
 
 <template>
-  <span class="base-radio">
+  <span class="base-radio flex gap-2">
     <input
       type="radio"
       v-bind="$attrs"

@@ -71,6 +71,8 @@ const createDoc = async (event: any, collection: string) => {
 const fetchAll = async (event: any, query: any, collection: string) => {
   let cursor: any
 
+  console.log('Q', query)
+
   try {
     const totalCount = await mongoClient.db().collection(collection).countDocuments()
 
@@ -138,12 +140,12 @@ const fetchAll = async (event: any, query: any, collection: string) => {
     }
 
     const page = query.page && query.page * 1 >= 1 ? query.page * 1 : 1
-    const limit = query.limit && query.limit * 1 >= 1 ? query.limit * 1 : 100
+    const limit = query.limit && query.limit * 1 > 0 ? query.limit * 1 : 100
     const skip = (page - 1) * limit
     pipeline.push({ $skip: skip })
     pipeline.push({ $limit: limit })
 
-    console.log('Pipeline', pipeline)
+    // console.log('Pipeline', pipeline)
 
     cursor = mongoClient.db().collection(collection).aggregate(pipeline)
     const docs = await cursor.toArray()

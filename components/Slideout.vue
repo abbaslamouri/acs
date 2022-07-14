@@ -3,8 +3,8 @@ defineEmits(['closeSlideout'])
 </script>
 
 <template>
-  <section class="slideout fixed inset-0 w-screen h-screen border-5 border-red-500">
-    <div class="overlay w-full h-full bg-slate-700 opacity-75" @click.self="$emit('closeSlideout')"></div>
+  <section class="fixed inset-0 w-screen h-screen border-5 border-red-500">
+    <div class="w-full h-full bg-slate-700 opacity-75" @click.self="$emit('closeSlideout')"></div>
     <div
       class="absolute top-0 right-0 h-full border-5 border-green-800 flex flex-col justify-between w-screen-lg bg-white"
     >

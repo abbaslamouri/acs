@@ -33,13 +33,13 @@ export default {
 </script>
 
 <template>
-  <div class="base-radio-group">
+  <div class="base-radio-group flex gap-4">
     <span class="group-label">{{ label }}</span>
     <component
       :is="vertical ? 'div' : 'span'"
       v-for="option in options"
       :key="option.key"
-      class="base-radio"
+      class="base-radio flex gap-2"
       :class="{ horizontal: !vertical }"
     >
       <BaseRadio
