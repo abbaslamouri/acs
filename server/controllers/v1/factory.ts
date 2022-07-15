@@ -71,7 +71,7 @@ const createDoc = async (event: any, collection: string) => {
 const fetchAll = async (event: any, query: any, collection: string) => {
   let cursor: any
 
-  console.log('Q', query)
+  // console.log('Q', query)
 
   try {
     const totalCount = await mongoClient.db().collection(collection).countDocuments()
@@ -107,18 +107,26 @@ const fetchAll = async (event: any, query: any, collection: string) => {
     }
 
     // Lookup stage
-    if (query.lookup) {
-      const lookupArr = query.lookup.split(',')
-      for (const prop in lookupArr) {
-        const lookupObj = {
-          from: lookupArr[prop].trim(),
-          localField: lookupArr[prop].trim(),
-          foreignField: '_id',
-          as: lookupArr[prop].trim(),
-        }
-        pipeline.push({ $lookup: { ...lookupObj } })
-      }
-    }
+    // if (query.lookup) {
+    //   const lookupArr = query.lookup.split(',')
+    //   for (const prop in lookupArr) {
+    //     const lookupObj = {
+    //       from: lookupArr[prop].trim().split('.')[lookupArr[prop].trim().split('.').length - 1],
+    //       localField: lookupArr[prop].trim(),
+    //       foreignField: '_id',
+    //       as: lookupArr[prop].trim(),
+    //     }
+
+    //     pipeline.push({
+    //       $lookup: {
+    //         from: 'countries',
+    //         localField: 'userAddresses.country',
+    //         foreignField: '_id',
+    //         as: 'userAddresses.country',
+    //       },
+    //     })
+    //   }
+    // }
 
     // Project stage
     if (query.project) {
@@ -139,13 +147,14 @@ const fetchAll = async (event: any, query: any, collection: string) => {
       pipeline.push({ $sort: sortObj })
     }
 
+    // Skip and limit
     const page = query.page && query.page * 1 >= 1 ? query.page * 1 : 1
     const limit = query.limit && query.limit * 1 > 0 ? query.limit * 1 : 100
     const skip = (page - 1) * limit
     pipeline.push({ $skip: skip })
     pipeline.push({ $limit: limit })
 
-    // console.log('Pipeline', pipeline)
+    console.log('Pipeline', pipeline)
 
     cursor = mongoClient.db().collection(collection).aggregate(pipeline)
     const docs = await cursor.toArray()

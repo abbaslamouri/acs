@@ -3,9 +3,6 @@ definePageMeta({
   layout: 'admin',
 })
 const pageTitle = ref('User | YRL')
-
-// const config = useRuntimeConfig()
-// const { errorMsg, message, galleryMedia, mediaReference, showMediaSelector } = useAppState()
 const { fetchAll, saveDoc } = useHttp()
 const route = useRoute()
 const router = useRouter()
@@ -21,23 +18,22 @@ const user = ref({
   userAddresses: [],
   media: [],
 })
-// const user = useState('user', () => {
-//   return { userAddresses: [] }
-// })
 
 const id = route.params.id === '_' ? null : route.params.id
 
-const params = {
-  match: `_id[eq]=${id}`,
-  project: '',
-  lookup: 'media',
+if (id) {
+  console.log('ID', id)
+  const params = {
+    match: `_id[eq]=${id}`,
+    project: '',
+    lookup: 'media',
+  }
+  response = await fetchAll('users', params)
+  console.log('USER', response.docs)
+  if (response.docs.length) user.value = response.docs[0]
 }
 
-// if (route.params.slug && route.params.slug !== "_") {
-response = await fetchAll('users', params)
-console.log(response)
-if (response.docs.length) user.value = response.docs[0]
-// }
+const currentUserAddress = JSON.stringify(user.value.userAddresses)
 
 response = await fetchAll('countries', { sort: 'countryName', limit: 300 })
 if (response.docs.length) countries.value = response.docs
@@ -46,20 +42,6 @@ provide('countries', countries)
 response = await fetchAll('states', { sort: 'name', limit: 100 })
 if (response.docs.length) states.value = response.docs
 provide('states', states)
-
-if (id) {
-  // response = await fetchAll('users', { id, populate: 'userAddresses gallery' })
-  // if (response && response.docs && response.docs[0]) user.value = response.docs[0]
-  // else router.push({ name: 'admin-users' })
-}
-// console.log(user.value)
-
-const blankPhoneNumber = {
-  phoneType: 'Cell',
-  phoneNumber: '2165026378',
-  phoneCountryCode: countries.value.find((c) => c.threeLetterCountryCode == 'USA'),
-}
-provide('blankPhoneNumber', blankPhoneNumber)
 
 // user.value.name = 'Abbas Lamouri'
 // user.value.email = 'abbaslamouri@yrlus.com'
@@ -86,7 +68,14 @@ const insertNewAddress = () => {
     postalCode: '44202',
     state: states.value.find((c) => c.name === 'Alaska'),
     country: countries.value.find((c) => c.threeLetterCountryCode === 'USA'),
-    phoneNumbers: [{ ...blankPhoneNumber, default: true }],
+    phoneNumbers: [
+      {
+        phoneType: 'Cell',
+        phoneNumber: '2165026378',
+        phoneCountryCode: countries.value.find((c) => c.threeLetterCountryCode == 'USA'),
+        default: true,
+      },
+    ],
     // deliveryInstructions: 'Some delivery instructions1',
   })
   if (user.value.userAddresses.length == 1) {
@@ -170,10 +159,10 @@ const closeModal = () => {
   showAddressFormModal.value = false
 }
 
-// const cancelAddressUpdate = () => {
-//   user.value.userAddresses = JSON.parse(currentUserAddress)
-//   showAddressFormModal.value = false
-// }
+const cancelAddressUpdate = () => {
+  user.value.userAddresses = JSON.parse(currentUserAddress)
+  showAddressFormModal.value = false
+}
 
 const setDefaultShippingAddress = () => {
   for (const prop in user.value.userAddresses) {
@@ -193,11 +182,11 @@ const setDefaultBillingAddress = () => {
 // user.userAddresses[addressToEditIndex] = $event
 // }
 
-const saveUserInfo = async () => {
+const saveUser = async () => {
   console.log(user.value)
-  if (!user.value.name) return (errorMsg.value = 'User name is required')
-  if (!user.value.email) return (errorMsg.value = 'User email is required')
-  if (!user.value.password) return (errorMsg.value = 'User [password] is required')
+  // if (!user.value.name) return (errorMsg.value = 'User name is required')
+  // if (!user.value.email) return (errorMsg.value = 'User email is required')
+  // if (!user.value.password) return (errorMsg.value = 'User [password] is required')
   response = await saveDoc('users', user.value)
   console.log('SAVE', response)
   if (!response || !response.insertedId) return
@@ -227,76 +216,71 @@ const saveUserInfo = async () => {
   //   }
 }
 
-// const saveAddress = async () => {
-//   let errorMessage = ''
-//   for (const prop in user.value.userAddresses[addressToEditIndex.value].phoneNumbers) {
-//     if (!user.value.userAddresses[addressToEditIndex.value].phoneNumbers[prop].phoneNumber) {
-//       errorMessage += '<p>Phone number is required</p>'
-//     }
-//     if (!user.value.userAddresses[addressToEditIndex.value].phoneNumbers[prop].phoneCountryCode) {
-//       errorMessage += '<p>Phone Country Code is required<p>'
-//     }
-//     if (errorMessage) return (errorMsg.value = errorMessage)
-//   }
+const saveAddress = async () => {
+  console.log(user.value)
+  showAddressFormModal.value = false
+  saveUser()
 
-//   const defaultPhoneNumber = user.value.userAddresses[addressToEditIndex.value].phoneNumbers.find((p) => p.default)
-//   if (!defaultPhoneNumber) user.value.userAddresses[addressToEditIndex.value].phoneNumbers[0].default = true
-
-//   const newPhoneNumbers = []
-//   await Promise.all(
-//     user.value.userAddresses[addressToEditIndex.value].phoneNumbers.map(async (item) => {
-//       const savedPhoneNumber = await saveDoc('phonenumbers', item)
-//       if (savedPhoneNumber) {
-//         response = await fetchDoc('phonenumbers', savedPhoneNumber.id)
-//         if (response) newPhoneNumbers.push(response.doc)
-//       }
-//     })
-//   )
-//   user.value.userAddresses[addressToEditIndex.value].phoneNumbers = newPhoneNumbers
-
-//   for (const prop in user.value.userAddresses) {
-//     if (!user.value.userAddresses[prop].name) {
-//       errorMessage += '<p>Name is required</p>'
-//     }
-//     if (!user.value.userAddresses[prop].addressLine1) {
-//       errorMessage += '<p>Shipping address is required</p>'
-//     }
-//     if (!user.value.userAddresses[prop].postalCode) {
-//       errorMessage += '<p>Postal code is required</p>'
-//     }
-//     if (!user.value.userAddresses[prop].state) {
-//       errorMessage += '<p>State is required<p>'
-//     }
-//     if (errorMessage) return (errorMsg.value = errorMessage)
-//   }
-
-//   const defaultShipAddress = user.value.userAddresses.find((a) => a.defaultShippingAddress)
-//   if (!defaultShipAddress) user.value.userAddresses[0].defaultShippingAddress = true
-
-//   const defaultBillAddress = user.value.userAddresses.find((a) => a.defaultBillingAddress)
-//   if (!defaultBillAddress) user.value.userAddresses[0].defaultBillingAddress = true
-
-//   const newUserAddresses = []
-//   await Promise.all(
-//     user.value.userAddresses.map(async (item) => {
-//       const savedAddress = await saveDoc('useraddresses', item)
-//       if (savedAddress) {
-//         response = await fetchDoc('useraddresses', savedAddress.id)
-//         if (response) newUserAddresses.push(response.doc)
-//       }
-//       // if (newUserAddress) newUserAddresses.push(newUserAddress)
-//     })
-//   )
-//   user.value.userAddresses = newUserAddresses
-
-//   const newUser = await saveDoc('users', user.value)
-//   if (newUser) {
-//     // user.value = newUser
-//     // router.push({ name: 'admin-users-id', params: { id: user.value.id } })
-//   }
-
-//   showAddressFormModal.value = false
-// }
+  //   let errorMessage = ''
+  //   for (const prop in user.value.userAddresses[addressToEditIndex.value].phoneNumbers) {
+  //     if (!user.value.userAddresses[addressToEditIndex.value].phoneNumbers[prop].phoneNumber) {
+  //       errorMessage += '<p>Phone number is required</p>'
+  //     }
+  //     if (!user.value.userAddresses[addressToEditIndex.value].phoneNumbers[prop].phoneCountryCode) {
+  //       errorMessage += '<p>Phone Country Code is required<p>'
+  //     }
+  //     if (errorMessage) return (errorMsg.value = errorMessage)
+  //   }
+  //   const defaultPhoneNumber = user.value.userAddresses[addressToEditIndex.value].phoneNumbers.find((p) => p.default)
+  //   if (!defaultPhoneNumber) user.value.userAddresses[addressToEditIndex.value].phoneNumbers[0].default = true
+  //   const newPhoneNumbers = []
+  //   await Promise.all(
+  //     user.value.userAddresses[addressToEditIndex.value].phoneNumbers.map(async (item) => {
+  //       const savedPhoneNumber = await saveDoc('phonenumbers', item)
+  //       if (savedPhoneNumber) {
+  //         response = await fetchDoc('phonenumbers', savedPhoneNumber.id)
+  //         if (response) newPhoneNumbers.push(response.doc)
+  //       }
+  //     })
+  //   )
+  //   user.value.userAddresses[addressToEditIndex.value].phoneNumbers = newPhoneNumbers
+  //   for (const prop in user.value.userAddresses) {
+  //     if (!user.value.userAddresses[prop].name) {
+  //       errorMessage += '<p>Name is required</p>'
+  //     }
+  //     if (!user.value.userAddresses[prop].addressLine1) {
+  //       errorMessage += '<p>Shipping address is required</p>'
+  //     }
+  //     if (!user.value.userAddresses[prop].postalCode) {
+  //       errorMessage += '<p>Postal code is required</p>'
+  //     }
+  //     if (!user.value.userAddresses[prop].state) {
+  //       errorMessage += '<p>State is required<p>'
+  //     }
+  //     if (errorMessage) return (errorMsg.value = errorMessage)
+  //   }
+  //   const defaultShipAddress = user.value.userAddresses.find((a) => a.defaultShippingAddress)
+  //   if (!defaultShipAddress) user.value.userAddresses[0].defaultShippingAddress = true
+  //   const defaultBillAddress = user.value.userAddresses.find((a) => a.defaultBillingAddress)
+  //   if (!defaultBillAddress) user.value.userAddresses[0].defaultBillingAddress = true
+  //   const newUserAddresses = []
+  //   await Promise.all(
+  //     user.value.userAddresses.map(async (item) => {
+  //       const savedAddress = await saveDoc('useraddresses', item)
+  //       if (savedAddress) {
+  //         response = await fetchDoc('useraddresses', savedAddress.id)
+  //         if (response) newUserAddresses.push(response.doc)
+  //       }
+  //       // if (newUserAddress) newUserAddresses.push(newUserAddress)
+  //     })
+  //   )
+  //   user.value.userAddresses = newUserAddresses
+  //   const newUser = await saveDoc('users', user.value)
+  //   if (newUser) {
+  //     // user.value = newUser
+  //     // router.push({ name: 'admin-users-id', params: { id: user.value.id } })
+  //   }
+}
 
 // const setUserMedia = async (mediaFiles) => {
 //   for (const prop in mediaFiles) {
@@ -348,20 +332,20 @@ const saveUserInfo = async () => {
       <h3 class="">Edit User</h3>
     </header>
     <main class="w-full flex flex-row gap-4">
-      <div class="flex-1 flex flex-col gap-4">
-        <AdminUsersUserInfo :user="user" @updateUser="user = { ...user, ...$event }" @saveUserInfo="saveUserInfo" />
-        <section class="border-1 rounded p-2" id="user-addresses">
+      <div class="flex-1 flex flex-col gap-8">
+        <AdminUsersUserInfo :user="user" @updateUser="user = { ...user, ...$event }" @saveUserInfo="saveUser" />
+        <section class="rounded border p-4 shadow-lg" id="user-addresses">
           <div class="admin-section-header">User Addresses</div>
           <div class="flex flex-col gap-5">
             <div class="flex flex-col gap-4">
               <div v-if="!user._id">Please save user information before adding userAddresses</div>
               <div class="flex flex-col gap-4" v-else>
                 <div
-                  class="customer-address flex flex-row items-start justify-between p-4 border border-slate-500 rounded"
+                  class="customer-address flex flex-row items-start justify-between p-4 border border-slate-300 rounded"
                   v-for="(userAddress, i) in user.userAddresses"
                   :key="userAddress.id"
                 >
-                  <div>
+                  <div class="flex flex-col gap-4">
                     <div class="flex flex-col gap-3 text-xs">
                       <h3 class="text-xl">Address</h3>
                       <AdminUsersUserAddress :userAddress="userAddress" />
@@ -385,7 +369,7 @@ const saveUserInfo = async () => {
                         Edit Address
                       </button>
                       <button
-                        class="btn btn-secondary px-2 py-2 text-sm br-3"
+                        class="btn btn-secondary px-4 py-2 text-xs rounded"
                         v-if="!userAddress.defaultBillingAddress && !userAddress.defaultShippingAddress"
                         @click="deleteAddress(i)"
                       >

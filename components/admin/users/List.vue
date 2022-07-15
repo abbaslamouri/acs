@@ -74,7 +74,7 @@ const deleteUser = (userId) => {
           <!-- <span v-if="user.active"><IconsCheck class="fill-green-700 w-2 h-2" /></span> -->
         </td>
         <td class="w-12">
-          <!-- <AdminRowActions
+          <AdminRowActions
             :showAction="showActionKeys[index]"
             :showEdit="true"
             :showActivate="true"
@@ -86,7 +86,7 @@ const deleteUser = (userId) => {
             @activateAction="$emit('activateUser', user.id)"
             @verifyAction="$emit('verifyUser', user.id)"
             @cancel="resetActions"
-          /> -->
+          />
         </td>
       </tr>
     </tbody>

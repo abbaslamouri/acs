@@ -22,7 +22,7 @@ watch(
 </script>
 
 <template>
-  <section class="border-1 rounded p-2" id="user-info">
+  <section class="border rounded p-4 shadow-lg" id="user-info">
     <div class="admin-section-header">User Information</div>
     <div class="flex flex-col gap-5">
       <div class="flex flex-row gap-2">

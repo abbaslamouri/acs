@@ -52,7 +52,7 @@ const localPhoneNumbers = ref(cloneDeep(props.phoneNumbers))
 // const { cart } = useCart()
 
 const countries = inject('countries')
-const blankPhoneNumber = inject('blankPhoneNumber')
+// const blankPhoneNumber = inject('blankPhoneNumber')
 
 // const user.userAddresses[addressIndex].phoneNumbers[phoneIndex] = ref({ ...props.phoneNumber })
 const phoneTypeOptions = [
@@ -63,7 +63,9 @@ const phoneTypeOptions = [
 
 const insertNewPhoneNumber = () => {
   localPhoneNumbers.value.push({
-    ...blankPhoneNumber,
+    phoneType: 'Cell',
+    phoneNumber: '2165026378',
+    phoneCountryCode: countries.value.find((c) => c.threeLetterCountryCode == 'USA'),
     default: false,
   })
 }
@@ -103,6 +105,14 @@ const insertNewPhoneNumber = () => {
 
 //   // user.userAddresses[addressIndex].phoneNumbers[phoneIndex]s[j].phoneCountryCode = $event.target.value
 // }
+
+const setPhoneNumber = (event, j) => {
+  console.log(event, j)
+  const selectedCountry = countries.value.find((c) => c._id == event)
+  if (selectedCountry) localPhoneNumbers.value[j].phoneCountryCode = selectedCountry
+
+  // localPhoneNumbers[j].phoneCountryCode = countries.find((c) => c._id == $event)
+}
 
 const setDefaultPhoneNumber = (event, j) => {
   console.log(event, j)
@@ -150,44 +160,18 @@ watch(
 </script>
 
 <template>
-  <!-- {{ phoneIndex }} -->
-  <!-- {{ user.userAddresses[addressIndex].phoneNumbers[phoneIndex] }} -->
-
-  <div class="flex flex-col gap-2">
-    <div class="flex flex-row items-center gap-2" v-for="(phoneNbr, j) in localPhoneNumbers" :key="`phone-number-${j}`">
-      <!-- {{ user.userAddresses[addressIndex].phoneNumbers[j] }} -->
-      <div class="min-w-14">
-        <!-- <label class="base-select">
-            <div class="label text-xs px-1">PhoneType</div>
-            <select @change="phoneNbr.phoneType = $event.target.value" class="text-xs">
-              <option value=""></option>
-              <option
-                v-for="option in phoneTypeOptions"
-                :key="option.key"
-                :value="option.key"
-                :selected="phoneNbr.phoneType == option.key"
-              >
-                {{ option.name }}
-              </option>
-            </select>
-          </label> -->
-        <FormsBaseSelect
-          label="PhoneType"
-          v-model="localPhoneNumbers[j].phoneType"
-          :options="[
-            { key: 'Cell', name: 'Cell' },
-            { key: 'Home', name: 'Home' },
-            { key: 'Work', name: 'Work' },
-          ]"
-        />
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-row items-center gap-4" v-for="(phoneNbr, j) in localPhoneNumbers" :key="`phone-number-${j}`">
+      <div class="w-40">
+        <FormsBaseSelect label="PhoneType" v-model="localPhoneNumbers[j].phoneType" :options="phoneTypeOptions" />
       </div>
-      <div class="min-w-20">
+      <div class="w-40">
         <FormsBaseInput label="Phone Number" placeholder="Phone Number" v-model="localPhoneNumbers[j].phoneNumber" />
       </div>
       <div class="flex-1">
-        <!-- <FormsBaseSelect
-          :value="localPhoneNumbers[phoneIndex].phoneCountryCode._id"
-          @update:modelValue="localPhoneNumbers[phoneIndex].phoneCountryCode = countries.find((c) => c._id == $event)"
+        <FormsBaseSelect
+          v-model="localPhoneNumbers[j].phoneCountryCode._id"
+          @update:modelValue="setPhoneNumber($event, j)"
           label="Country Code"
           nullOption="-"
           :options="
@@ -195,8 +179,8 @@ watch(
               return { key: c._id, name: c.countryName }
             })
           "
-        /> -->
-        <label class="base-select">
+        />
+        <!-- <label class="base-select">
           <div class="label text-xs px-1">Country</div>
           <select
             @change="localPhoneNumbers[j].phoneCountryCode = countries.find((c) => c._id == $event.target.value)"
@@ -214,21 +198,21 @@ watch(
               {{ option.name }}
             </option>
           </select>
-        </label>
+        </label> -->
       </div>
-      <div class="">
+      <div class="text-xs">
         <FormsBaseCheckbox
           v-model="localPhoneNumbers[j].default"
           label="Set as Default"
           @update:modelValue="setDefaultPhoneNumber($event, j)"
         />
       </div>
-      <button class="btn btn__secondary" @click="removePhoneNumber(j)" v-if="localPhoneNumbers.length > 1">
-        <IconsMinus />
+      <button class="btn" @click="removePhoneNumber(j)" v-if="localPhoneNumbers.length > 1">
+        <IconsClose class="w-5 h-5" />
       </button>
     </div>
     <button
-      class="btn btn__secondary items-self-end px-2 py-05"
+      class="btn btn-secondary self-end px-4 py-2 text-xs"
       @click="insertNewPhoneNumber"
       v-if="localPhoneNumbers.length <= 4"
     >

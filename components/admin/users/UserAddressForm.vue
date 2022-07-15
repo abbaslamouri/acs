@@ -175,7 +175,7 @@ watch(
         <FormsBaseInput class="flex-1" label="Email" placeholder="Email" v-model="localUserAddress.email" />
       </div> -->
     </section>
-    <section class="flex-col gap-1 border border-slate-400 p-2 br-3">
+    <section class="flex-col gap-1 border border-slate-400 p-4 rounded">
       <AdminUsersPhoneNumbersForm
         :phoneNumbers="localUserAddress.phoneNumbers"
         @updatePhoneNumbers="localUserAddress.phoneNumbers = $event"

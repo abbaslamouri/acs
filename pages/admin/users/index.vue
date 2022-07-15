@@ -28,7 +28,7 @@ const sortOptions = [
 const params = computed(() => {
   return {
     match: '',
-    project: 'name, email, slug, sortOrder',
+    project: 'name, email, sortOrder',
     lookup: 'media',
     page: page.value,
     limit: perPage.value,
@@ -45,8 +45,9 @@ const pages = computed(() => {
 
 const fetchAllUsers = async () => {
   response = await fetchAll('users', params.value)
+  console.log(response)
   if (!response) return
-  users.value = response.users
+  users.value = response.docs
   count.value = response.count
   totalCount.value = response.totalCount
 }
@@ -86,26 +87,26 @@ const fetchAllUsers = async () => {
 //     : parseInt(totalCount.value / perPage.value)
 // })
 
-// const handleSearch = async (searchKeyword) => {
-//   keyword.value = searchKeyword
-//   page.value = 1
-//   await fetchAllUsers()
-// }
+const handleSearch = async (searchKeyword) => {
+  keyword.value = searchKeyword
+  page.value = 1
+  await fetchAllUsers()
+}
 
-// const toggleSort = async (event) => {
-//   sort.field = event.field
-//   sort.order = event.order
-//   await fetchAllUsers()
-// }
+const toggleSort = async (event) => {
+  sort.field = event.field
+  sort.order = event.order
+  await fetchAllUsers()
+}
 
 // const setPage = async (currentPage) => {
 //   page.value = currentPage
 //   await fetchAllUsers()
 // }
 
-// const setPerPage = async () => {
-//   await fetchAllUsers()
-// }
+const setPerPage = async () => {
+  await fetchAllUsers()
+}
 
 const deleteUser = async (userId) => {
   if (!confirm('Are you sure you want to delete this user?')) return
@@ -155,29 +156,29 @@ await fetchAllUsers()
 </script>
 
 <template>
-  <div class="flex-1 flex-col p-3">
+  <div class="p-4">
     <Title>{{ title }}</Title>
-    <div class="flex-1 flex-col justify-between gap-3" v-if="totalCount">
-      <header class="flex-row items-center justify-between w-full">
+    <div class="flex flex-col justify-between gap-4" v-if="totalCount">
+      <header class="flex items-center justify-between w-full">
         <h3 class="title">Products</h3>
-        <!-- <NuxtLink :to="{ name: 'admin-users-id', params: { id: '_' } }">
-          <button class="btn btn__primary btn__pill px-2 py-05">
-            <IconsPlus />
+        <NuxtLink :to="{ name: 'admin-users-id', params: { id: '_' } }">
+          <button class="btn btn-primary px-4 py-2 text-xs">
+            <IconsPlus class="w-5 h-5 fill-white" />
             <span>Add</span>
           </button>
-        </NuxtLink> -->
+        </NuxtLink>
       </header>
-      <main class="flex-1 max-width-130 w-full flex-col gap-3">
+      <main class="">
         <div class="flex-col gap-3 flex-col br-5">
           <div class="flex-row items-center gap-4" v-if="totalCount">
-            <!-- <FormsBaseInput name="Per Page" label="Per Page" v-model="perPage" @update:modelValue="setPerPage" /> -->
-            <!-- <Sort
+            <FormsBaseInput name="Per Page" label="Per Page" v-model="perPage" @update:modelValue="setPerPage" />
+            <Sort
               :sort="sort"
               :sortOptions="sortOptions"
               @toggleSort="toggleSort"
               v-if="totalCount && users.length > 1"
-            /> -->
-            <!-- <Search class="flex-1" @searchKeywordSelected="handleSearch" v-if="totalCount && users.length > 1" /> -->
+            />
+            <Search class="flex-1" @searchKeywordSelected="handleSearch" v-if="totalCount && users.length > 1" />
           </div>
           <AdminUsersList
             :users="users"
@@ -188,11 +189,24 @@ await fetchAllUsers()
           />
         </div>
       </main>
-      <footer class="w-full max-width-130">
+      <footer class="w-full">
         <!-- <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1 && !keyword" /> -->
       </footer>
     </div>
-    <div class="p-10 flex flex-col gap-2" v-else>
+    <AdminListFallback v-else>
+      <template #header>Add User</template>
+      <template #default>
+        <div class="">Create your first user</div>
+        <NuxtLink
+          class="btn btn-primary btn-pill px-4 py-2 text-xs self-end"
+          :to="{ name: 'admin-users-id', params: { id: '_' } }"
+        >
+          <IconsPlus class="fill-white w-5 h-5" />
+          <span>Add</span>
+        </NuxtLink>
+      </template>
+    </AdminListFallback>
+    <!-- <div class="p-10 flex flex-col gap-2" v-else>
       <h3>Add your first user</h3>
       <NuxtLink
         class="bg-[#0F172A] px-4 py-1 flex text-white items-center gap-2 rounded self-start hover:(text-red-100 bg-[#64748B])"
@@ -201,7 +215,7 @@ await fetchAllUsers()
         <IconsPlus class="w-5 h-5 fill-current" />
         <span>Add</span>
       </NuxtLink>
-    </div>
+    </div> -->
   </div>
 </template>
 
