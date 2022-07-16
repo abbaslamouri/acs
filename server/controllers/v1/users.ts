@@ -6,6 +6,8 @@ import errorHandler from '~/server/utils/errorHandler'
 const fetchAllUsers = async (event: any, query: any, collection: string) => {
   let cursor: any
 
+  // 62cf33d3389f8babd5bb1862
+
   // console.log('Q', query)
 
   try {
@@ -41,6 +43,174 @@ const fetchAllUsers = async (event: any, query: any, collection: string) => {
       pipeline.push({ $match: { ...matchObj } })
     }
 
+    pipeline.push(
+      {
+        $unwind: {
+          path: '$userAddresses',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: '$userAddresses.phoneNumbers',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'countries',
+          localField: 'userAddresses.phoneNumbers.phoneCountryCode',
+          foreignField: '_id',
+          as: 'userAddresses.phoneNumbers.phoneCountryCode',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userAddresses.phoneNumbers.phoneCountryCode',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'countries',
+          localField: 'userAddresses.country',
+          foreignField: '_id',
+          as: 'userAddresses.country',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userAddresses.country',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'states',
+          localField: 'userAddresses.state',
+          foreignField: '_id',
+          as: 'userAddresses.state',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userAddresses.state',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: '$userAddresses._id',
+          // userAddress: { $first: '$userAddresses' },
+          phoneNumbers: {
+            $push: '$userAddresses.phoneNumbers',
+          },
+          // name: { $first: '$userAddresses.name' },
+          // addressType: { $first: '$userAddresses.addressType' },
+          // title: { $first: '$userAddresses.title' },
+          // company: { $first: '$userAddresses.company' },
+          // addressLine1: { $first: '$userAddresses.addressLine1' },
+          // addressLine2: { $first: '$userAddresses.addressLine2' },
+          // city: { $first: '$userAddresses.city' },
+          // state: { $first: '$userAddresses.state' },
+          // postalCode: { $first: '$userAddresses.postalCode' },
+          // country: { $first: '$userAddresses.country' },
+          // defaultShippingAddress: { $first: '$userAddresses.defaultShippingAddress' },
+          // defaultBilliingAddress: { $first: '$userAddresses.defaultBilliingAddress' },
+          userAddress: { $first: '$userAddresses' },
+
+          // name: { $first: '$userAddresses.name' },
+          doc: { $first: '$$ROOT' },
+        },
+      },
+      {
+        $group: {
+          _id: '$doc._id',
+          phoneNumbers: {
+            $push: '$phoneNumbers',
+          },
+          address: { $first: '$userAddress' },
+
+          // name: { $first: '$userAddress.name' },
+
+          // name: { $first: '$userAddresses.name' },
+          doc: { $first: '$$ROOT' },
+        },
+      },
+      {
+        $project: {
+          name: '$_id',
+          locations: {
+            $setUnion: ['$phoneNumbers', '$address'],
+          },
+          // "_id": 0
+        },
+      }
+      // {
+      //   $group: {
+      //     _id: '$userAddresses.userAddresses_id',
+      //     phoneNumbers: {
+      //       $push: '$userAddresses.phoneNumbers',
+      //     },
+      //     // 'userAddresses.phoneNumbers': {
+      //     //   $push: '$userAddresses.phoneNumbers',
+      //     // },
+      //     // userAddresses: { $first: '$userAddresses' },
+
+      //     // name: { $first: '$userAddresses.name' },
+      //     // doc: { $first: '$$ROOT' },
+      //   },
+      // }
+      // {
+      //   $group: {
+      //     _id: '$doc._id',
+      //     doc: { $first: '$doc' },
+      //     userAddresses: {
+      //       $push: '$phoneNumbers',
+      //     },
+      //     // userAddress: { $first: '$userAddress' },
+      //     // phoneNumbers: { $first: '$phoneNumbers' },
+      //   },
+      // }
+    )
+
+    // {
+    //   $replaceRoot: {
+    //     newRoot: {
+    //       $mergeObjects: ['$doc', '$$ROOT'],
+    //     },
+    //   },
+    // }
+
+    // {
+    //   $replaceRoot: { newRoot: '$doc' },
+    // }
+    // {
+    //   $group: {
+    //     _id: '$_id',
+    //     doc: { $first: '$$ROOT' },
+    //   },
+    // },
+
+    // pipeline.push()
+
+    // {
+    //   $lookup: {
+    //     from: 'countries',
+    //     localField: 'userAddresses.county',
+    //     foreignField: '_id',
+    //     as: 'userAddresses.county',
+    //   },
+    // }
+
+    // {
+    //   $replaceRoot: {
+    //     newRoot: {
+    //       $mergeObjects: [{ $arrayElemAt: ['$phoneCountryCode', 1] }, '$$ROOT'],
+    //     },
+    //   },
+    // }
+
     // Lookup stage
     // if (query.lookup) {
     //   const lookupArr = query.lookup.split(',')
@@ -51,42 +221,54 @@ const fetchAllUsers = async (event: any, query: any, collection: string) => {
     //       foreignField: '_id',
     //       as: lookupArr[prop].trim(),
     //     }
-
-    pipeline.push({
-      $unwind: {
-        path: '$userAddresses',
-        preserveNullAndEmptyArrays: true,
-      },
-    })
-    pipeline.push({
-      $unwind: {
-        path: '$userAddresses.phoneNumbers',
-        preserveNullAndEmptyArrays: true,
-      },
-    })
-
-    pipeline.push({
-      $lookup: {
-        from: 'countries',
-        localField: 'userAddresses.phoneNumbers.phoneCountryCode',
-        foreignField: '_id',
-        as: 'userAddresses.phoneNumbers.phoneCountryCode',
-      },
-    })
-    pipeline.push({
-      $unwind: {
-        path: '$userAddresses.phoneNumbers.phoneCountryCode',
-        preserveNullAndEmptyArrays: true,
-      },
-    })
+    /////////
+    // pipeline.push({
+    //   $unwind: {
+    //     path: '$userAddresses',
+    //     preserveNullAndEmptyArrays: true,
+    //   },
+    // })
 
     // pipeline.push({
-    //   $group: {
-    //     _id: '$userAddresses._id',
-    //     phoneNumbers: {
-    //       $push: '$phoneNumbers',
-    //     },
+    //   $unwind: {
+    //     path: '$userAddresses.phoneNumbers',
+    //     preserveNullAndEmptyArrays: true,
     //   },
+    // })
+
+    // pipeline.push({
+    //   $lookup: {
+    //     from: 'countries',
+    //     localField: 'userAddresses.phoneNumbers.phoneCountryCode',
+    //     foreignField: '_id',
+    //     as: 'phoneCountryCode',
+    //   },
+    // })
+
+    // pipeline.push()
+
+    // pipeline.push({
+    //   $project: {
+    //     addressPhone: { $concat: ['$userAddresses._id'] },
+    //     doc: { $first: '$$ROOT' },
+    //   },
+    // })
+
+    ////////////
+
+    // pipeline.push()
+
+    // pipeline.push({
+    //   $replaceRoot: { newRoot: '$doc' },
+    // })
+    // pipeline.push({
+    //   $group: {
+    //     _id: '$_id',
+    //     doc: { $first: '$$ROOT' },
+    //   },
+    // })
+    // pipeline.push({
+    //   $replaceRoot: { newRoot: '$doc' },
     // })
 
     // pipeline.push({
@@ -129,6 +311,11 @@ const fetchAllUsers = async (event: any, query: any, collection: string) => {
     cursor = mongoClient.db().collection(collection).aggregate(pipeline)
     const docs = await cursor.toArray()
     if (!docs) throw new AppError(`We were not able to fetch ${collection}`, 400)
+    console.log('DDDDDD', docs)
+    for (const i in docs) {
+      // docs[i] = { ...docs[i].doc, userAddresses: docs[i].userAddresses }
+      // dics[i].userAddresses
+    }
     return {
       docs,
       totalCount,

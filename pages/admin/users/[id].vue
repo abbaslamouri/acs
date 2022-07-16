@@ -29,7 +29,7 @@ if (id) {
     lookup: 'media',
   }
   response = await fetchAll('users', params)
-  console.log('USER', response.docs)
+  console.log('USER', response)
   if (response.docs.length) user.value = response.docs[0]
 }
 

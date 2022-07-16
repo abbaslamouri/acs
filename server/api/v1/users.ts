@@ -10,6 +10,8 @@ export default defineEventHandler(async (event) => {
   const query: any = useQuery(event)
   // console.log('Query', query)
 
+  // 62cf33d3389f8babd5bb1862
+
   switch (event.req.method) {
     case 'GET':
       return await fetchAllUsers(event, query, 'users')
@@ -30,6 +32,7 @@ export default defineEventHandler(async (event) => {
         body.userAddresses[i]._id = new ObjectId()
         body.userAddresses[i].country = new ObjectId(body.userAddresses[i].country._id)
         for (const j in body.userAddresses[i].phoneNumbers) {
+          console.log('XX', body.userAddresses[i].phoneNumbers[j])
           body.userAddresses[i].phoneNumbers[j].phoneCountryCode = new ObjectId(
             body.userAddresses[i].phoneNumbers[j].phoneCountryCode._id
           )
