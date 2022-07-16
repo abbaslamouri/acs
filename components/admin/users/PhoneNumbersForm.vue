@@ -44,7 +44,7 @@ const props = defineProps({
 
 const emit = defineEmits(['insertNewPhoneNumber', 'removePhoneNumber', 'setDefaultPhoneNumber', 'updatePhoneNumbers'])
 
-const localPhoneNumbers = ref(cloneDeep(props.phoneNumbers))
+const localPhoneNumbers = ref(props.phoneNumbers)
 
 // const user = useState('user')
 // console.log(user.value)
@@ -108,7 +108,9 @@ const insertNewPhoneNumber = () => {
 
 const setPhoneNumber = (event, j) => {
   console.log(event, j)
+  console.log('LPN', localPhoneNumbers.value)
   const selectedCountry = countries.value.find((c) => c._id == event)
+  console.log(selectedCountry)
   if (selectedCountry) localPhoneNumbers.value[j].phoneCountryCode = selectedCountry
 
   // localPhoneNumbers[j].phoneCountryCode = countries.find((c) => c._id == $event)
@@ -153,6 +155,7 @@ const removePhoneNumber = (j) => {
 watch(
   () => localPhoneNumbers.value,
   (newVal) => {
+    console.log('NV', newVal)
     emit('updatePhoneNumbers', newVal)
   },
   { deep: true }
@@ -161,16 +164,17 @@ watch(
 
 <template>
   <div class="flex flex-col gap-4">
+    <!-- {{ localPhoneNumbers }} -->
     <div class="flex flex-row items-center gap-4" v-for="(phoneNbr, j) in localPhoneNumbers" :key="`phone-number-${j}`">
       <div class="w-40">
-        <FormsBaseSelect label="PhoneType" v-model="localPhoneNumbers[j].phoneType" :options="phoneTypeOptions" />
+        <FormsBaseSelect label="PhoneType" :value="localPhoneNumbers[j].phoneType" :options="phoneTypeOptions" />
       </div>
       <div class="w-40">
         <FormsBaseInput label="Phone Number" placeholder="Phone Number" v-model="localPhoneNumbers[j].phoneNumber" />
       </div>
       <div class="flex-1">
         <FormsBaseSelect
-          v-model="localPhoneNumbers[j].phoneCountryCode._id"
+          :value="localPhoneNumbers[j].phoneCountryCode._id"
           @update:modelValue="setPhoneNumber($event, j)"
           label="Country Code"
           nullOption="-"

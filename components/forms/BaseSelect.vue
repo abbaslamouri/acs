@@ -1,6 +1,6 @@
 <script setup>
 defineProps({
-  modelValue: {
+  value: {
     type: [String, Number],
     default: '',
   },
@@ -34,7 +34,7 @@ export default {
     <select
       class="appearance-none w-full bg-gray cursor-pointer border-2 border-gray-300 py-2 px-4 text-xs rounded"
       ref="selectRef"
-      :value="modelValue"
+      :value="value"
       :class="`base-select-${uuid}`"
       :aria-describedby="errorMsg ? `base-input-error-${uuid}` : null"
       :aria-invalid="errorMsg ? true : null"
@@ -47,7 +47,7 @@ export default {
         v-for="option in options"
         :key="option.key"
         :value="option.key"
-        :selected="modelValue === option.key"
+        :selected="value === option.key"
         :disabled="option.disabled || option.disabledIf"
       >
         {{ option.name }}

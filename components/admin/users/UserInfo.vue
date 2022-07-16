@@ -1,6 +1,4 @@
 <script setup>
-import cloneDeep from 'lodash.clonedeep'
-
 const props = defineProps({
   user: {
     type: Object,
@@ -10,7 +8,7 @@ const props = defineProps({
 
 const emit = defineEmits(['updateUser', 'saveUserInfo'])
 
-const localUser = ref(cloneDeep(props.user))
+const localUser = ref(props.user)
 
 watch(
   () => localUser.value,
@@ -46,7 +44,7 @@ watch(
         <div class="min-w-sm">
           <FormsBaseSelect
             label="Role"
-            v-model="localUser.role"
+            :value="localUser.role"
             :options="[
               { key: 'admin', name: 'Admin' },
               { key: 'shop-manager', name: 'Shop Manager' },

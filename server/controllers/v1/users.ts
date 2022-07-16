@@ -1,3 +1,4 @@
+import cloneDeep from 'lodash.clonedeep'
 import { ObjectId } from 'mongodb'
 import AppError from '~/server/utils/AppError'
 import mongoClient from '~/server/utils/mongoClient'
@@ -43,136 +44,153 @@ const fetchAllUsers = async (event: any, query: any, collection: string) => {
       pipeline.push({ $match: { ...matchObj } })
     }
 
-    pipeline.push(
-      {
-        $unwind: {
-          path: '$userAddresses',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: '$userAddresses.phoneNumbers',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'countries',
-          localField: 'userAddresses.phoneNumbers.phoneCountryCode',
-          foreignField: '_id',
-          as: 'userAddresses.phoneNumbers.phoneCountryCode',
-        },
-      },
-      {
-        $unwind: {
-          path: '$userAddresses.phoneNumbers.phoneCountryCode',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'countries',
-          localField: 'userAddresses.country',
-          foreignField: '_id',
-          as: 'userAddresses.country',
-        },
-      },
-      {
-        $unwind: {
-          path: '$userAddresses.country',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'states',
-          localField: 'userAddresses.state',
-          foreignField: '_id',
-          as: 'userAddresses.state',
-        },
-      },
-      {
-        $unwind: {
-          path: '$userAddresses.state',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $group: {
-          _id: '$userAddresses._id',
-          // userAddress: { $first: '$userAddresses' },
-          phoneNumbers: {
-            $push: '$userAddresses.phoneNumbers',
-          },
-          // name: { $first: '$userAddresses.name' },
-          // addressType: { $first: '$userAddresses.addressType' },
-          // title: { $first: '$userAddresses.title' },
-          // company: { $first: '$userAddresses.company' },
-          // addressLine1: { $first: '$userAddresses.addressLine1' },
-          // addressLine2: { $first: '$userAddresses.addressLine2' },
-          // city: { $first: '$userAddresses.city' },
-          // state: { $first: '$userAddresses.state' },
-          // postalCode: { $first: '$userAddresses.postalCode' },
-          // country: { $first: '$userAddresses.country' },
-          // defaultShippingAddress: { $first: '$userAddresses.defaultShippingAddress' },
-          // defaultBilliingAddress: { $first: '$userAddresses.defaultBilliingAddress' },
-          userAddress: { $first: '$userAddresses' },
+    // pipeline.push(
+    //   {
+    //     $unwind: {
+    //       path: '$userAddresses',
+    //       preserveNullAndEmptyArrays: true,
+    //     },
+    //   },
+    //   {
+    //     $unwind: {
+    //       path: '$userAddresses.phoneNumbers',
+    //       preserveNullAndEmptyArrays: true,
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'countries',
+    //       localField: 'userAddresses.phoneNumbers.phoneCountryCode',
+    //       foreignField: '_id',
+    //       as: 'userAddresses.phoneNumbers.phoneCountryCode',
+    //     },
+    //   },
+    //   {
+    //     $unwind: {
+    //       path: '$userAddresses.phoneNumbers.phoneCountryCode',
+    //       preserveNullAndEmptyArrays: true,
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'countries',
+    //       localField: 'userAddresses.country',
+    //       foreignField: '_id',
+    //       as: 'userAddresses.country',
+    //     },
+    //   },
+    //   {
+    //     $unwind: {
+    //       path: '$userAddresses.country',
+    //       preserveNullAndEmptyArrays: true,
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'states',
+    //       localField: 'userAddresses.state',
+    //       foreignField: '_id',
+    //       as: 'userAddresses.state',
+    //     },
+    //   },
+    //   {
+    //     $unwind: {
+    //       path: '$userAddresses.state',
+    //       preserveNullAndEmptyArrays: true,
+    //     },
+    //   },
+    //   // {
+    //   //   $group: {
+    //   //     _id: '$userAddresses._id',
+    //   //     phoneNumbers: {
+    //   //       $push: '$userAddresses.phoneNumbers',
+    //   //     },
+    //   //     // name: { $first: '$name' },
+    //   //     // doc: { $first: '$$ROOT' },
+    //   //   },
+    //   // }
+    //   {
+    //     $group: {
+    //       _id: '$userAddresses._id',
+    //       // userAddress: { $first: '$userAddresses' },
+    //       phoneNumbers: {
+    //         $push: '$userAddresses.phoneNumbers',
+    //       },
+    //       name: { $first: '$userAddresses.name' },
+    //       addressType: { $first: '$userAddresses.addressType' },
+    //       title: { $first: '$userAddresses.title' },
+    //       company: { $first: '$userAddresses.company' },
+    //       addressLine1: { $first: '$userAddresses.addressLine1' },
+    //       addressLine2: { $first: '$userAddresses.addressLine2' },
+    //       city: { $first: '$userAddresses.city' },
+    //       state: { $first: '$userAddresses.state' },
+    //       postalCode: { $first: '$userAddresses.postalCode' },
+    //       country: { $first: '$userAddresses.country' },
+    //       defaultShippingAddress: { $first: '$userAddresses.defaultShippingAddress' },
+    //       defaultBilliingAddress: { $first: '$userAddresses.defaultBilliingAddress' },
+    //       // userAddress: {
+    //       //   $first: '$userAddresses',
+    //       // },
 
-          // name: { $first: '$userAddresses.name' },
-          doc: { $first: '$$ROOT' },
-        },
-      },
-      {
-        $group: {
-          _id: '$doc._id',
-          phoneNumbers: {
-            $push: '$phoneNumbers',
-          },
-          address: { $first: '$userAddress' },
+    //       // name: { $first: '$userAddresses.name' },
+    //       doc: { $first: '$$ROOT' },
+    //     },
+    //   }
+    // {
+    //   $group: {
+    //     _id: '$doc._id',
+    //     // phoneNumbers: {
+    //     //   $push: '$phoneNumbers',
+    //     // },
+    //     userAddresses: { $push: '$userAddress' },
 
-          // name: { $first: '$userAddress.name' },
+    //     // name: { $first: '$userAddress.name' },
 
-          // name: { $first: '$userAddresses.name' },
-          doc: { $first: '$$ROOT' },
-        },
-      },
-      {
-        $project: {
-          name: '$_id',
-          locations: {
-            $setUnion: ['$phoneNumbers', '$address'],
-          },
-          // "_id": 0
-        },
-      }
-      // {
-      //   $group: {
-      //     _id: '$userAddresses.userAddresses_id',
-      //     phoneNumbers: {
-      //       $push: '$userAddresses.phoneNumbers',
-      //     },
-      //     // 'userAddresses.phoneNumbers': {
-      //     //   $push: '$userAddresses.phoneNumbers',
-      //     // },
-      //     // userAddresses: { $first: '$userAddresses' },
+    //     // name: { $first: '$userAddresses.name' },
+    //     doc: { $first: '$$ROOT' },
+    //   },
+    // }
+    // {
+    //   $project: {
+    //     name: '$_id',
+    //     locations: {
+    //       $setUnion: ['$phoneNumbers', '$address'],
+    //     },
+    //     // "_id": 0
+    //   },
+    // }
+    // {
+    //   $group: {
+    //     _id: '$userAddresses.userAddresses_id',
+    //     phoneNumbers: {
+    //       $push: '$userAddresses.phoneNumbers',
+    //     },
+    //     // 'userAddresses.phoneNumbers': {
+    //     //   $push: '$userAddresses.phoneNumbers',
+    //     // },
+    //     // userAddresses: { $first: '$userAddresses' },
 
-      //     // name: { $first: '$userAddresses.name' },
-      //     // doc: { $first: '$$ROOT' },
-      //   },
-      // }
-      // {
-      //   $group: {
-      //     _id: '$doc._id',
-      //     doc: { $first: '$doc' },
-      //     userAddresses: {
-      //       $push: '$phoneNumbers',
-      //     },
-      //     // userAddress: { $first: '$userAddress' },
-      //     // phoneNumbers: { $first: '$phoneNumbers' },
-      //   },
-      // }
-    )
+    //     // name: { $first: '$userAddresses.name' },
+    //     // doc: { $first: '$$ROOT' },
+    //   },
+    // }
+    // {
+    //   $group: {
+    //     _id: '$doc._id',
+    //     doc: { $first: '$doc' },
+    //     user: {
+    //       $push: '$userAddress',
+    //     },
+    //     // userAddresses: {
+    //     //   _id: { $first: '$_id' },
+    //     //   phoneNumbers: { $first: '$phoneNumbers' },
+    //     //   title: { $first: '$title' },
+    //     // },
+    //     // userAddress: { $first: '$userAddress' },
+    //     // phoneNumbers: { $first: '$phoneNumbers' },
+    //   },
+    // }
+    // )
 
     // {
     //   $replaceRoot: {
@@ -310,12 +328,15 @@ const fetchAllUsers = async (event: any, query: any, collection: string) => {
 
     cursor = mongoClient.db().collection(collection).aggregate(pipeline)
     const docs = await cursor.toArray()
-    if (!docs) throw new AppError(`We were not able to fetch ${collection}`, 400)
-    console.log('DDDDDD', docs)
-    for (const i in docs) {
-      // docs[i] = { ...docs[i].doc, userAddresses: docs[i].userAddresses }
-      // dics[i].userAddresses
-    }
+    // if (!userAddresses) throw new AppError(`We were not able to fetch ${collection}`, 400)
+    // console.log('DDDDDD', userAddresses)
+    // const doc = userAddresses[0].doc
+    // for (const i in userAddresses) {
+    // userAddresses[i] = { ...cloneDeep(userAddresses[i]), phoneNumbers: userAddresses[i].phoneNumbers }
+    // userAddresses[i].phoneNumbers = , userAddresses: userAddresses[i].userAddresses }
+    // dics[i].userAddresses
+    // }
+    // const docs = [{ ...doc, userAddresses }]
     return {
       docs,
       totalCount,

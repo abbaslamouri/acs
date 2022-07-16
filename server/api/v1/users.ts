@@ -27,21 +27,21 @@ export default defineEventHandler(async (event) => {
       body.sortOrder = body.sortOrder ? body.sortOrder * 1 : 0
       body.active = body.active ? body.active : false
       body.verified = body.verified ? body.verified : false
-      for (const i in body.userAddresses) {
-        body.userAddresses[i].state = new ObjectId(body.userAddresses[i].state._id)
-        body.userAddresses[i]._id = new ObjectId()
-        body.userAddresses[i].country = new ObjectId(body.userAddresses[i].country._id)
-        for (const j in body.userAddresses[i].phoneNumbers) {
-          console.log('XX', body.userAddresses[i].phoneNumbers[j])
-          body.userAddresses[i].phoneNumbers[j].phoneCountryCode = new ObjectId(
-            body.userAddresses[i].phoneNumbers[j].phoneCountryCode._id
-          )
-          body.userAddresses[i].phoneNumbers[j]._id = new ObjectId()
-        }
-      }
-      for (const i in body.media) {
-        body.media[i] = new ObjectId(body.media[i]._id)
-      }
+      // for (const i in body.userAddresses) {
+      //   body.userAddresses[i].state = new ObjectId(body.userAddresses[i].state._id)
+      //   body.userAddresses[i]._id = new ObjectId()
+      //   body.userAddresses[i].country = new ObjectId(body.userAddresses[i].country._id)
+      //   for (const j in body.userAddresses[i].phoneNumbers) {
+      //     console.log('XX', body.userAddresses[i].phoneNumbers[j])
+      //     body.userAddresses[i].phoneNumbers[j].phoneCountryCode = new ObjectId(
+      //       body.userAddresses[i].phoneNumbers[j].phoneCountryCode._id
+      //     )
+      //     body.userAddresses[i].phoneNumbers[j]._id = new ObjectId()
+      //   }
+      // }
+      // for (const i in body.media) {
+      //   body.media[i] = new ObjectId(body.media[i]._id)
+      // }
       console.log('BBBBB', body)
       if (event.req.method === 'POST') return await insertDoc(event, body, 'users')
       else return await updateDoc(event, body, 'users')

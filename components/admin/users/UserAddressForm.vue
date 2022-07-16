@@ -51,7 +51,7 @@ const countries = inject('countries')
 const states = inject('states')
 
 // const localOrderCustomer = ref({})
-const localUserAddress = ref(cloneDeep(props.userAddress))
+const localUserAddress = ref(props.userAddress)
 // const user.userAddresses[addressIndex].shippingAddress = ref({})
 // const user.userAddresses[addressIndex].customer.phoneNumbers = ref([...props.orderPhoneNumbers])
 
@@ -236,8 +236,9 @@ watch(
       </button> -->
     </section>
     <section class="flex flex-col gap-6">
+      <!-- {{ localUserAddress }} -->
       <FormsBaseInput label="Company" placeholder="Company" v-model="localUserAddress.company" />
-      <div class=" flex flex-row gap-2">
+      <div class="flex flex-row gap-2">
         <div class="flex-1">
           <FormsBaseInput label="Address Line 1" placeholder="Address Line 1" v-model="localUserAddress.addressLine1" />
         </div>
@@ -251,12 +252,12 @@ watch(
         </div>
         <div class="flex-1">
           <FormsBaseSelect
-            v-model="localUserAddress.state._id"
+            :value="localUserAddress.state"
             label="State"
             nullOption="-"
             :options="
               states.map((s) => {
-                return { key: s._id, name: s.name }
+                return { key: s.name, name: s.name }
               })
             "
             @update:modelValue="setAddressState"
@@ -285,7 +286,7 @@ watch(
         </div>
         <div class="flex-1">
           <FormsBaseSelect
-            v-model="localUserAddress.country._id"
+            :value="localUserAddress.country._id"
             label="Country"
             nullOption="-"
             :options="
@@ -316,7 +317,7 @@ watch(
     </section>
     <section class="delivery-instructions">
       <div class="field-group">
-        <FormsBaseTextarea label="Delivery Instructions"  v-model="localUserAddress.deliveryInstructions" />
+        <FormsBaseTextarea label="Delivery Instructions" v-model="localUserAddress.deliveryInstructions" />
       </div>
     </section>
     <section class="items-self-start flex flex-row gap-4 text-sm">

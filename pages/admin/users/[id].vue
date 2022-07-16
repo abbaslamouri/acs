@@ -6,6 +6,7 @@ const pageTitle = ref('User | YRL')
 const { fetchAll, saveDoc } = useHttp()
 const route = useRoute()
 const router = useRouter()
+const errorMsg = useState('errorMsg')
 const addressToEditIndex = ref('')
 const showAddressFormModal = ref(false)
 const countries = ref([])
@@ -22,7 +23,6 @@ const user = ref({
 const id = route.params.id === '_' ? null : route.params.id
 
 if (id) {
-  console.log('ID', id)
   const params = {
     match: `_id[eq]=${id}`,
     project: '',
@@ -66,13 +66,16 @@ const insertNewAddress = () => {
     addressLine2: 'Room 101',
     city: 'Aurora',
     postalCode: '44202',
-    state: states.value.find((c) => c.name === 'Alaska'),
+    state: 'Alaska',
+    // country: 'United States',
     country: countries.value.find((c) => c.threeLetterCountryCode === 'USA'),
+    // country: 'United States',
     phoneNumbers: [
       {
         phoneType: 'Cell',
-        phoneNumber: '2165026378',
+        phoneNumber: '216502637800',
         phoneCountryCode: countries.value.find((c) => c.threeLetterCountryCode == 'USA'),
+        // phoneCountryName: 'United States',
         default: true,
       },
     ],
@@ -81,6 +84,9 @@ const insertNewAddress = () => {
   if (user.value.userAddresses.length == 1) {
     user.value.userAddresses[0].defaultShippingAddress = true
     user.value.userAddresses[0].defaultBillingAddress = true
+  } else {
+    user.value.userAddresses[0].defaultShippingAddress = false
+    user.value.userAddresses[0].defaultBillingAddress = false
   }
   addressToEditIndex.value = user.value.userAddresses.length - 1
   // console.log(user.value)
@@ -99,35 +105,37 @@ const insertNewAddress = () => {
 //   }
 // }
 
-// const editAddress = (i) => {
-//   addressToEditIndex.value = i
-//   showAddressFormModal.value = true
-//   // displayStatus.value = 'editing'
-//   // editAction.value = 'add'
-// }
+const editAddress = (i) => {
+  addressToEditIndex.value = i
+  showAddressFormModal.value = true
+  // displayStatus.value = 'editing'
+  // editAction.value = 'add'
+}
 
-// const deleteAddress = async (i) => {
-//   if (!confirm('Are you sure you want to delete this address?')) return
-//   console.log('user', user.value)
-//   if (!user.value.id) return (errorMsg.value = 'Nothing to delete')
-//   user.value.userAddresses.splice(i, 1)
+const deleteAddress = async (i) => {
+  if (!confirm('Are you sure you want to delete this address?')) return
+  console.log('user', user.value)
+  if (!user.value._id) return (errorMsg.value = 'Nothing to delete')
+  user.value.userAddresses.splice(i, 1)
 
-//   const defaultShipAddress = user.value.userAddresses.find((a) => a.defaultShippingAddress)
-//   if (!defaultShipAddress) user.value.userAddresses[0].defaultShippingAddress = true
+  const defaultShipAddress = user.value.userAddresses.find((a) => a.defaultShippingAddress)
+  if (!defaultShipAddress) user.value.userAddresses[0].defaultShippingAddress = true
 
-//   const defaultBillAddress = user.value.userAddresses.find((a) => a.defaultBillingAddress)
-//   if (!defaultBillAddress) user.value.userAddresses[0].defaultBillingAddress = true
+  const defaultBillAddress = user.value.userAddresses.find((a) => a.defaultBillingAddress)
+  if (!defaultBillAddress) user.value.userAddresses[0].defaultBillingAddress = true
 
-//   const newUser = await saveDoc('users', user.value)
-//   if (newUser) {
-//     console.log(newUser)
-//     // user.value = newUser
-//     router.push({ name: 'admin-users-id', params: { id: user.value.id } })
-//   }
+  await saveUser()
 
-//   // displayStatus.value = 'editing'
-//   // editAction.value = 'add'
-// }
+  // const newUser = await saveDoc('users', user.value)
+  // if (newUser) {
+  //   console.log(newUser)
+  //   // user.value = newUser
+  //   router.push({ name: 'admin-users-id', params: { id: user.value.id } })
+  // }
+
+  //   // displayStatus.value = 'editing'
+  //   // editAction.value = 'add'
+}
 
 // const insertNewPhoneNumber = () => {
 //   user.value.userAddresses[addressToEditIndex.value].phoneNumbers.push({
@@ -164,18 +172,57 @@ const cancelAddressUpdate = () => {
   showAddressFormModal.value = false
 }
 
-const setDefaultShippingAddress = () => {
-  for (const prop in user.value.userAddresses) {
-    user.value.userAddresses[prop].defaultShippingAddress = false
+const resetDefaultAddress = (addressType, i) => {
+  if (user.value.userAddresses.length < 2) return
+  if (addressType === 'shippingAddress') {
+    for (const prop in user.value.userAddresses) {
+      user.value.userAddresses[prop].defaultShippingAddress = false
+    }
+    user.value.userAddresses[i].defaultShippingAddress = true
+  } else if (addressType === 'billingAddress') {
+    for (const prop in user.value.userAddresses) {
+      user.value.userAddresses[prop].defaultBillingAddress = false
+    }
+    user.value.userAddresses[i].defaultBillingAddress = true
   }
-  user.value.userAddresses[addressToEditIndex.value].defaultShippingAddress = true
+}
+
+const setDefaultShippingAddress = () => {
+  // if (user.value.userAddresses.length < 2) return
+  // for (const prop in user.value.userAddresses) {
+  //   user.value.userAddresses[prop].defaultShippingAddress = false
+  // }
+  resetDefaultAddress('shippingAddress', addressToEditIndex.value)
+  // user.value.userAddresses[addressToEditIndex.value].defaultShippingAddress = true
 }
 
 const setDefaultBillingAddress = () => {
-  for (const prop in user.value.userAddresses) {
-    user.value.userAddresses[prop].defaultBillingAddress = false
-  }
-  user.value.userAddresses[addressToEditIndex.value].defaultBillingAddress = true
+  // if (user.value.userAddresses.length < 2) return
+  // for (const prop in user.value.userAddresses) {
+  //   user.value.userAddresses[prop].defaultBillingAddress = false
+  // }
+  resetDefaultAddress('billingAddress', addressToEditIndex.value)
+  // user.value.userAddresses[addressToEditIndex.value].defaultBillingAddress = true
+}
+
+const switchShippingAddress = async (i) => {
+  // for (const prop in user.value.userAddresses) {
+  //   console.log(prop)
+  //   user.value.userAddresses[prop].defaultShippingAddress = false
+  // }
+  resetDefaultAddress('shippingAddress', i)
+  // user.value.userAddresses[i].defaultShippingAddress = true
+  await saveUser()
+}
+
+const switchBillingAddress = async (i) => {
+  // for (const prop in user.value.userAddresses) {
+  //   console.log(prop)
+  //   user.value.userAddresses[prop].defaultBillingAddress = false
+  // }
+  resetDefaultAddress('billingAddress', i)
+  // user.value.userAddresses[i].defaultBillingAddress = true
+  await saveUser()
 }
 
 // const updateUserAddress = (event) => {
@@ -184,6 +231,7 @@ const setDefaultBillingAddress = () => {
 
 const saveUser = async () => {
   console.log(user.value)
+  // return
   // if (!user.value.name) return (errorMsg.value = 'User name is required')
   // if (!user.value.email) return (errorMsg.value = 'User email is required')
   // if (!user.value.password) return (errorMsg.value = 'User [password] is required')
@@ -217,9 +265,13 @@ const saveUser = async () => {
 }
 
 const saveAddress = async () => {
-  console.log(user.value)
+  const defaultShippingAddress = user.value.userAddresses.find((a) => a.defaultShippingAddress)
+  if (!defaultShippingAddress) user.value.userAddresses[0].defaultShippingAddress = true
+  const defaultBillingAddress = user.value.userAddresses.find((a) => a.defaultBillingAddress)
+  if (!defaultBillingAddress) user.value.userAddresses[0].defaultBillingAddress = true
+  console.log('OOOOOO', user.value)
   showAddressFormModal.value = false
-  saveUser()
+  await saveUser()
 
   //   let errorMessage = ''
   //   for (const prop in user.value.userAddresses[addressToEditIndex.value].phoneNumbers) {
@@ -374,6 +426,22 @@ const saveAddress = async () => {
                         @click="deleteAddress(i)"
                       >
                         Delete Address
+                      </button>
+                    </div>
+                    <div class="flex flex-col gap-1 items-start text-xs">
+                      <button
+                        class="text-yellow-700"
+                        @click="switchShippingAddress(i)"
+                        v-if="!userAddress.defaultShippingAddress"
+                      >
+                        Set as the default shipping address
+                      </button>
+                      <button
+                        class="text-yellow-700"
+                        @click="switchBillingAddress(i)"
+                        v-if="!userAddress.defaultBillingAddress"
+                      >
+                        Set as the default billing address
                       </button>
                     </div>
                   </div>
