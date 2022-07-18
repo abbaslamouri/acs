@@ -7,7 +7,7 @@ const props = defineProps({
   galleryIntro: String,
   // mediaReference: String,
 })
-const emit = defineEmits(['setSelectedMedia', 'setGalleryImage', 'removeGalleryImage', 'selectFromProductGallery'])
+const emit = defineEmits(['setMedia', 'placeMedia', 'removeMedia', 'selectFromProductGallery'])
 // const mediaReference = useState('mediaReference')
 
 // const { errorMsg, message, showMediaSelector, mediaReference, galleryMedia } = useAppState()
@@ -18,17 +18,17 @@ const setMediaReference = () => {
   showMediaSelector.value = true
 }
 
-const setSelectedMedia = (event) => {
+const setMedia = (event) => {
   showMediaSelector.value = false
-  emit('setSelectedMedia', event)
+  emit('setMedia', event)
 }
 </script>
 
 <template>
-  <section class="shadow-lg w-full bg-white p-2 br-5" id="details">
-    <div class="flex flex-row items-center justify-between text-sm mb-1">
+  <section class=" w-full bg-white p-2 br-5" id="details">
+    <!-- <div class="flex flex-row items-center justify-between text-sm mb-1">
       <div class="uppercase inline-block border-b-stone-300 font-bold pb-05">Image Gallery</div>
-    </div>
+    </div> -->
     <div class="flex flex-col items-center gap-4">
       <div class="intro flex flex-row items-center gap-2 bg-slate-200 p-2 rounded text-sm" v-if="galleryIntro">
         <IconsInfo class="w-5 h-5 fill-sky-600" />
@@ -38,8 +38,8 @@ const setSelectedMedia = (event) => {
         :gallery="gallery"
         :galleryIntro="galleryIntro"
         galleryType="product"
-        @removeGalleryImage="$emit('removeGalleryImage', $event)"
-        @setGalleryImage="$emit('setGalleryImage', $event)"
+        @removeMedia="$emit('removeMedia', $event)"
+        @placeMedia="$emit('placeMedia', $event)"
       />
       <button class="btn bg-gray-300 text-xs" @click.prevent="showMediaSelector = !showMediaSelector">
         <IconsImage />
@@ -50,7 +50,7 @@ const setSelectedMedia = (event) => {
     <div class="" bg-white v-if="showMediaSelector">
       <div class="fixed inset-0 bg-gray-600 opacity-75 w-screen h-screen"></div>
       <div class="fixed top-[2vw] left-[2vw] w-[96vw] h-[96vh] bg-white">
-        <LazyMediaUploader @setSelectedMedia="setSelectedMedia" @mediaSelectCancel="showMediaSelector = false" />
+        <LazyMediaUploader @setMedia="setMedia" @mediaSelectCancel="showMediaSelector = false" />
       </div>
     </div>
   </section>
@@ -71,8 +71,8 @@ const setSelectedMedia = (event) => {
         :gallery="gallery"
         :galleryIntro="galleryIntro"
         galleryType="product"
-        @removeGalleryImage="$emit('removeGalleryImage', $event)"
-        @setGalleryImage="$emit('setGalleryImage', $event)"
+        @removeMedia="$emit('removeMedia', $event)"
+        @placeMedia="$emit('placeMedia', $event)"
       />
       <div class="w-full flex-col items-center gap-2">
         <div class="flex-row gap-2">

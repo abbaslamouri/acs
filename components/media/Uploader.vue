@@ -1,5 +1,5 @@
 <script setup>
-defineEmits(['setSelectedMedia'])
+defineEmits(['setMedia'])
 const config = useRuntimeConfig()
 const route = useRoute()
 const { fetchAll, saveMedia } = useHttp()
@@ -122,7 +122,7 @@ const handleSearch = async (searchKeyword) => {
   await fetchMedia()
 }
 
-// const setSelectedMedia = () => {
+// const setMedia = () => {
 //   galleryMedia.value = selectedMedia.value
 //   showMediaSelector.value = false
 // }
@@ -183,9 +183,7 @@ await fetchMedia()
     </div>
     <div class="actions bg-slate-300 py-2 px-4 flex flex-row gap-2 justify-end" v-if="route.name !== 'admin-media'">
       <button class="btn btn-secondary text-xs px-4 py-1" @click="$emit('mediaSelectCancel')">Cancel</button>
-      <button class="btn btn-primary text-xs px-4 py-1" @click="$emit('setSelectedMedia', selectedMedia)">
-        Select
-      </button>
+      <button class="btn btn-primary text-xs px-4 py-1" @click="$emit('setMedia', selectedMedia)">Select</button>
     </div>
     <transition name="slideout">
       <Slideout v-if="toggleSlideout" @closeSlideout="toggleSlideout = false">

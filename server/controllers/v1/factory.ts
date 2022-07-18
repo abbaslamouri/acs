@@ -107,26 +107,26 @@ const fetchAll = async (event: any, query: any, collection: string) => {
     }
 
     // Lookup stage
-    // if (query.lookup) {
-    //   const lookupArr = query.lookup.split(',')
-    //   for (const prop in lookupArr) {
-    //     const lookupObj = {
-    //       from: lookupArr[prop].trim().split('.')[lookupArr[prop].trim().split('.').length - 1],
-    //       localField: lookupArr[prop].trim(),
-    //       foreignField: '_id',
-    //       as: lookupArr[prop].trim(),
-    //     }
+    if (query.lookup) {
+      const lookupArr = query.lookup.split(',')
+      for (const prop in lookupArr) {
+        const lookupObj = {
+          from: lookupArr[prop].trim().split('.')[lookupArr[prop].trim().split('.').length - 1],
+          localField: lookupArr[prop].trim(),
+          foreignField: '_id',
+          as: lookupArr[prop].trim(),
+        }
 
-    //     pipeline.push({
-    //       $lookup: {
-    //         from: 'countries',
-    //         localField: 'userAddresses.country',
-    //         foreignField: '_id',
-    //         as: 'userAddresses.country',
-    //       },
-    //     })
-    //   }
-    // }
+        pipeline.push({
+          $lookup: {
+            from: lookupObj.from,
+            localField: lookupObj.localField,
+            foreignField: lookupObj.foreignField,
+            as: lookupObj.as,
+          },
+        })
+      }
+    }
 
     // Project stage
     if (query.project) {

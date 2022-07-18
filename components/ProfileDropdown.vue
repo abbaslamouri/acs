@@ -1,5 +1,8 @@
 <script setup>
-// const { loggedInUser, token, isAuthenticated, signout } = useAuth()
+const { signout } = useAuth()
+const message = useState('message')
+const loggedInUser = useState('loggedInUser')
+const isAuthenticated = useState('isAuthenticated')
 // const { errorMsg, message } = useAppState()
 const showProfileDropdown = ref(false)
 
@@ -7,10 +10,10 @@ const lougout = async () => {
   showProfileDropdown.value = false
   const response = await signout()
   if (!response) return
-  // token.value = null
-  // isAuthenticated.value = false
-  // if (process.client) localStorage.removeItem('cart')
-  // message.value = 'You are logged out'
+  console.log(response)
+  loggedInUser.value = ''
+  isAuthenticated.value = false
+  message.value = 'You are logged out'
 }
 </script>
 
@@ -20,9 +23,8 @@ const lougout = async () => {
       class="header flex-row items-center gap-1 text-slate-900 text-xs py-05 px-1 cursor-pointer br-3 relative z-99"
       v-bind:class="{ selected: showProfileDropdown }"
     >
-      <!-- <IconsPersonFill class="fill-slate-900" /> -->
       <h3 class="font-light uppercase" @click="showProfileDropdown = !showProfileDropdown">
-        Welcome {{ loggedInUser.name }}
+        Welcome {{ loggedInUser }}
       </h3>
     </div>
     <div
@@ -31,9 +33,9 @@ const lougout = async () => {
     >
       <h3 class="">My Accoun</h3>
       <ul>
-        <li v-if="loggedInUser.role !== 'admin'">
+        <!-- <li v-if="loggedInUser.role !== 'admin'">
           <NuxtLink :to="{ name: `admin` }">Admin Dashboard</NuxtLink>
-        </li>
+        </li> -->
         <li>
           <NuxtLink :to="{ name: `admin` }">Order History</NuxtLink>
         </li>

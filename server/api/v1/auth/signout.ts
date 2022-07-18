@@ -2,7 +2,7 @@ import slugify from 'slugify'
 import { ObjectId } from 'mongodb'
 
 import { fetchAll, insertDoc, updateDoc, deleteDoc } from '~/server/controllers/v1/factory'
-import { fetchAllUsers } from '~/server/controllers/v1/users'
+import { signup, verifyEmail, signin, signout } from '~/server/controllers/v1/auth'
 // import { deleteDoc } from '~/server/controllers/v1/galleries'
 
 export default defineEventHandler(async (event) => {
@@ -21,12 +21,12 @@ export default defineEventHandler(async (event) => {
     case 'PATCH':
       body = await useBody(event)
       console.log('Body', body)
-      body.name = body.name.trim()
-      body.email = body.email.trim().toLowerCase()
-      body.role = body.role ? body.role : 'user'
+      // body.name = body.name.trim()
+      // body.email = body.email.trim().toLowerCase()
+      // body.role = body.role ? body.role : 'user'
       // body.sortOrder = body.sortOrder ? body.sortOrder * 1 : 0
-      body.active = body.active ? body.active : false
-      body.verified = body.verified ? body.verified : false
+      // body.active = body.active ? body.active : false
+      // body.verified = body.verified ? body.verified : false
       // for (const i in body.userAddresses) {
       //   body.userAddresses[i].state = new ObjectId(body.userAddresses[i].state._id)
       //   body.userAddresses[i]._id = new ObjectId()
@@ -43,11 +43,10 @@ export default defineEventHandler(async (event) => {
       //   body.media[i] = new ObjectId(body.media[i]._id)
       // }
 
-      for (const i in body.media) {
-        body.media[i] = new ObjectId(body.media[i]._id)
-      }
-      if (event.req.method === 'POST') return await insertDoc(event, body, 'users')
-      else return await updateDoc(event, body, 'users')
+      // for (const i in body.media) {
+      //   body.media[i] = new ObjectId(body.media[i]._id)
+      // }
+      return await signout(event, body)
       break
 
     case 'DELETE':

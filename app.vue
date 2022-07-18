@@ -2,6 +2,11 @@
 const errorMsg = useState('errorMsg', () => '')
 const message = useState('message', () => '')
 const showCart = useState('showCart', () => false)
+const isAuthenticated = useState('isAuthenticated', () => (useCookie('jwt') && useCookie('jwt').value ? true : false))
+const token = useState('jwt', () => (useCookie('jwt') && useCookie('jwt').value ? useCookie('jwt').value : ''))
+const loggedInUser = useState('loggedInUser', () =>
+  useCookie('userName') && useCookie('userName').value ? useCookie('userName').value : ''
+)
 // const mediaReference = useState('mediaReference', () => '')
 // const { message, errorMsg, showMediaSelector, showCartSlideout } = useAppState()
 const hideSnackbar = () => {

@@ -22,8 +22,13 @@ const errorHandler = (event: any, err: any) => {
   let statusCode = 400
   // let data: any
 
-  if (err.name === 'CustomAPIError') {
+  if (err.name === 'CustomAPIError' || err.name === 'TokenExpiredError') {
     message = err.message
+    statusCode = err.statusCode
+  }
+
+  if (err.name === 'TokenExpiredError') {
+    message = 'Your token has expired, please contact customer service'
     statusCode = err.statusCode
   }
 

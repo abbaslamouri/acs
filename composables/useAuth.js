@@ -1,59 +1,62 @@
 const useAuth = () => {
   const config = useRuntimeConfig()
+  const errorMsg = useState('errorMsg')
+  const loggedInUser = useState('loggedInUser')
+  const jwt = useState('jwt')
+
   // const { errorMsg, message } = useAppState()
 
-  const loggedInUser = useState('loggedInUser', () =>
-    useCookie('loggedInUser') && useCookie('loggedInUser').value ? useCookie('loggedInUser').value : {}
-  )
+  // const loggedInUser = useState('loggedInUser', () =>
+  //   useCookie('userName') && useCookie('userName').value ? useCookie('userName').value : {}
+  // )
 
-  const token = useState('token', () =>
-    useCookie('token') && useCookie('token').value ? useCookie('token').value : ''
-  )
+  // const token = useState('token', () =>
+  //   useCookie('token') && useCookie('token').value ? useCookie('token').value : ''
+  // )
 
-  const isAuthenticated = useState('isAuthenticated', () =>
-    useCookie('token') && useCookie('token').value ? true : false
-  )
+  // const isAuthenticated = useState('isAuthenticated', () => (useCookie('jwt') && useCookie('jwt').value ? true : false))
 
-  const isAdmin = useState('isAdmin', () =>
-    useCookie('loggedInUser').value && useCookie('loggedInUser').value.role === 'admin' ? true : false
-  )
+  // const isAdmin = useState('isAdmin', () =>
+  //   useCookie('loggedInUser').value && useCookie('loggedInUser').value.role === 'admin' ? true : false
+  // )
 
-  const getErrorStr = (errors) => {
-    console.log('MYERROR', errors)
-    let errorStr = ''
-    for (const prop in errors) {
-      errorStr = `${errorStr}<li>${errors[prop].message}</li>`
-    }
-    return `<ul>${errorStr}</ul>`
-  }
+  // const getErrorStr = (errors) => {
+  //   console.log('MYERROR', errors)
+  //   let errorStr = ''
+  //   for (const prop in errors) {
+  //     errorStr = `${errorStr}<li>${errors[prop].message}</li>`
+  //   }
+  //   return `<ul>${errorStr}</ul>`
+  // }
 
-  const signup = async (payload) => {
+  const signup = async (body) => {
     errorMsg.value = ''
     try {
-      const response = await fetch(`${config.apiUrl}/auth/signup`, {
+      const response = await $fetch(`/api/v1/auth/signup`, {
         method: 'POST',
-        body: JSON.stringify(payload),
-        headers: new Headers({
-          'Content-Type': 'application/json',
-          // Authorization: `Bearer ${token.value}`,
-        }),
+        body,
       })
-      if (response.ok) {
-        const data = await response.json()
-        // const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        // const userCookie = useCookie('loggedInUser', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        // tokenCookie.value = data.token
-        // userCookie.value = data.user
-        // user.value = userCookie.value
-        // token.value = tokenCookie.value
-        // isAuthenticated.value = true
-        return data
-      }
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
+
+      return response
     } catch (err) {
       console.log('MYERROR', err)
-      errorMsg.value = err
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
+      return false
+    }
+  }
+
+  const verifyEmail = async (user) => {
+    errorMsg.value = ''
+    try {
+      const response = await $fetch(`/api/v1/auth/verify-email`, {
+        method: 'POST',
+        body: user,
+      })
+
+      return response
+    } catch (err) {
+      console.log('MYERROR', err)
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
       return false
     }
   }
@@ -89,78 +92,39 @@ const useAuth = () => {
   //   }
   // }
 
-  const signin = async (payload) => {
+  const signin = async (user) => {
     errorMsg.value = ''
-    message.value = ''
     try {
-      const response = await fetch(`${config.apiUrl}/auth/signin`, {
+      const response = await $fetch(`/api/v1/auth/signin`, {
         method: 'POST',
-        body: JSON.stringify(payload),
-        headers: new Headers({
-          'Content-Type': 'application/json',
-          // Authorization: `Bearer ${token.value}`,
-        }),
+        body: user,
       })
-      if (response.ok) {
-        const data = await response.json()
-        const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        const userCookie = useCookie('loggedInUser', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        tokenCookie.value = data.token
-        userCookie.value = data.user
-        loggedInUser.value = userCookie.value
-        token.value = tokenCookie.value
-        isAuthenticated.value = true
-        return true
-      }
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
+      return response
     } catch (err) {
       console.log('MYERROR', err)
-      errorMsg.value = err
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
       return false
     }
   }
 
-  const confirmEmail = async (payload) => {
+  const signout = async (user) => {
     errorMsg.value = ''
-    message.value = ''
-    console.log(payload)
+    // const token = useCookie('jwt') && useCookie('jwt').value ? useCookie('jwt').value : ''
+    // console.log('TT', jwt.value)
+    // console.log('loggedInUser', loggedInUser.value)
     try {
-      const response = await fetch(`${config.apiUrl}/auth/confirm-email`, {
-        method: 'PATCH',
-        body: JSON.stringify(payload),
-        headers: new Headers({
-          'Content-Type': 'application/json',
-          // Authorization: `Bearer ${token.value}`,
-        }),
+      const response = await $fetch(`/api/v1/auth/signout`, {
+        method: 'POST',
+        body: user,
+        // headers: new Headers({
+        //   'Content-Type': 'application/json',
+        //   Authorization: `Bearer ${jwt.value}`,
+        // }),
       })
-      if (response.ok) {
-        const data = await response.json()
-        const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        const userCookie = useCookie('loggedInUser', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        tokenCookie.value = data.token
-        userCookie.value = data.user
-        loggedInUser.value = userCookie.value
-        token.value = tokenCookie.value
-        isAuthenticated.value = true
-        return true
-      }
-      // if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      // throw getErrorStr((await response.json()).errors)
-
-      // const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/completeSignup/${token}`, {
-      //   method: 'PATCH',
-      //   body: { ...user },
-      // })
-      // if (error.value) throw error.value
-      // if (data.value && data.value.status === 'fail') {
-      //   if (process.client) errorMsg.value = data.value.message
-      //   return false
-      // }
-      // return data.value
+      return response
     } catch (err) {
       console.log('MYERROR', err)
-      errorMsg.value = err
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
       return false
     }
   }
@@ -185,40 +149,40 @@ const useAuth = () => {
   // }
 
   const fetchLoggedInUser = async () => {
-    errorMsg.value = ''
-    message.value = ''
-    // const token =
-    //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
-    //     ? useCookie('auth').value.token
-    //     : null
-    console.log('KKKKKKKK', token.value)
-    try {
-      const response = await fetch(`${config.apiUrl}/users/fetch-loggedin-user`, {
-        method: 'GET',
-        // body: JSON.stringify(payload),
-        headers: new Headers({
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token.value}`,
-        }),
-      })
-      if (response.ok) {
-        const data = await response.json()
-        // const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        // const userCookie = useCookie('user', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        // tokenCookie.value = data.token
-        // userCookie.value = data.user
-        // loggedInUser.value = userCookie.value
-        // token.value = tokenCookie.value
-        // isAuthenticated.value = true
-        return data
-      }
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
-    } catch (err) {
-      console.log('MYERROR', err)
-      errorMsg.value = err
-      return false
-    }
+    // errorMsg.value = ''
+    // message.value = ''
+    // // const token =
+    // //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
+    // //     ? useCookie('auth').value.token
+    // //     : null
+    // console.log('KKKKKKKK', token.value)
+    // try {
+    //   const response = await fetch(`${config.apiUrl}/users/fetch-loggedin-user`, {
+    //     method: 'GET',
+    //     // body: JSON.stringify(payload),
+    //     headers: new Headers({
+    //       'Content-Type': 'application/json',
+    //       Authorization: `Bearer ${token.value}`,
+    //     }),
+    //   })
+    //   if (response.ok) {
+    //     const data = await response.json()
+    //     // const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
+    //     // const userCookie = useCookie('user', { maxAge: data.cookieExpires * 24 * 60 * 60 })
+    //     // tokenCookie.value = data.token
+    //     // userCookie.value = data.user
+    //     // loggedInUser.value = userCookie.value
+    //     // token.value = tokenCookie.value
+    //     // isAuthenticated.value = true
+    //     return data
+    //   }
+    //   if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+    //   throw getErrorStr((await response.json()).errors)
+    // } catch (err) {
+    //   console.log('MYERROR', err)
+    //   errorMsg.value = err
+    //   return false
+    // }
     // const { data, pending, error } = await useFetch(`${config.apiUrl}/users/fetchLoggedIn`, {
     //   headers: { Authorization: `Bearer ${token}` },
     // })
@@ -239,106 +203,104 @@ const useAuth = () => {
   }
 
   const updateLoggedInUserData = async (payload) => {
-    errorMsg.value = ''
-    message.value = ''
-    const token =
-      useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
-        ? useCookie('auth').value.token
-        : null
-    try {
-      // const { data, pending, error } = await useFetch(`${config.apiUrl}/users/updateLoggedInData`, {
-      //   method: 'PATCH',
-      //   body: payload,
-      //   headers: { Authorization: `Bearer ${token}` },
-      // })
-      // if (error.value) throw error.value
-      // if (data.value && data.value.status === 'fail') {
-      //   if (process.client) errorMsg.value = data.value.message
-      //   return false
-      // }
-      // return data.value.doc
-    } catch (err) {
-      console.log('MYERROR', err)
-      errorMsg.value = err.data && err.data.message ? err.data.message : err.message ? err.message : ''
-      return false
-    }
+    // errorMsg.value = ''
+    // message.value = ''
+    // const token =
+    //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
+    //     ? useCookie('auth').value.token
+    //     : null
+    // try {
+    //   // const { data, pending, error } = await useFetch(`${config.apiUrl}/users/updateLoggedInData`, {
+    //   //   method: 'PATCH',
+    //   //   body: payload,
+    //   //   headers: { Authorization: `Bearer ${token}` },
+    //   // })
+    //   // if (error.value) throw error.value
+    //   // if (data.value && data.value.status === 'fail') {
+    //   //   if (process.client) errorMsg.value = data.value.message
+    //   //   return false
+    //   // }
+    //   // return data.value.doc
+    // } catch (err) {
+    //   console.log('MYERROR', err)
+    //   errorMsg.value = err.data && err.data.message ? err.data.message : err.message ? err.message : ''
+    //   return false
+    // }
   }
 
   const forgotPassword = async (payload) => {
-    errorMsg.value = ''
-    message.value = ''
-    try {
-      const response = await fetch(`${config.apiUrl}/auth/forgot-password`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: new Headers({
-          'Content-Type': 'application/json',
-          // Authorization: `Bearer ${token.value}`,
-        }),
-      })
-      if (response.ok) {
-        const data = await response.json()
-        return data
-        // const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        // const userCookie = useCookie('user', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        // tokenCookie.value = data.token
-        // userCookie.value = data.user
-        // user.value = userCookie.value
-        // token.value = tokenCookie.value
-        // isAuthenticated.value = true
-        // return true
-      }
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
-
-      // const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/forgotpassword`, {
-      //   method: 'POST',
-      //   body: {
-      //     email,
-      //     passwordResetUrl: `${config.BASE_Url}/auth/resetpassword`,
-      //     emailSubject: 'Your password reset token (valid for 1 hour)',
-      //   },
-      // })
-      // console.log('DATA', data.value)
-      // if (error.value) throw error.value
-      // if (data.value && data.value.status === 'fail') {
-      //   if (process.client) errorMsg.value = data.value.message
-      //   return false
-      // }
-      // return data.value
-    } catch (err) {
-      console.log('MYERROR', err)
-      errorMsg.value = err
-      return false
-    }
+    // errorMsg.value = ''
+    // message.value = ''
+    // try {
+    //   const response = await fetch(`${config.apiUrl}/auth/forgot-password`, {
+    //     method: 'POST',
+    //     body: JSON.stringify(payload),
+    //     headers: new Headers({
+    //       'Content-Type': 'application/json',
+    //       // Authorization: `Bearer ${token.value}`,
+    //     }),
+    //   })
+    //   if (response.ok) {
+    //     const data = await response.json()
+    //     return data
+    //     // const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
+    //     // const userCookie = useCookie('user', { maxAge: data.cookieExpires * 24 * 60 * 60 })
+    //     // tokenCookie.value = data.token
+    //     // userCookie.value = data.user
+    //     // user.value = userCookie.value
+    //     // token.value = tokenCookie.value
+    //     // isAuthenticated.value = true
+    //     // return true
+    //   }
+    //   if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+    //   throw getErrorStr((await response.json()).errors)
+    //   // const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/forgotpassword`, {
+    //   //   method: 'POST',
+    //   //   body: {
+    //   //     email,
+    //   //     passwordResetUrl: `${config.BASE_Url}/auth/resetpassword`,
+    //   //     emailSubject: 'Your password reset token (valid for 1 hour)',
+    //   //   },
+    //   // })
+    //   // console.log('DATA', data.value)
+    //   // if (error.value) throw error.value
+    //   // if (data.value && data.value.status === 'fail') {
+    //   //   if (process.client) errorMsg.value = data.value.message
+    //   //   return false
+    //   // }
+    //   // return data.value
+    // } catch (err) {
+    //   console.log('MYERROR', err)
+    //   errorMsg.value = err
+    //   return false
+    // }
   }
 
   const resetPassword = async (payload) => {
-    errorMsg.value = ''
-    message.value = ''
+    // errorMsg.value = ''
+    // message.value = ''
     try {
-      const response = await fetch(`${config.apiUrl}/auth/reset-password`, {
-        method: 'PATCH',
-        body: JSON.stringify(payload),
-        headers: new Headers({
-          'Content-Type': 'application/json',
-          // Authorization: `Bearer ${token.value}`,
-        }),
-      })
-      if (response.ok) {
-        const data = await response.json()
-        const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        const userCookie = useCookie('loggedInUser', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-        tokenCookie.value = data.token
-        userCookie.value = data.user
-        loggedInUser.value = userCookie.value
-        token.value = tokenCookie.value
-        isAuthenticated.value = true
-        return true
-      }
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
-
+      // const response = await fetch(`${config.apiUrl}/auth/reset-password`, {
+      //   method: 'PATCH',
+      //   body: JSON.stringify(payload),
+      //   headers: new Headers({
+      //     'Content-Type': 'application/json',
+      //     // Authorization: `Bearer ${token.value}`,
+      //   }),
+      // })
+      // if (response.ok) {
+      //   const data = await response.json()
+      //   const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
+      //   const userCookie = useCookie('loggedInUser', { maxAge: data.cookieExpires * 24 * 60 * 60 })
+      //   tokenCookie.value = data.token
+      //   userCookie.value = data.user
+      //   loggedInUser.value = userCookie.value
+      //   token.value = tokenCookie.value
+      //   isAuthenticated.value = true
+      //   return true
+      // }
+      // if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+      // throw getErrorStr((await response.json()).errors)
       // const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/forgotpassword`, {
       //   method: 'POST',
       //   body: {
@@ -356,7 +318,7 @@ const useAuth = () => {
       // return data.value
     } catch (err) {
       console.log('MYERROR', err)
-      errorMsg.value = err
+      // errorMsg.value = err
       return false
     }
   }
@@ -388,38 +350,38 @@ const useAuth = () => {
   //   }
   // }
 
-  const signout = async () => {
-    errorMsg.value = ''
-    message.value = ''
-    let response
-    console.log(config.apiUrl)
-    try {
-      response = await fetch(`${config.apiUrl}/auth/signout`, {
-        method: 'POST',
-        headers: new Headers({
-          'Content-Type': 'application/json',
-          // Authorization: `Bearer ${token && token.value ? token.value : ''}`,
-        }),
-      })
-      if (response.ok) {
-        const tokenCookie = useCookie('token', { maxAge: 0 })
-        const userCookie = useCookie('loggedInUser', { maxAge: 0 })
-        tokenCookie.value = ''
-        userCookie.value = ''
-        loggedInUser.value = ''
-        token.value = ''
-        isAuthenticated.value = false
-        return true
-      }
-      if (!response.headers.get('content-type')?.includes('application/json')) throw response.statusText
-      throw getErrorStr((await response.json()).errors)
-    } catch (err) {
-      console.log('MYERROR', err)
-      errorMsg.value = err
-      console.log(errorMsg.value)
-      return false
-    }
-  }
+  // const signout = async () => {
+  // errorMsg.value = ''
+  // message.value = ''
+  // let response
+  // console.log(config.apiUrl)
+  // try {
+  //   response = await fetch(`${config.apiUrl}/auth/signout`, {
+  //     method: 'POST',
+  //     headers: new Headers({
+  //       'Content-Type': 'application/json',
+  //       // Authorization: `Bearer ${token && token.value ? token.value : ''}`,
+  //     }),
+  //   })
+  //   if (response.ok) {
+  //     const tokenCookie = useCookie('token', { maxAge: 0 })
+  //     const userCookie = useCookie('loggedInUser', { maxAge: 0 })
+  //     tokenCookie.value = ''
+  //     userCookie.value = ''
+  //     loggedInUser.value = ''
+  //     token.value = ''
+  //     isAuthenticated.value = false
+  //     return true
+  //   }
+  //   if (!response.headers.get('content-type')?.includes('application/json')) throw response.statusText
+  //   throw getErrorStr((await response.json()).errors)
+  // } catch (err) {
+  //   console.log('MYERROR', err)
+  //   errorMsg.value = err
+  //   console.log(errorMsg.value)
+  //   return false
+  // }
+  // }
 
   // const login = async (user) => {
   //   console.log('here')
@@ -468,13 +430,13 @@ const useAuth = () => {
   // }
 
   return {
-    loggedInUser,
-    token,
-    isAuthenticated,
-    isAdmin,
+    // loggedInUser,
+    // token,
+    // isAuthenticated,
+    // isAdmin,
     signup,
     // signupEmail,
-    confirmEmail,
+    verifyEmail,
     signin,
     signout,
     fetchLoggedInUser,

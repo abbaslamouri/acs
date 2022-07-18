@@ -19,6 +19,7 @@ const user = ref({
   userAddresses: [],
   media: [],
 })
+const galleryIntro = ref('This image gallery contains all images associated with this user.')
 
 const id = route.params.id === '_' ? null : route.params.id
 
@@ -43,18 +44,6 @@ response = await fetchAll('states', { sort: 'name', limit: 100 })
 if (response.docs.length) states.value = response.docs
 provide('states', states)
 
-// user.value.name = 'Abbas Lamouri'
-// user.value.email = 'abbaslamouri@yrlus.com'
-// user.value.password = 'adrar0714'
-
-// const fetchUser = async () => {
-//   const id = route.params.id === '_' ? undefined : route.params.id
-//   if (!id) return router.push({ name: 'admin-users' })
-//   response = await fetchAll('users', { id, populate: 'userAddresses gallery' })
-//   if (response && response.docs && response.docs[0]) user.value = response.docs[0]
-//   console.log(user.value)
-// }
-
 const insertNewAddress = () => {
   user.value.userAddresses.push({
     addressType: 'Residential',
@@ -67,19 +56,16 @@ const insertNewAddress = () => {
     city: 'Aurora',
     postalCode: '44202',
     state: 'Alaska',
-    // country: 'United States',
     country: countries.value.find((c) => c.threeLetterCountryCode === 'USA'),
-    // country: 'United States',
     phoneNumbers: [
       {
         phoneType: 'Cell',
         phoneNumber: '216502637800',
         phoneCountryCode: countries.value.find((c) => c.threeLetterCountryCode == 'USA'),
-        // phoneCountryName: 'United States',
         default: true,
       },
     ],
-    // deliveryInstructions: 'Some delivery instructions1',
+    deliveryInstructions: 'Some delivery instructions1',
   })
   if (user.value.userAddresses.length == 1) {
     user.value.userAddresses[0].defaultShippingAddress = true
@@ -89,27 +75,12 @@ const insertNewAddress = () => {
     user.value.userAddresses[0].defaultBillingAddress = false
   }
   addressToEditIndex.value = user.value.userAddresses.length - 1
-  // console.log(user.value)
   showAddressFormModal.value = true
-  // displayStatus.value = 'editing'
-  // editAction.value = 'add'
 }
-
-// const updatePhoneNumber = (payload) => {
-//   user.value.userAddresses[addressToEditIndex.value].phoneNumbers[payload.index] = payload.phoneNumber
-//   if (user.value.userAddresses[addressToEditIndex.value].phoneNumbers[payload.index].isDefault) {
-//     for (const prop in user.value.userAddresses[addressToEditIndex.value].phoneNumbers) {
-//       user.value.userAddresses[addressToEditIndex.value].phoneNumbers[prop].isDefault = false
-//     }
-//     user.value.userAddresses[addressToEditIndex.value].phoneNumbers[payload.index].isDefault = true
-//   }
-// }
 
 const editAddress = (i) => {
   addressToEditIndex.value = i
   showAddressFormModal.value = true
-  // displayStatus.value = 'editing'
-  // editAction.value = 'add'
 }
 
 const deleteAddress = async (i) => {
@@ -117,49 +88,12 @@ const deleteAddress = async (i) => {
   console.log('user', user.value)
   if (!user.value._id) return (errorMsg.value = 'Nothing to delete')
   user.value.userAddresses.splice(i, 1)
-
   const defaultShipAddress = user.value.userAddresses.find((a) => a.defaultShippingAddress)
   if (!defaultShipAddress) user.value.userAddresses[0].defaultShippingAddress = true
-
   const defaultBillAddress = user.value.userAddresses.find((a) => a.defaultBillingAddress)
   if (!defaultBillAddress) user.value.userAddresses[0].defaultBillingAddress = true
-
   await saveUser()
-
-  // const newUser = await saveDoc('users', user.value)
-  // if (newUser) {
-  //   console.log(newUser)
-  //   // user.value = newUser
-  //   router.push({ name: 'admin-users-id', params: { id: user.value.id } })
-  // }
-
-  //   // displayStatus.value = 'editing'
-  //   // editAction.value = 'add'
 }
-
-// const insertNewPhoneNumber = () => {
-//   user.value.userAddresses[addressToEditIndex.value].phoneNumbers.push({
-//     ...blankPhoneNumber,
-//     default: false,
-//   })
-// }
-
-// const removePhoneNumber = (event) => {
-//   user.value.userAddresses[addressToEditIndex.value].phoneNumbers.splice(event, 1)
-//   if (user.value.userAddresses[addressToEditIndex.value].phoneNumbers.length === 1) {
-//     user.value.userAddresses[addressToEditIndex.value].phoneNumbers[0].isDefault = true
-//   } else {
-//     if (!user.value.userAddresses[addressToEditIndex.value].phoneNumbers.find((p) => p.isDefault))
-//       user.value.userAddresses[addressToEditIndex.value].phoneNumbers[0].isDefault = true
-//   }
-// }
-
-// const setDefaultPhoneNumber = (event) => {
-//   for (const prop in user.value.userAddresses[addressToEditIndex.value].phoneNumbers) {
-//     user.value.userAddresses[addressToEditIndex.value].phoneNumbers[prop].isDefault = false
-//   }
-//   user.value.userAddresses[addressToEditIndex.value].phoneNumbers[event].isDefault = true
-// }
 
 const closeModal = () => {
   if (currentUserAddress !== JSON.stringify(user.value.userAddresses))
@@ -188,46 +122,22 @@ const resetDefaultAddress = (addressType, i) => {
 }
 
 const setDefaultShippingAddress = () => {
-  // if (user.value.userAddresses.length < 2) return
-  // for (const prop in user.value.userAddresses) {
-  //   user.value.userAddresses[prop].defaultShippingAddress = false
-  // }
   resetDefaultAddress('shippingAddress', addressToEditIndex.value)
-  // user.value.userAddresses[addressToEditIndex.value].defaultShippingAddress = true
 }
 
 const setDefaultBillingAddress = () => {
-  // if (user.value.userAddresses.length < 2) return
-  // for (const prop in user.value.userAddresses) {
-  //   user.value.userAddresses[prop].defaultBillingAddress = false
-  // }
   resetDefaultAddress('billingAddress', addressToEditIndex.value)
-  // user.value.userAddresses[addressToEditIndex.value].defaultBillingAddress = true
 }
 
 const switchShippingAddress = async (i) => {
-  // for (const prop in user.value.userAddresses) {
-  //   console.log(prop)
-  //   user.value.userAddresses[prop].defaultShippingAddress = false
-  // }
   resetDefaultAddress('shippingAddress', i)
-  // user.value.userAddresses[i].defaultShippingAddress = true
   await saveUser()
 }
 
 const switchBillingAddress = async (i) => {
-  // for (const prop in user.value.userAddresses) {
-  //   console.log(prop)
-  //   user.value.userAddresses[prop].defaultBillingAddress = false
-  // }
   resetDefaultAddress('billingAddress', i)
-  // user.value.userAddresses[i].defaultBillingAddress = true
   await saveUser()
 }
-
-// const updateUserAddress = (event) => {
-// user.userAddresses[addressToEditIndex] = $event
-// }
 
 const saveUser = async () => {
   console.log(user.value)
@@ -334,46 +244,19 @@ const saveAddress = async () => {
   //   }
 }
 
-// const setUserMedia = async (mediaFiles) => {
-//   for (const prop in mediaFiles) {
-//     console.log(mediaFiles[prop].id)
-//     const found = user.value.gallery.find((m) => m.id == mediaFiles[prop].id)
-//     if (!found) user.value.gallery.push(mediaFiles[prop])
-//   }
-//   const newUser = await saveDoc('users', user.value)
-//   if (newUser) {
-//     console.log(newUser)
-//     // user.value = newUser
-//     router.push({ name: 'admin-users-id', params: { id: user.value.id } })
-//   }
-// }
-
-// watch(
-//   () => galleryMedia.value,
-//   (currentVal) => {
-//     console.log(currentVal)
-
-//     if (mediaReference.value === 'userMedia') setUserMedia(currentVal)
-//   },
-//   { deep: true }
-// )
-
-// await fetchUser()
-// const currentUserAddress = JSON.stringify(user.value.userAddresses)
-
-// watch(
-//   () => galleryMedia.value,
-//   (currentVal) => {
-//     if (mediaReference.value === 'userMedia') user.value.gallery[0] = currentVal[0]
-//   },
-//   { deep: true }
-// )
+const setMedia = async (event) => {
+  console.log(user.value)
+  for (const prop in event) {
+    const found = user.value.media.find((m) => m._id == event[prop]._id)
+    if (!found) user.value.media.push(event[prop])
+  }
+  await saveUser()
+}
 </script>
 
 <template>
   <div class="h-full w-full flex flex-col gap-4 p-4">
     <Title>{{ pageTitle }}</Title>
-    <!-- <div class="w-full max-w-screen-xl border-5"> -->
     <header class="flex flex-col gap-2 w-full">
       <div class="go-back" id="product-go-back">
         <NuxtLink class="flex flex-row gap-2 text-yellow-700" :to="{ name: 'admin-users' }">
@@ -388,86 +271,31 @@ const saveAddress = async () => {
         <AdminUsersUserInfo :user="user" @updateUser="user = { ...user, ...$event }" @saveUserInfo="saveUser" />
         <section class="rounded border p-4 shadow-lg" id="user-addresses">
           <div class="admin-section-header">User Addresses</div>
-          <div class="flex flex-col gap-5">
-            <div class="flex flex-col gap-4">
-              <div v-if="!user._id">Please save user information before adding userAddresses</div>
-              <div class="flex flex-col gap-4" v-else>
-                <div
-                  class="customer-address flex flex-row items-start justify-between p-4 border border-slate-300 rounded"
-                  v-for="(userAddress, i) in user.userAddresses"
-                  :key="userAddress.id"
-                >
-                  <div class="flex flex-col gap-4">
-                    <div class="flex flex-col gap-3 text-xs">
-                      <h3 class="text-xl">Address</h3>
-                      <AdminUsersUserAddress :userAddress="userAddress" />
-                      <div>
-                        <div
-                          class="text-green-700 flex flex-row items-center gap-2"
-                          v-if="userAddress.defaultShippingAddress"
-                        >
-                          <IconsCheck class="w-5 h-5 fill-green-700" /> <span>Default shipping address</span>
-                        </div>
-                        <div
-                          class="text-green-700 flex flex-row items-center gap-2"
-                          v-if="userAddress.defaultBillingAddress"
-                        >
-                          <IconsCheck class="w-5 h-5 fill-green-700" /> <span>Default billing address</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="flex flex-row gap-1">
-                      <button class="btn btn-secondary px-4 py-2 text-xs rounded" @click="editAddress(i)">
-                        Edit Address
-                      </button>
-                      <button
-                        class="btn btn-secondary px-4 py-2 text-xs rounded"
-                        v-if="!userAddress.defaultBillingAddress && !userAddress.defaultShippingAddress"
-                        @click="deleteAddress(i)"
-                      >
-                        Delete Address
-                      </button>
-                    </div>
-                    <div class="flex flex-col gap-1 items-start text-xs">
-                      <button
-                        class="text-yellow-700"
-                        @click="switchShippingAddress(i)"
-                        v-if="!userAddress.defaultShippingAddress"
-                      >
-                        Set as the default shipping address
-                      </button>
-                      <button
-                        class="text-yellow-700"
-                        @click="switchBillingAddress(i)"
-                        v-if="!userAddress.defaultBillingAddress"
-                      >
-                        Set as the default billing address
-                      </button>
-                    </div>
-                  </div>
-                  <div class="flex flex-col text-xs">
-                    <h3 class="text-lg">Phone Numbers</h3>
-                    <div class="" v-for="userPhoneNumber in userAddress.phoneNumbers">
-                      <AdminUsersUserPhoneNumber :userPhoneNumber="userPhoneNumber" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button
-                class="btn btn-secondary px-4 py-1 self-end text-xs"
-                :class="{ disabled: !user.id }"
-                @click="insertNewAddress"
-              >
-                Add Address
-              </button>
-            </div>
+          <div v-if="!user._id">Please save user information before adding userAddresses</div>
+          <div class="flex flex-col gap-5" v-else>
+            <AdminUsersUserAddresses
+              :user="user"
+              @insertNewAddress="insertNewAddress"
+              @editAddress="editAddress"
+              @deleteAddress="deleteAddress"
+              @switchShippingAddress="switchShippingAddress"
+              @switchBillingAddress="switchBillingAddress"
+            />
           </div>
         </section>
-
-        <!-- <section class="" id="user-addresses"> -->
-        <!-- <div class="flex-row items-center justify-between mb-1">
-            <div class="uppercase border border-b-gray-400 font-bold inline-block">User Addresses</div>
-          </div> -->
+        <section class="rounded border p-4 shadow-lg" id="user-addresses">
+          <div class="admin-section-header">User Images</div>
+          <div v-if="!user._id">Please save user information before adding images</div>
+          <div class="flex flex-col gap-5" v-else>
+            <AdminImageGallery
+              :gallery="user.media"
+              :galleryIntro="galleryIntro"
+              @removeMedia="user.media.splice($event, 1)"
+              @placeMedia="user.media[$event.index] = $event.value"
+              @setMedia="setMedia"
+            />
+          </div>
+        </section>
 
         <Modal :outerBoxWidth="75" :outerBoxHeight="90" @closeModal="closeModal" v-if="showAddressFormModal">
           <template v-slot:header>
@@ -488,95 +316,12 @@ const saveAddress = async () => {
             </section>
           </template>
         </Modal>
-        <!-- </section> -->
-        <!-- <EcommerceAdminProductPrice :product="product" @updatePrice="product.value = { ...product.value, ...$event }" /> -->
-        <!-- <EcommerceAdminProductEligibility /> -->
-        <!-- <EcommerceAdminProductNextHigherAssembly /> -->
-        <!-- <EcommerceAdminProductStockManagement
-          :product="product"
-          @updateStock="product.value = { ...product.value, ...$event }"
-        /> -->
-
-        <!-- <EcommerceAdminProductAttributesContent
-          v-if="product.id && product.productType === 'variable'"
-          @toggleAttributesSlideout="showAttributesSlideout = $event"
-        /> -->
-        <!-- <EcommerceAdminProductAttributesSlideout
-          v-if="showAttributesSlideout"
-          @toggleAttributesSlideout="showAttributesSlideout = $event"
-          @saveAttributes="saveProduct"
-        /> -->
-
-        <!-- <EcommerceAdminProductVariantsContent
-          @toggleVariantsSlideout="showVariantsSlideout = $event"
-          v-if="product.id && product.productType === 'variable' && product.attributes.length"
-        /> -->
-        <!-- <EcommerceAdminProductVariantsSlideout
-          v-if="showVariantsSlideout"
-          @toggleVariantsSlideout="showVariantsSlideout = $event"
-          @saveVariants="saveProduct"
-        /> -->
-        <!-- <EcommerceProductDetails :product="product" @updateDetails="product.value = { ...product.value, ...$event }" /> -->
-
-        <!-- <EcommerceProductShippingOptions :product="product" /> -->
-        <!-- <EcommerceProductDigitalDelivery :product="product" /> -->
-        <!-- <EcommerceProductExtraFields :product="product" /> -->
-        <!-- <EcommerceProductSeo :product="product" /> -->
-        <!-- <EcommerceProductMisc :product="product" /> -->
-      </div>
-      <div class="w-[16rem] -1">
-        <AdminUsersRightSidebar />
-        <section class="admin-image-gallery shadow-md p-2 flex-col gap-2 bg-white" id="image-gallery">
-          <!-- <AdminImageGallery :gallery="user.gallery" mediaReference="userMedia" /> -->
-        </section>
       </div>
     </main>
-    <div class="self-end px-4 sticky bottom-4">
+    <div class="self-end px-4 sticky -z-10 bottom-4">
       <a href="#product-go-back" class="btn px-2 py-1">Go To Top</a>
     </div>
-    <!-- <footer class="w-full max-width-130 bg-slate-300 px-2 py-1 br-5 flex-row justify-center text-2xl">Footer</footer> -->
-    <!-- </div> -->
   </div>
 </template>
 
-<style lang="scss" scoped>
-/* @import '@/assets/scss/variables'; */
-
-/* .customer-address {
-  &:nth-of-type(even) {
-    background-color: $slate-200;
-  }
-  // &:nth-of-type(odd) {
-  //   background-color: $slate-400;
-  // }
-}
-
-.main {
-  display: grid;
-  grid-template-columns: 1fr 30rem;
-  gap: 2rem;
-  align-items: flex-start;
-
-  .left-sidebar {
-    position: sticky;
-    top: 10rem;
-    background-color: white;
-    border: 1px solid $slate-100;
-    border-radius: 3px;
-    padding: 2rem 0.5rem;
-  }
-
-  .right-sidebar {
-    position: sticky;
-    top: 10rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-}
-
-// .go-to-top {
-//   position: sticky;
-//   bottom: 4rem;
-// } */
-</style>
+<style lang="scss" scoped></style>

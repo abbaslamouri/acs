@@ -140,11 +140,11 @@ const userSchema = {
           description: 'Password reset token',
         },
         passwordResetExpires: {
-          bsonType: 'bool',
+          bsonType: 'date',
           description: 'Password reset token expiry',
         },
         passwordChangeDate: {
-          bsonType: 'bool',
+          bsonType: 'date',
           description: 'Password change date',
         },
       },

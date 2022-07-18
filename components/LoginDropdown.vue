@@ -7,42 +7,30 @@ defineProps({
 const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
-// const { loggedInUser, token, isAuthenticated, signin } = useAuth()
+const { signin } = useAuth()
+const loggedInUser = useState('loggedInUser')
+const isAuthenticated = useState('isAuthenticated')
+const errorMsg = useState('errorMsg')
+const message = useState('message')
 // const { errorMsg, message } = useAppState()
 const showAuthDropdown = ref(false)
-const formUser = reactive({
+const user = reactive({
   email: '',
   password: '',
 })
 
 const signup = async () => {
-  // if (user.password !== user.passwordConfirm)
-  // 	return (errorMsg.value = "Your password and confirmation password don't match")
-  // const response = await signup(user)
-  // console.log(response)
-  // if (!response) return
-  // const customer = response.user
-  // cart.value.customer = customer
-  // cart.value.name = customer.name
-  // cart.value.email = customer.email
-  // cart.value.billingAddress = customer.billingAddress
-  // const cartShippingAddress = customer.shippingAddresses.find((a) => a.isDefault)
-  // if (cartShippingAddress) cart.value.shippingAddress = cartShippingAddress
-  // else cart.value.shippingAddress = customer.shippingAddresses[0]
-  // const cartPhoneNumber = customer.phoneNumbers.find((p) => p.isDefault)
-  // if (cartPhoneNumber) cart.value.phoneNumber = cartPhoneNumber
-  // else cart.value.phoneNumber = customer.phoneNumbers[0]
-
-  // console.log(cart.value)
-
-  // router.push({ name: 'ecommerce-shipping' })
   router.push({ name: 'auth-signup', query: { redirect: route.name } })
   showAuthDropdown.value = false
 }
 
 const login = async () => {
   showAuthDropdown.value = false
-  await signin(formUser)
+  const auth = await signin(user)
+  if (!auth) return
+  loggedInUser.value = auth.userName
+  isAuthenticated.value = true
+  message.value = 'Login succssful'
 }
 
 const forgotPassword = async () => {
@@ -61,7 +49,7 @@ const forgotPassword = async () => {
     <div class="z-10">
       <a
         href="#"
-        class="header flex flex-row items-center gap-2 px-4 py-2 border border-gray-400 rounded-sm z-30 hover:(bg-white text-slate-900 )"
+        class="header flex items-center gap-2 px-4 py-2 border border-gray-400 rounded-sm z-30 hover:(bg-white text-slate-900 )"
         :class="{ selected: showAuthDropdown }"
         @click="showAuthDropdown = !showAuthDropdown"
       >
@@ -72,15 +60,15 @@ const forgotPassword = async () => {
         <h3 class="title">Sin in</h3>
         <p class="text-xs">Access your account and place an order:</p>
         <div class="flex flex-col gap-4">
-          <FormsBaseInput label="Email" type="email" v-model="formUser.email" :required="true" />
-          <FormsBaseInput label="Password" type="password" v-model="formUser.password" :required="true" />
+          <FormsBaseInput label="Email" type="email" v-model="user.email" :required="true" />
+          <FormsBaseInput label="Password" type="password" v-model="user.password" :required="true" />
         </div>
         <div>
           <button class="btn btn-link w-full text-sm" @click.prevent="forgotPassword">
             <p>Forgot Password?</p>
           </button>
         </div>
-        <button class="btn btn-secondary w-full flex-row justify-between text-xs" @click.prevent="login">
+        <button class="btn btn-secondary w-fullflex justify-between text-xs" @click.prevent="login">
           <p>Sign in</p>
           <IconsArrowEast />
         </button>

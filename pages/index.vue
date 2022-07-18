@@ -2,7 +2,7 @@
 const title = ref('Main | YRL')
 const config = useRuntimeConfig()
 
-const { fetchAll } = useHttp()
+// const { fetchAll } = useHttp()
 
 const carouselGallery = ref([])
 

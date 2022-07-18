@@ -27,13 +27,22 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     dbUrl: '',
+    jwtSecret: '',
+    jwtMaxAge: '',
+    jwtSignupTokenMaxAge: '',
+    pwResetTokenMaxAge: '',
+    sendgridApiKey: '',
+    sendgridSignupTemplateId: '',
+    sendgridPasswordResetTemplateId: '',
+    sendgridOrderReceivedTemplateId: '',
 
     public: {
       apiUrl: '',
       siteUrl: '',
       doSpaceEndpoint: '',
       maxFileUploads: '',
-      // NUXT_PUBLIC_MAX_FILE_UPLOADS
+      fromEmail: '',
+      fromName: '',
     },
   },
 })

@@ -16,8 +16,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
-  'setGalleryImage',
-  'removeGalleryImage',
+  'placeMedia',
+  'removeMedia',
   // 'mediaSelectorClicked',
   // 'galleryModified',
   // 'selectFromProductImages',
@@ -47,8 +47,8 @@ const mouseLeave = (event, index) => {
   hoveredImage.value = null
 }
 
-// const removeGalleryImage = (index) => {
-// emit('removeGalleryImage', index)
+// const removeMedia = (index) => {
+// emit('removeMedia', index)
 // currentGallery.value.splice(index, 1)
 // }
 
@@ -73,8 +73,8 @@ const handleDragleave = (event) => {
 const handleDrop = async (event, index) => {
   const pickedElement = props.gallery[pickIndex.value]
   const droppedElement = props.gallery[index]
-  emit('setGalleryImage', { index: pickIndex.value, value: droppedElement })
-  emit('setGalleryImage', { index: index, value: pickedElement })
+  emit('placeMedia', { index: pickIndex.value, value: droppedElement })
+  emit('placeMedia', { index: index, value: pickedElement })
   // currentGallery.value[pickIndex.value] = pickedElement
   // currentGallery.value[index] = pickedElement
   event.target.closest('.thumb').classList.remove('over')
@@ -136,7 +136,7 @@ const setFeaturedImage = (event) => {
             draggable="false"
           />
         </div>
-        <span class="delete absolute top-2 right-2" @click.prevent="$emit('removeGalleryImage', index)"
+        <span class="delete absolute top-2 right-2" @click.prevent="$emit('removeMedia', index)"
           ><IconsDelete class="w-5 h-5"
         /></span>
       </div>

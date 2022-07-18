@@ -1,6 +1,8 @@
 import sgMail from '@sendgrid/mail'
 import colors from 'colors'
 
+const config = useRuntimeConfig()
+
 class Email {
   to: string
   firstname: string
@@ -19,7 +21,7 @@ class Email {
 
   async send(templateId: string) {
     console.log('SPREAD', { ...this.data, firstname: this.firstname })
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+    sgMail.setApiKey(config.sendgridApiKey as string)
 
     const msg: any = {
       to: {
@@ -27,12 +29,12 @@ class Email {
         name: this.firstname,
       },
       from: {
-        email: process.env.FROM_EMAIL,
-        name: process.env.FROM_NAME,
+        email: config.public.fromEmail,
+        name: config.public.fromName,
       },
       replyTo: {
-        email: process.env.FROM_EMAIL,
-        name: process.env.FROM_NAME,
+        email: config.public.fromEmail,
+        name: config.public.fromName,
       },
       subject: this.subject,
       // template_id: templateId,
@@ -46,21 +48,21 @@ class Email {
   }
 
   async sendRegisterationEmail() {
-    await this.send(process.env.SENDGRID_SIGNUP_TEMPLATE_ID as string)
+    await this.send(config.sendgridSignupTemplateId as string)
   }
 
   async sendPasswordResetEmail() {
-    await this.send(process.env.SENDGRID_PASSWORD_RESET_TEMPLATE_ID as string)
+    await this.send(config.sendgridPasswordResetTemplateId as string)
   }
 
   async sendOrderProcessing() {
-    await this.send(process.env.SENDGRID_ORDER_TEMPLATE_ID as string)
+    await this.send(config.sendgridOrderReceivedTemplateId as string)
   }
 }
 
 export default Email
 
-// sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+// sgMail.setApiKey(config.sendGridAoiKeyprocess.env.SENDGRID_API_KEY)
 
 //         const msg = {
 //           to: {
