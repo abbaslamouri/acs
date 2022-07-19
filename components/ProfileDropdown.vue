@@ -4,10 +4,10 @@ const message = useState('message')
 const loggedInUser = useState('loggedInUser')
 const isAuthenticated = useState('isAuthenticated')
 // const { errorMsg, message } = useAppState()
-const showProfileDropdown = ref(false)
+const showDropdown = ref(false)
 
 const lougout = async () => {
-  showProfileDropdown.value = false
+  showDropdown.value = false
   const response = await signout()
   if (!response) return
   console.log(response)
@@ -18,37 +18,41 @@ const lougout = async () => {
 </script>
 
 <template>
-  <div class="profile-dropdown relative">
+  <div class="relative flex items-center text-xs">
     <div
-      class="header flex-row items-center gap-1 text-slate-900 text-xs py-05 px-1 cursor-pointer br-3 relative z-99"
-      v-bind:class="{ selected: showProfileDropdown }"
-    >
-      <h3 class="font-light uppercase" @click="showProfileDropdown = !showProfileDropdown">
-        Welcome {{ loggedInUser }}
-      </h3>
-    </div>
-    <div
-      v-if="showProfileDropdown"
-      class="menu absolute flex-col gap-2 p-2 bg-slate-50 z-99 text-slate-800 w-full text-xs"
-    >
-      <h3 class="">My Accoun</h3>
-      <ul>
-        <!-- <li v-if="loggedInUser.role !== 'admin'">
+      class="fixed inset-0 w-full h-full opacity-50 bg-slate-900 z-9"
+      v-if="showDropdown"
+      @click="showDropdown = !showDropdown"
+    ></div>
+    <div class="z-10">
+      <a
+        href="#"
+        class="flex items-center gap-2 px-4 py-2 border border-gray-400 rounded-sm z-30 bg-white hover:(text-slate-700 )"
+        :class="{ selected: showDropdown }"
+        @click="showDropdown = !showDropdown"
+      >
+        <IconsUser class="w-4 h-4" />
+        <h3 class="font-light uppercase">Welcome {{ loggedInUser }}</h3>
+      </a>
+      <div class="shadow-md flex flex-col gap-4 bg-slate-50 p-2 absolute z-20 text-slate-800 w-full border border-gray-400 " v-if="showDropdown">
+        <h3 class="">My Accoun</h3>
+        <ul class="flex flex-col gap-2">
+          <!-- <li v-if="loggedInUser.role !== 'admin'">
           <NuxtLink :to="{ name: `admin` }">Admin Dashboard</NuxtLink>
         </li> -->
-        <li>
-          <NuxtLink :to="{ name: `admin` }">Order History</NuxtLink>
-        </li>
-        <li>
-          <NuxtLink :to="{ name: `admin` }">Account Information?</NuxtLink>
-        </li>
-        <li>
-          <NuxtLink :to="{ name: `admin` }">Addresses?</NuxtLink>
-        </li>
-      </ul>
-      <button class="btn btn__secondary py-05 px1" @click="lougout">Sign out</button>
+          <li>
+            <NuxtLink :to="{ name: `admin` }">Order History</NuxtLink>
+          </li>
+          <li>
+            <NuxtLink :to="{ name: `admin` }">Account Indivation?</NuxtLink>
+          </li>
+          <li>
+            <NuxtLink :to="{ name: `admin` }">Addresses?</NuxtLink>
+          </li>
+        </ul>
+        <button class="btn btn__secondary py-05 px1" @click="lougout">Sign out</button>
+      </div>
     </div>
-    <div class="overlay" v-if="showProfileDropdown" @click="showProfileDropdown = !showProfileDropdown"></div>
   </div>
 </template>
 

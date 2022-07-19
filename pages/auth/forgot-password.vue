@@ -1,24 +1,24 @@
 <script setup>
 const { forgotPassword } = useAuth()
-const { message, errorMsg } = useAppState()
+const errorMsg = useState('errorMsg')
+const message = useState('messsage')
 
 const email = ref('abbaslamouri@yrlus.com')
 
 const handleForgotPassword = async () => {
-  errorMsg.value = null
-  message.value = null
   const response = await forgotPassword({
     email: email.value,
     url: `${window.location.protocol}//${window.location.host}/auth/reset-password`,
     emailSubject: 'Your password reset token (valid for 1 hour)',
   })
   if (response) return (message.value = 'Please check your email for instructions to reset your password.')
+  console.log(response)
 }
 </script>
 
 <template>
-  <div class="h-100vh bg-slate-900 flex-row justify-center items-start pt-10">
-    <form class="bg-slate-50 p-4 br-3 flex-col gap-2" @submit.prevent="handleForgotPassword">
+  <div class="flex-1 bg-slate-900 flex justify-center items-start pt-10 w-screen">
+    <form class="bg-slate-50 p-6 br-3 flex flex-col gap-6 w-screen-sm" @submit.prevent="handleForgotPassword">
       <h2>Forgot you password?</h2>
       <FormsBaseInput
         type="email"
@@ -35,7 +35,9 @@ const handleForgotPassword = async () => {
       </p>
       <p class="text-sm">If you have questions, please call customer service at 1-800-555-5555.</p>
 
-      <button class="btn btn__primary py-05 px-1 items-self-end">Reset Password<IconsChevronRight /></button>
+      <button class="btn btn-primary py-2 px-4 self-end text-xs tracking-wide">
+        Reset Password<IconsChevronRight class="fill-white w-5 h-5" />
+      </button>
     </form>
   </div>
 </template>

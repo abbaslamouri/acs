@@ -1,69 +1,30 @@
-import slugify from 'slugify'
-import { ObjectId } from 'mongodb'
+import { getSinedJwtToken } from '~/server/controllers/v1/auth'
+import AppError from '~/server/utils/AppError'
+import mongoClient from '~/server/utils/mongoClient'
+import errorHandler from '~/server/utils/errorHandler'
+import { checkPassword } from '~/server/controllers/v1/auth'
+import { setAuthCookies } from '~/server/controllers/v1/auth'
 
-import { fetchAll, insertDoc, updateDoc, deleteDoc } from '~/server/controllers/v1/factory'
-import { signup, verifyEmail, signin } from '~/server/controllers/v1/auth'
-// import { deleteDoc } from '~/server/controllers/v1/galleries'
+const config = useRuntimeConfig()
 
 export default defineEventHandler(async (event) => {
-  let body: any
-  const query: any = useQuery(event)
-  // console.log('Query', query)
+  try {
+    if (event.req.method !== 'POST') return
+    const body = await useBody(event)
+    console.log('Body', body)
+    const { email, password } = body
+    if (!email || !password) throw new AppError('Email and Password are required', 404)
+    const user = await mongoClient.db().collection('users').findOne({ email })
+    console.log('US', user)
+    if (!user || !(await checkPassword(password, user.password))) throw new AppError('Invalid email or password', 401)
 
-  // 62cf33d3389f8babd5bb1862
+    const token = await getSinedJwtToken(user._id, Number(config.jwtMaxAge) * 24 * 60 * 60)
 
-  switch (event.req.method) {
-    case 'GET':
-      return await fetchAll(event, query, 'users')
-      break
-
-    case 'POST':
-    case 'PATCH':
-      body = await useBody(event)
-      console.log('Body', body)
-      // body.name = body.name.trim()
-      // body.email = body.email.trim().toLowerCase()
-      // body.role = body.role ? body.role : 'user'
-      // body.sortOrder = body.sortOrder ? body.sortOrder * 1 : 0
-      // body.active = body.active ? body.active : false
-      // body.verified = body.verified ? body.verified : false
-      // for (const i in body.userAddresses) {
-      //   body.userAddresses[i].state = new ObjectId(body.userAddresses[i].state._id)
-      //   body.userAddresses[i]._id = new ObjectId()
-      //   body.userAddresses[i].country = new ObjectId(body.userAddresses[i].country._id)
-      //   for (const j in body.userAddresses[i].phoneNumbers) {
-      //     console.log('XX', body.userAddresses[i].phoneNumbers[j])
-      //     body.userAddresses[i].phoneNumbers[j].phoneCountryCode = new ObjectId(
-      //       body.userAddresses[i].phoneNumbers[j].phoneCountryCode._id
-      //     )
-      //     body.userAddresses[i].phoneNumbers[j]._id = new ObjectId()
-      //   }
-      // }
-      // for (const i in body.media) {
-      //   body.media[i] = new ObjectId(body.media[i]._id)
-      // }
-
-      // for (const i in body.media) {
-      //   body.media[i] = new ObjectId(body.media[i]._id)
-      // }
-      return await signin(event, body)
-      break
-
-    case 'DELETE':
-      return await deleteDoc(event, query, 'users')
-      break
-
-    // case 'PATCH':
-    //   body = await useBody(event)
-    //   console.log('Body', body)
-    //   for (const prop in body.media) {
-    //     body.media[prop] = new ObjectId(body.media[prop]._id)
-    //   }
-    //   body.sortOrder = body.sortOrder * 1
-    //   return await updateDoc(event, body, 'galleries')
-    //   break
-
-    default:
-      break
+    await setAuthCookies(event, user, token)
+    return {
+      userName: user.name,
+    }
+  } catch (err) {
+    errorHandler(event, err)
   }
 })

@@ -30,7 +30,7 @@ export default defineNuxtConfig({
     jwtSecret: '',
     jwtMaxAge: '',
     jwtSignupTokenMaxAge: '',
-    pwResetTokenMaxAge: '',
+    pwResetTokenExpiresIn: '',
     sendgridApiKey: '',
     sendgridSignupTemplateId: '',
     sendgridPasswordResetTemplateId: '',

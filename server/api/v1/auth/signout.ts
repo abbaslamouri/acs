@@ -1,69 +1,49 @@
-import slugify from 'slugify'
 import { ObjectId } from 'mongodb'
+import AppError from '~/server/utils/AppError'
+import mongoClient from '~/server/utils/mongoClient'
+import errorHandler from '~/server/utils/errorHandler'
+import sendEmail from '~/server/utils/Email'
 
-import { fetchAll, insertDoc, updateDoc, deleteDoc } from '~/server/controllers/v1/factory'
-import { signup, verifyEmail, signin, signout } from '~/server/controllers/v1/auth'
-// import { deleteDoc } from '~/server/controllers/v1/galleries'
+const config = useRuntimeConfig()
 
 export default defineEventHandler(async (event) => {
-  let body: any
-  const query: any = useQuery(event)
-  // console.log('Query', query)
+  try {
+    if (event.req.method !== 'POST') return
+    // const body = await useBody(event)
+    // console.log('Body', body)
+    const jwtToken = useCookie(event, 'jwt') || ''
+    const userName = useCookie(event, 'userName') || ''
 
-  // 62cf33d3389f8babd5bb1862
+    // await setAuthCookies(event, user, jwt)
+    console.log('Bo', jwtToken, userName)
+    const decoded: any = jwt.verify(jwtToken, config.jwtSecret)
+    console.log('DECODED', decoded)
+    // console.log(config.jwtSecret, decoded)
+    const user = await mongoClient
+      .db()
+      .collection('users')
+      .findOne({
+        _id: new ObjectId(decoded.id),
+      })
+    console.log('US', user)
+    if (!user)
+      throw new AppError(
+        'We were not able to find your email in our database, please contact customer serveice at 555-555-5555',
+        404
+      )
+    if (!user.name === userName)
+      throw new AppError('We were not able to vefify your email, please contact customer serveice at 555-555-5555', 404)
 
-  switch (event.req.method) {
-    case 'GET':
-      return await fetchAll(event, query, 'users')
-      break
-
-    case 'POST':
-    case 'PATCH':
-      body = await useBody(event)
-      console.log('Body', body)
-      // body.name = body.name.trim()
-      // body.email = body.email.trim().toLowerCase()
-      // body.role = body.role ? body.role : 'user'
-      // body.sortOrder = body.sortOrder ? body.sortOrder * 1 : 0
-      // body.active = body.active ? body.active : false
-      // body.verified = body.verified ? body.verified : false
-      // for (const i in body.userAddresses) {
-      //   body.userAddresses[i].state = new ObjectId(body.userAddresses[i].state._id)
-      //   body.userAddresses[i]._id = new ObjectId()
-      //   body.userAddresses[i].country = new ObjectId(body.userAddresses[i].country._id)
-      //   for (const j in body.userAddresses[i].phoneNumbers) {
-      //     console.log('XX', body.userAddresses[i].phoneNumbers[j])
-      //     body.userAddresses[i].phoneNumbers[j].phoneCountryCode = new ObjectId(
-      //       body.userAddresses[i].phoneNumbers[j].phoneCountryCode._id
-      //     )
-      //     body.userAddresses[i].phoneNumbers[j]._id = new ObjectId()
-      //   }
-      // }
-      // for (const i in body.media) {
-      //   body.media[i] = new ObjectId(body.media[i]._id)
-      // }
-
-      // for (const i in body.media) {
-      //   body.media[i] = new ObjectId(body.media[i]._id)
-      // }
-      return await signout(event, body)
-      break
-
-    case 'DELETE':
-      return await deleteDoc(event, query, 'users')
-      break
-
-    // case 'PATCH':
-    //   body = await useBody(event)
-    //   console.log('Body', body)
-    //   for (const prop in body.media) {
-    //     body.media[prop] = new ObjectId(body.media[prop]._id)
-    //   }
-    //   body.sortOrder = body.sortOrder * 1
-    //   return await updateDoc(event, body, 'galleries')
-    //   break
-
-    default:
-      break
+    const cookieOptions = {
+      maxAge: 1,
+      httpOnly: true,
+      secure: true,
+    }
+    setCookie(event, 'jwt', '', cookieOptions)
+    setCookie(event, 'userName', '', cookieOptions)
+    // event.statusCode = 200
+    return true
+  } catch (err) {
+    errorHandler(event, err)
   }
 })

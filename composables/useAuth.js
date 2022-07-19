@@ -129,6 +129,36 @@ const useAuth = () => {
     }
   }
 
+  const forgotPassword = async (email) => {
+    errorMsg.value = ''
+    try {
+      const response = await $fetch(`/api/v1/auth/forgot-password`, {
+        method: 'POST',
+        body: email,
+      })
+      return response
+    } catch (err) {
+      console.log('MYERROR', err)
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
+      return false
+    }
+  }
+
+  const resetPassword = async (payload) => {
+    errorMsg.value = ''
+    try {
+      const response = await $fetch(`/api/v1/auth/reset-password`, {
+        method: 'POST',
+        body: payload,
+      })
+      return response
+    } catch (err) {
+      console.log('MYERROR', err)
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
+      return false
+    }
+  }
+
   // const signin = async (user) => {
   //   try {
   //     const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/signin`, {
@@ -226,101 +256,6 @@ const useAuth = () => {
     //   errorMsg.value = err.data && err.data.message ? err.data.message : err.message ? err.message : ''
     //   return false
     // }
-  }
-
-  const forgotPassword = async (payload) => {
-    // errorMsg.value = ''
-    // message.value = ''
-    // try {
-    //   const response = await fetch(`${config.apiUrl}/auth/forgot-password`, {
-    //     method: 'POST',
-    //     body: JSON.stringify(payload),
-    //     headers: new Headers({
-    //       'Content-Type': 'application/json',
-    //       // Authorization: `Bearer ${token.value}`,
-    //     }),
-    //   })
-    //   if (response.ok) {
-    //     const data = await response.json()
-    //     return data
-    //     // const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-    //     // const userCookie = useCookie('user', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-    //     // tokenCookie.value = data.token
-    //     // userCookie.value = data.user
-    //     // user.value = userCookie.value
-    //     // token.value = tokenCookie.value
-    //     // isAuthenticated.value = true
-    //     // return true
-    //   }
-    //   if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-    //   throw getErrorStr((await response.json()).errors)
-    //   // const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/forgotpassword`, {
-    //   //   method: 'POST',
-    //   //   body: {
-    //   //     email,
-    //   //     passwordResetUrl: `${config.BASE_Url}/auth/resetpassword`,
-    //   //     emailSubject: 'Your password reset token (valid for 1 hour)',
-    //   //   },
-    //   // })
-    //   // console.log('DATA', data.value)
-    //   // if (error.value) throw error.value
-    //   // if (data.value && data.value.status === 'fail') {
-    //   //   if (process.client) errorMsg.value = data.value.message
-    //   //   return false
-    //   // }
-    //   // return data.value
-    // } catch (err) {
-    //   console.log('MYERROR', err)
-    //   errorMsg.value = err
-    //   return false
-    // }
-  }
-
-  const resetPassword = async (payload) => {
-    // errorMsg.value = ''
-    // message.value = ''
-    try {
-      // const response = await fetch(`${config.apiUrl}/auth/reset-password`, {
-      //   method: 'PATCH',
-      //   body: JSON.stringify(payload),
-      //   headers: new Headers({
-      //     'Content-Type': 'application/json',
-      //     // Authorization: `Bearer ${token.value}`,
-      //   }),
-      // })
-      // if (response.ok) {
-      //   const data = await response.json()
-      //   const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-      //   const userCookie = useCookie('loggedInUser', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-      //   tokenCookie.value = data.token
-      //   userCookie.value = data.user
-      //   loggedInUser.value = userCookie.value
-      //   token.value = tokenCookie.value
-      //   isAuthenticated.value = true
-      //   return true
-      // }
-      // if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      // throw getErrorStr((await response.json()).errors)
-      // const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/forgotpassword`, {
-      //   method: 'POST',
-      //   body: {
-      //     email,
-      //     passwordResetUrl: `${config.BASE_Url}/auth/resetpassword`,
-      //     emailSubject: 'Your password reset token (valid for 1 hour)',
-      //   },
-      // })
-      // console.log('DATA', data.value)
-      // if (error.value) throw error.value
-      // if (data.value && data.value.status === 'fail') {
-      //   if (process.client) errorMsg.value = data.value.message
-      //   return false
-      // }
-      // return data.value
-    } catch (err) {
-      console.log('MYERROR', err)
-      // errorMsg.value = err
-      return false
-    }
   }
 
   // const resetPasswordxxxx = async (payload) => {

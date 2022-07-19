@@ -1,69 +1,62 @@
-import slugify from 'slugify'
 import { ObjectId } from 'mongodb'
+import { setAuthCookies } from '~/server/controllers/v1/auth'
+import jwt from 'jsonwebtoken'
+import { getSinedJwtToken } from '~/server/controllers/v1/auth'
+import AppError from '~/server/utils/AppError'
+import mongoClient from '~/server/utils/mongoClient'
+import errorHandler from '~/server/utils/errorHandler'
 
-import { fetchAll, insertDoc, updateDoc, deleteDoc } from '~/server/controllers/v1/factory'
-import { signup, verifyEmail } from '~/server/controllers/v1/auth'
-// import { deleteDoc } from '~/server/controllers/v1/galleries'
+const config = useRuntimeConfig()
 
 export default defineEventHandler(async (event) => {
-  let body: any
-  const query: any = useQuery(event)
-  // console.log('Query', query)
+  try {
+    if (event.req.method !== 'POST') return
+    const body = await useBody(event)
+    console.log('Body', body)
+    const { email, signupToken } = body
+    const decoded: any = jwt.verify(signupToken, config.jwtSecret)
+    console.log('DECODED', decoded)
+    console.log(config.jwtSecret, decoded)
+    const user = await mongoClient
+      .db()
+      .collection('users')
+      .findOne({
+        _id: new ObjectId(decoded.id),
+      })
+    console.log('US', user)
+    if (!user)
+      throw new AppError(
+        'We were not able to find your email in our database, please contact customer serveice at 555-555-5555',
+        404
+      )
+    if (!user.email === email)
+      throw new AppError('We were not able to vefify your email, please contact customer serveice at 555-555-5555', 404)
 
-  // 62cf33d3389f8babd5bb1862
+    const verified = await mongoClient
+      .db()
+      .collection('users')
+      .updateOne(
+        {
+          _id: new ObjectId(user._id),
+        },
+        { $set: { verified: true } }
+      )
+    console.log('verified', verified)
+    if (!verified || !verified.modifiedCount)
+      throw new AppError(
+        'We were not able to update your records, please contact customer serveice at 555-555-5555',
+        404
+      )
 
-  switch (event.req.method) {
-    case 'GET':
-      return await fetchAll(event, query, 'users')
-      break
+    const token = await getSinedJwtToken(user._id, Number(config.jwtMaxAge) * 24 * 60 * 60)
 
-    case 'POST':
-    case 'PATCH':
-      body = await useBody(event)
-      console.log('Body', body)
-      // body.name = body.name.trim()
-      // body.email = body.email.trim().toLowerCase()
-      // body.role = body.role ? body.role : 'user'
-      // body.sortOrder = body.sortOrder ? body.sortOrder * 1 : 0
-      // body.active = body.active ? body.active : false
-      // body.verified = body.verified ? body.verified : false
-      // for (const i in body.userAddresses) {
-      //   body.userAddresses[i].state = new ObjectId(body.userAddresses[i].state._id)
-      //   body.userAddresses[i]._id = new ObjectId()
-      //   body.userAddresses[i].country = new ObjectId(body.userAddresses[i].country._id)
-      //   for (const j in body.userAddresses[i].phoneNumbers) {
-      //     console.log('XX', body.userAddresses[i].phoneNumbers[j])
-      //     body.userAddresses[i].phoneNumbers[j].phoneCountryCode = new ObjectId(
-      //       body.userAddresses[i].phoneNumbers[j].phoneCountryCode._id
-      //     )
-      //     body.userAddresses[i].phoneNumbers[j]._id = new ObjectId()
-      //   }
-      // }
-      // for (const i in body.media) {
-      //   body.media[i] = new ObjectId(body.media[i]._id)
-      // }
+    await setAuthCookies(event, user, token)
 
-      // for (const i in body.media) {
-      //   body.media[i] = new ObjectId(body.media[i]._id)
-      // }
-      return await verifyEmail(event, body)
-      break
-
-    case 'DELETE':
-      return await deleteDoc(event, query, 'users')
-      break
-
-    // case 'PATCH':
-    //   body = await useBody(event)
-    //   console.log('Body', body)
-    //   for (const prop in body.media) {
-    //     body.media[prop] = new ObjectId(body.media[prop]._id)
-    //   }
-    //   body.sortOrder = body.sortOrder * 1
-    //   return await updateDoc(event, body, 'galleries')
-    //   break
-
-    default:
-      break
+    return {
+      userName: user.name,
+      // token: token,
+    }
+  } catch (err) {
+    errorHandler(event, err)
   }
 })

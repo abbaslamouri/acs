@@ -13,7 +13,7 @@ const isAuthenticated = useState('isAuthenticated')
 const errorMsg = useState('errorMsg')
 const message = useState('message')
 // const { errorMsg, message } = useAppState()
-const showAuthDropdown = ref(false)
+const showDropdown = ref(false)
 const user = reactive({
   email: '',
   password: '',
@@ -21,11 +21,11 @@ const user = reactive({
 
 const signup = async () => {
   router.push({ name: 'auth-signup', query: { redirect: route.name } })
-  showAuthDropdown.value = false
+  showDropdown.value = false
 }
 
 const login = async () => {
-  showAuthDropdown.value = false
+  showDropdown.value = false
   const auth = await signin(user)
   if (!auth) return
   loggedInUser.value = auth.userName
@@ -35,7 +35,7 @@ const login = async () => {
 
 const forgotPassword = async () => {
   router.push({ name: 'auth-forgot-password' })
-  showAuthDropdown.value = false
+  showDropdown.value = false
 }
 </script>
 
@@ -43,20 +43,20 @@ const forgotPassword = async () => {
   <div class="relative flex items-center text-xs">
     <div
       class="fixed inset-0 w-full h-full opacity-50 bg-slate-900 z-9"
-      v-if="showAuthDropdown"
-      @click="showAuthDropdown = !showAuthDropdown"
+      v-if="showDropdown"
+      @click="showDropdown = !showDropdown"
     ></div>
     <div class="z-10">
       <a
         href="#"
-        class="header flex items-center gap-2 px-4 py-2 border border-gray-400 rounded-sm z-30 hover:(bg-white text-slate-900 )"
-        :class="{ selected: showAuthDropdown }"
-        @click="showAuthDropdown = !showAuthDropdown"
+        class="flex items-center gap-2 px-4 py-2 border border-gray-400 rounded-sm z-20 bg-white hover:( text-slate-700 )"
+        :class="{ selected: showDropdown }"
+        @click="showDropdown = !showDropdown"
       >
         <IconsUser class="w-4 h-4" />
         <h3 class="font-light uppercase">Sign in / Create acount</h3>
       </a>
-      <form class="shadow-md flex flex-col gap-4 bg-slate-50 p-2 absolute z-20 text-slate-800" v-if="showAuthDropdown">
+      <form class="shadow-md flex flex-col gap-4 bg-slate-50 p-2 absolute z-20 text-slate-800 w-full border border-gray-400" v-if="showDropdown">
         <h3 class="title">Sin in</h3>
         <p class="text-xs">Access your account and place an order:</p>
         <div class="flex flex-col gap-4">
@@ -85,19 +85,19 @@ const forgotPassword = async () => {
 </template>
 
 <style lang="scss" scoped>
-.header {
-  &.dark {
-    color: red;
-  }
-  &:hover,
-  &.selected {
-    background-color: white;
-    color: #0f172a;
-    border-bottom: transparent;
-    border-radius: 0.125rem 0.125rem 0 0;
-    svg {
-      fill: #0f172a;
-    }
-  }
-}
+// .header {
+//   &.dark {
+//     color: red;
+//   }
+//   &:hover,
+//   &.selected {
+//     background-color: white;
+//     color: #0f172a;
+//     border-bottom: transparent;
+//     border-radius: 0.125rem 0.125rem 0 0;
+//     svg {
+//       fill: #0f172a;
+//     }
+//   }
+// }
 </style>

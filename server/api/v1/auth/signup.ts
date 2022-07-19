@@ -1,70 +1,55 @@
-import slugify from 'slugify'
-import { ObjectId } from 'mongodb'
+import { hashPassword } from '~/server/controllers/v1/auth'
+import { getSinedJwtToken } from '~/server/controllers/v1/auth'
+import AppError from '~/server/utils/AppError'
+import mongoClient from '~/server/utils/mongoClient'
+import errorHandler from '~/server/utils/errorHandler'
+import sendEmail from '~/server/utils/Email'
 
-import { fetchAll, insertDoc, updateDoc, deleteDoc } from '~/server/controllers/v1/factory'
-import { signup } from '~/server/controllers/v1/auth'
-// import { deleteDoc } from '~/server/controllers/v1/galleries'
+const config = useRuntimeConfig()
 
 export default defineEventHandler(async (event) => {
-  let body: any
-  const query: any = useQuery(event)
-  // console.log('Query', query)
+  try {
+    if (event.req.method !== 'POST') return
+    const body = await useBody(event)
+    console.log('Body', body)
+    const { user, url, emailSubject } = body
+    const newUser = await mongoClient
+      .db()
+      .collection('users')
+      .insertOne({
+        name: user.name,
+        email: user.email,
+        password: await hashPassword(user.password),
+        role: 'user',
+        active: false,
+        verified: false,
+        passwordChangeDate: new Date(Date.now()),
+      })
+    if (!newUser || !newUser.insertedId) throw new AppError('Registration failed, please try again later', 404)
 
-  // 62cf33d3389f8babd5bb1862
+    const token = await getSinedJwtToken(newUser.insertedId, Number(config.jwtSignupTokenMaxAge) * 24 * 60 * 60)
 
-  switch (event.req.method) {
-    case 'GET':
-      return await fetchAll(event, query, 'users')
-      break
-
-    case 'POST':
-    case 'PATCH':
-      body = await useBody(event)
-      console.log('Body', body)
-      // body.name = body.name.trim()
-      // body.email = body.email.trim().toLowerCase()
-      // body.role = body.role ? body.role : 'user'
-      // body.sortOrder = body.sortOrder ? body.sortOrder * 1 : 0
-      // body.active = body.active ? body.active : false
-      // body.verified = body.verified ? body.verified : false
-      // for (const i in body.userAddresses) {
-      //   body.userAddresses[i].state = new ObjectId(body.userAddresses[i].state._id)
-      //   body.userAddresses[i]._id = new ObjectId()
-      //   body.userAddresses[i].country = new ObjectId(body.userAddresses[i].country._id)
-      //   for (const j in body.userAddresses[i].phoneNumbers) {
-      //     console.log('XX', body.userAddresses[i].phoneNumbers[j])
-      //     body.userAddresses[i].phoneNumbers[j].phoneCountryCode = new ObjectId(
-      //       body.userAddresses[i].phoneNumbers[j].phoneCountryCode._id
-      //     )
-      //     body.userAddresses[i].phoneNumbers[j]._id = new ObjectId()
-      //   }
-      // }
-      // for (const i in body.media) {
-      //   body.media[i] = new ObjectId(body.media[i]._id)
-      // }
-
-      // for (const i in body.media) {
-      //   body.media[i] = new ObjectId(body.media[i]._id)
-      // }
-      if (event.req.method === 'POST') return await signup(event, body)
-      else return await updateDoc(event, body, 'users')
-      break
-
-    case 'DELETE':
-      return await deleteDoc(event, query, 'users')
-      break
-
-    // case 'PATCH':
-    //   body = await useBody(event)
-    //   console.log('Body', body)
-    //   for (const prop in body.media) {
-    //     body.media[prop] = new ObjectId(body.media[prop]._id)
-    //   }
-    //   body.sortOrder = body.sortOrder * 1
-    //   return await updateDoc(event, body, 'galleries')
-    //   break
-
-    default:
-      break
+    const emailText = `
+        Hello,
+        Thank you for signing up on our site.
+        Please copy the url below and paste it in your browser to verify your account.
+        ${url}?signupToken=${token}
+        `
+    const emailHtml = `
+        <h3>Hello ${user.name},</h3>
+        <p>Thank you for signingup on our site.</p>
+        <p>Please click the link below to verify your account.</p>
+        <p>${url}?signupToken=${token}</p>
+        `
+    await new sendEmail({
+      name: user.name,
+      email: user.email,
+      emailSubject,
+      emailText,
+      emailHtml,
+    }).sendRegisterationEmail()
+    return true
+  } catch (err) {
+    errorHandler(event, err)
   }
 })
