@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb'
+import jwt from 'jsonwebtoken'
 import AppError from '~/server/utils/AppError'
 import mongoClient from '~/server/utils/mongoClient'
 import errorHandler from '~/server/utils/errorHandler'
