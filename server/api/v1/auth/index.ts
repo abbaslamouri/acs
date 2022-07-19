@@ -1,8 +1,8 @@
 import slugify from 'slugify'
 import { ObjectId } from 'mongodb'
 
-import { fetchAll, insertDoc, updateDoc, deleteDoc } from '~/server/controllers/v1/factory'
-import { signup, verifyEmail, signin } from '~/server/controllers/v1/auth'
+// import { fetchAll, insertDoc, updateDoc, deleteDoc } from '~/server/controllers/v1/factory'
+// import { signup, verifyEmail, signin } from '~/server/controllers/v1/auth'
 // import { deleteDoc } from '~/server/controllers/v1/galleries'
 
 export default defineEventHandler(async (event) => {
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   switch (event.req.method) {
     case 'GET':
-      return await fetchAll(event, query, 'users')
+      // return await fetchAll(event, query, 'users')
       break
 
     case 'POST':
@@ -46,11 +46,11 @@ export default defineEventHandler(async (event) => {
       // for (const i in body.media) {
       //   body.media[i] = new ObjectId(body.media[i]._id)
       // }
-      return await signin(event, body)
+      // return await signin(event, body)
       break
 
     case 'DELETE':
-      return await deleteDoc(event, query, 'users')
+      // return await deleteDoc(event, query, 'users')
       break
 
     // case 'PATCH':
