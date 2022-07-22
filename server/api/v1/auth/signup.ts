@@ -20,6 +20,8 @@ export default defineEventHandler(async (event) => {
         name: user.name,
         email: user.email,
         password: await hashPassword(user.password),
+        accountNumber: (await mongoClient.db().collection('users').countDocuments()) + 101013,
+        signupDate: new Date(Date.now()),
         role: 'user',
         active: false,
         verified: false,

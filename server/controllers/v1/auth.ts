@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { ObjectId } from 'mongodb'
 import { promisify } from 'util'
 import AppError from '~/server/utils/AppError'
 import mongoClient from '~/server/utils/mongoClient'
@@ -14,6 +15,13 @@ const hashPassword = async (password: string) => {
 
 const checkPassword = async (password: string, hash: string) => {
   return await bcrypt.compare(password, hash)
+}
+
+const hasPasswordChanged = async function (JWTTimestamp: number, user: any) {
+  if (user.passwordChangeDate) {
+    return parseInt(user.passwordChangeDate.getTime(), 10) / 1000 > JWTTimestamp
+  }
+  return false
 }
 
 const getSinedJwtToken = async function (id: any, maxAge: number) {
@@ -61,4 +69,29 @@ const createUser = async (event: any) => {
   }
 }
 
-export { fetchUserById, createUser, hashPassword, checkPassword, getSinedJwtToken, setAuthCookies }
+const getAuth = async (event: any) => {
+  try {
+    const jwtToken =
+      event.req.headers &&
+      event.req.headers.authorization &&
+      (event.req.headers.authorization as String).startsWith('Bearer')
+        ? (event.req.headers.authorization as String).split(' ')[1]
+        : ''
+    if (!jwtToken) throw new AppError('You are not allowed to access these resources, please login', 401)
+    const decoded: any = jwt.verify(jwtToken, config.jwtSecret)
+    const user = await mongoClient
+      .db()
+      .collection('users')
+      .findOne({
+        _id: new ObjectId(decoded.id),
+      })
+    if (!user) throw new AppError('We cannot find a user with this token in our database', 401)
+    if (await hasPasswordChanged(decoded.iat, user))
+      throw new AppError('User changed password recently, please login again', 401)
+    return user
+  } catch (err) {
+    errorHandler(event, err)
+  }
+}
+
+export { fetchUserById, createUser, hashPassword, checkPassword, getSinedJwtToken, setAuthCookies, getAuth }

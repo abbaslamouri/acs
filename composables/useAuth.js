@@ -179,6 +179,19 @@ const useAuth = () => {
   // }
 
   const fetchLoggedInUser = async () => {
+    errorMsg.value = ''
+    try {
+      const response = await $fetch(`/api/v1/auth/loggedin-user`, {
+        headers: {
+          Authorization: `Bearer ${jwt.value}`,
+        },
+      })
+      return response
+    } catch (err) {
+      console.log('MYERROR', err)
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
+      return false
+    }
     // errorMsg.value = ''
     // message.value = ''
     // // const token =
@@ -232,7 +245,23 @@ const useAuth = () => {
     // }
   }
 
-  const updateLoggedInUserData = async (payload) => {
+  const updateLoggedInUserInfo = async (body) => {
+    errorMsg.value = ''
+    try {
+      const response = await $fetch(`/api/v1/auth/update-loggedin-user-info`, {
+        method: 'PATCH',
+        body,
+        headers: {
+          Authorization: `Bearer ${jwt.value}`,
+        },
+      })
+      return response
+    } catch (err) {
+      console.log('MYERROR', err)
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
+      return false
+    }
+
     // errorMsg.value = ''
     // message.value = ''
     // const token =
@@ -256,6 +285,24 @@ const useAuth = () => {
     //   errorMsg.value = err.data && err.data.message ? err.data.message : err.message ? err.message : ''
     //   return false
     // }
+  }
+  const updateLoggedInUserPwd = async (body) => {
+    console.log('LLLLLLLL')
+    errorMsg.value = ''
+    try {
+      const response = await $fetch(`/api/v1/auth/update-loggedin-user-password`, {
+        method: 'PATCH',
+        body,
+        headers: {
+          Authorization: `Bearer ${jwt.value}`,
+        },
+      })
+      return response
+    } catch (err) {
+      console.log('MYERROR', err)
+      if (err.data && err.data.statusMessage) errorMsg.value = err.data.statusMessage
+      return false
+    }
   }
 
   // const resetPasswordxxxx = async (payload) => {
@@ -375,7 +422,8 @@ const useAuth = () => {
     signin,
     signout,
     fetchLoggedInUser,
-    updateLoggedInUserData,
+    updateLoggedInUserInfo,
+    updateLoggedInUserPwd,
     forgotPassword,
     resetPassword,
   }

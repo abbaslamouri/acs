@@ -13,6 +13,14 @@ const userSchema = {
           description: 'User email is required and 200 characters max',
           pattern: '^[a-z0-9]+(.[_a-z0-9]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,15})$',
         },
+        accountNumber: {
+          bsonType: 'int',
+          description: 'User membership number',
+        },
+        signupDate: {
+          bsonType: 'date ',
+          description: 'Date user joined',
+        },
         userAddresses: {
           bsonType: 'array',
           description: 'User Addresses',

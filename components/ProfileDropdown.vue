@@ -1,4 +1,5 @@
 <script setup>
+const router = useRouter()
 const { signout } = useAuth()
 const message = useState('message')
 const loggedInUser = useState('loggedInUser')
@@ -14,6 +15,11 @@ const lougout = async () => {
   loggedInUser.value = ''
   isAuthenticated.value = false
   message.value = 'You are logged out'
+}
+
+const goToProfile = () => {
+  showDropdown.value = false
+  router.push({ name: `auth-profile` })
 }
 </script>
 
@@ -34,18 +40,19 @@ const lougout = async () => {
         <IconsUser class="w-4 h-4" />
         <h3 class="font-light uppercase">Welcome {{ loggedInUser }}</h3>
       </a>
-      <div class="shadow-md flex flex-col gap-4 bg-slate-50 p-2 absolute z-20 text-slate-800 w-full border border-gray-400 " v-if="showDropdown">
+      <div
+        class="shadow-md flex flex-col gap-4 bg-slate-50 p-2 absolute z-20 text-slate-800 w-full border border-gray-400"
+        v-if="showDropdown"
+      >
         <h3 class="">My Accoun</h3>
         <ul class="flex flex-col gap-2">
-          <!-- <li v-if="loggedInUser.role !== 'admin'">
-          <NuxtLink :to="{ name: `admin` }">Admin Dashboard</NuxtLink>
-        </li> -->
+          <li>
+            <NuxtLink :to="{ name: `admin` }">Admin Dashboard</NuxtLink>
+          </li>
           <li>
             <NuxtLink :to="{ name: `admin` }">Order History</NuxtLink>
           </li>
-          <li>
-            <NuxtLink :to="{ name: `admin` }">Account Indivation?</NuxtLink>
-          </li>
+          <li class="cursor-pointer" @click="goToProfile">Personal Information</li>
           <li>
             <NuxtLink :to="{ name: `admin` }">Addresses?</NuxtLink>
           </li>
