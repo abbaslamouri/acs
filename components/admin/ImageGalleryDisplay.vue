@@ -145,12 +145,11 @@ const setFeaturedImage = (event) => {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
 
 // .gallery {
 .thumb {
   svg {
-    fill: $slate-50;
+    // fill: $slate-50;
   }
 
   .move,
@@ -160,7 +159,7 @@ const setFeaturedImage = (event) => {
   }
 
   &.hovered {
-    background-color: $slate-500;
+    // background-color: $slate-500;
 
     img {
       opacity: 0.1;
@@ -175,7 +174,7 @@ const setFeaturedImage = (event) => {
 
   &.over {
     opacity: 0.3;
-    border: 2px dashed $slate-600;
+    // border: 2px dashed $slate-600;
   }
 
   // &__imageTitle {

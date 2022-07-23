@@ -7,7 +7,7 @@ import { hashPassword } from '~/server/controllers/v1/auth'
 
 export default defineEventHandler(async (event) => {
   try {
-    if (event.req.method !== 'POST') return
+    if (event.req.method !== 'POST') throw new AppError('invalid request', 401)
     const body = await useBody(event)
     console.log('Body', body)
     const { password, resetToken } = body

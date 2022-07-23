@@ -101,7 +101,6 @@ watch(
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
 
 .main {
   display: grid;
@@ -113,7 +112,7 @@ watch(
     position: sticky;
     top: 10rem;
     background-color: white;
-    border: 1px solid $slate-100;
+    // border: 1px solid $slate-100;
     border-radius: 3px;
     padding: 2rem 0.5rem;
   }

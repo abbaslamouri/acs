@@ -23,5 +23,4 @@ defineEmits(['closeSlideout'])
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
 </style>

@@ -6,23 +6,25 @@ import AppError from '~/server/utils/AppError'
 import mongoClient from '~/server/utils/mongoClient'
 import errorHandler from '~/server/utils/errorHandler'
 import sendEmail from '~/server/utils/Email'
-import { getAuth } from '~/server/controllers/v1/auth'
+import { getAuth, checkPassword, hashPassword } from '~/server/controllers/v1/auth'
 
 const config = useRuntimeConfig()
 
 export default defineEventHandler(async (event) => {
   try {
-    if (event.req.method !== 'PATCH') throw new AppError('invalid request', 401)
+    if (event.req.method !== 'POST') throw new AppError('invalid request', 401)
     const body = await useBody(event)
     console.log('Body', body)
     const user = await getAuth(event)
-    if (!user) throw new AppError('You must be logged in to update your info', 401)
+    console.log(user)
+    if (!user) throw new AppError('You must be logged in to change your password', 401)
+    if (!(await checkPassword(body.currentPassword, user.password))) throw new AppError('Invalid current password', 401)
     const updatedUser = await mongoClient
       .db()
       .collection('users')
-      .updateOne({ _id: new ObjectId(user._id) }, { $set: { name: body.name, email: body.email } })
-    if (!updatedUser || !updatedUser.modifiedCount)
-      throw new AppError('We are not able to update your personal information', 401)
+      .updateOne({ _id: new ObjectId(user._id) }, { $set: { password: await hashPassword(body.newPassword) } })
+    console.log('US', updatedUser)
+    if (!updatedUser || !updatedUser.modifiedCount) throw new AppError('We are not able to update your password', 401)
     return true
 
     // if (event.req.method !== 'GET') return

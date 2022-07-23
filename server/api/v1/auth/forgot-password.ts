@@ -9,10 +9,10 @@ const config = useRuntimeConfig()
 
 export default defineEventHandler(async (event) => {
   try {
-    if (event.req.method !== 'POST') return
+    if (event.req.method !== 'POST') throw new AppError('invalid request', 401)
     const body = await useBody(event)
     console.log('Body', body)
-    const { email, url, emailSubject } = body
+    const { email, url } = body
     if (!email) throw new AppError('Please enter a valid email', 404)
     const user = await mongoClient.db().collection('users').findOne({ email })
     console.log('US', user)
@@ -21,14 +21,12 @@ export default defineEventHandler(async (event) => {
 
     user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
     user.passwordResetExpires = new Date(Date.now() + config.pwResetTokenExpiresIn * 60 * 60 * 1000)
-
     const updatedUser = await mongoClient
       .db()
       .collection('users')
       .replaceOne({ _id: new ObjectId(user._id) }, user)
     console.log('US', updatedUser)
     if (!updatedUser) throw new AppError('We cannot update document', 404)
-
     const emailText = `
         Hello,
         Please copy the url below and paste it in your browser to reset your password.
@@ -42,8 +40,7 @@ export default defineEventHandler(async (event) => {
     await new sendEmail({
       name: user.name,
       email: user.email,
-      emailSubject,
-      // url: `${url}?token=${token}`,
+      emailSubject: 'Your password reset token (valid for 1 hour)',
       emailText,
       emailHtml,
     }).sendPasswordResetEmail()

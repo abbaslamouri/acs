@@ -20,7 +20,6 @@ class Email {
   }
 
   async send(templateId: string) {
-    console.log('SPREAD', { ...this.data, firstname: this.firstname })
     sgMail.setApiKey(config.sendgridApiKey as string)
 
     const msg: any = {
@@ -44,7 +43,7 @@ class Email {
     }
 
     await sgMail.send(msg)
-    console.log(colors.green.bold('Message sent'))
+    // console.log(colors.green.bold('Message sent'))
   }
 
   async sendRegisterationEmail() {

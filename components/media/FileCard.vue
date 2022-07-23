@@ -51,8 +51,6 @@ const config = useRuntimeConfig()
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
-
 .card {
   .tooltip {
     opacity: 0;
@@ -66,11 +64,11 @@ const config = useRuntimeConfig()
       margin-left: -5px;
       border-width: 5px;
       border-style: solid;
-      border-color: $slate-600 transparent transparent transparent;
+      // border-color: $slate-600 transparent transparent transparent;
     }
   }
   &.hovered {
-    background-color: $slate-500;
+    // background-color: $slate-500;
 
     img {
       opacity: 0.5;

@@ -4,20 +4,18 @@ defineProps({
     type: String,
   },
 })
-const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
 const { signin } = useAuth()
 const loggedInUser = useState('loggedInUser')
 const isAuthenticated = useState('isAuthenticated')
-const errorMsg = useState('errorMsg')
 const message = useState('message')
-// const { errorMsg, message } = useAppState()
 const showDropdown = ref(false)
 const user = reactive({
   email: '',
   password: '',
 })
+const loading = ref(false)
 
 const signup = async () => {
   router.push({ name: 'auth-signup', query: { redirect: route.name } })
@@ -26,7 +24,9 @@ const signup = async () => {
 
 const login = async () => {
   showDropdown.value = false
+  loading.value = true
   const auth = await signin(user)
+  loading.value = false
   if (!auth) return
   loggedInUser.value = auth.userName
   isAuthenticated.value = true
@@ -40,23 +40,26 @@ const forgotPassword = async () => {
 </script>
 
 <template>
-  <div class="relative flex items-center text-xs">
+  <div class="relative flex items-center text-xs min-w-60 border border-gray-400 rounded">
     <div
       class="fixed inset-0 w-full h-full opacity-50 bg-slate-900 z-9"
       v-if="showDropdown"
       @click="showDropdown = !showDropdown"
     ></div>
-    <div class="z-10">
+    <div class="z-10 w-full">
       <a
         href="#"
-        class="flex items-center gap-2 px-4 py-2 border border-gray-400 rounded-sm z-20 bg-white hover:( text-slate-700 )"
+        class="flex items-center gap-2 px-4 py-2 rounded-sm z-20 bg-white hover:( text-slate-700 )"
         :class="{ selected: showDropdown }"
         @click="showDropdown = !showDropdown"
       >
         <IconsUser class="w-4 h-4" />
         <h3 class="font-light uppercase">Sign in / Create acount</h3>
       </a>
-      <form class="shadow-md flex flex-col gap-4 bg-slate-50 p-2 absolute z-20 text-slate-800 w-full border border-gray-400" v-if="showDropdown">
+      <form
+        class="shadow-md flex flex-col gap-4 bg-slate-50 p-2 absolute z-20 text-slate-800 w-full"
+        v-if="showDropdown"
+      >
         <h3 class="title">Sin in</h3>
         <p class="text-xs">Access your account and place an order:</p>
         <div class="flex flex-col gap-4">
@@ -81,23 +84,8 @@ const forgotPassword = async () => {
         </div>
       </form>
     </div>
+    <Spinner v-if="loading" />
   </div>
 </template>
 
-<style lang="scss" scoped>
-// .header {
-//   &.dark {
-//     color: red;
-//   }
-//   &:hover,
-//   &.selected {
-//     background-color: white;
-//     color: #0f172a;
-//     border-bottom: transparent;
-//     border-radius: 0.125rem 0.125rem 0 0;
-//     svg {
-//       fill: #0f172a;
-//     }
-//   }
-// }
-</style>
+<style lang="scss" scoped></style>

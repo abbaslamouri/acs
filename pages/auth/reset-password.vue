@@ -9,12 +9,16 @@ const message = useState('messsage')
 
 const password = ref('adrar0714')
 const passwordConfirm = ref('adrar0714')
+const loading = ref(false)
 
 const handleResetPassword = async () => {
   if (password.value !== passwordConfirm.value)
     return (errorMsg.value = "Your password and confirmation password don't match")
+  loading.value = true
   const data = await resetPassword({ password: password.value, resetToken: route.query.resetToken })
   console.log(data)
+  loading.value = false
+
   if (!data) return
   // (errorMsg.value = 'password reset  failed, please try again later')
   // const auth = useCookie('auth', {
@@ -25,8 +29,8 @@ const handleResetPassword = async () => {
   // user.value = data.user
   // resetToken.value = data.resetToken
   // isAuthenticated.value = true
-  // router.push({ name: 'ecommerce-products' })
-  message.value = 'Password reset successfull, you are now logged in.'
+  router.push({ name: 'index' })
+  message.value = 'Password reset successfull, please login.'
 }
 </script>
 
@@ -59,6 +63,7 @@ const handleResetPassword = async () => {
         Reset Password<IconsChevronRight class="fill-white w-5 h-5" />
       </button>
     </form>
+    <Spinner v-if="loading" />
   </main>
 </template>
 

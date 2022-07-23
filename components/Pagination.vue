@@ -87,8 +87,6 @@ const setCurrentPage = async (p) => {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
-
 .base-select {
   select {
     // min-height: 3.1rem;
@@ -104,7 +102,7 @@ const setCurrentPage = async (p) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid $slate-400;
+  // border: 1px solid $slate-400;
   width: 2rem;
   height: 2rem;
   border-radius: 2px;
@@ -124,8 +122,8 @@ const setCurrentPage = async (p) => {
   }
 
   &.active {
-    background-color: $slate-400;
-    color: $slate-50;
+    // background-color: $slate-400;
+    // color: $slate-50;
   }
 }
 </style>

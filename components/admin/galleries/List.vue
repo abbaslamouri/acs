@@ -60,7 +60,6 @@ const deleteGallery = (galleryId) => {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
 
 th {
   // border: 1px solid red

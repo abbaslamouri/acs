@@ -55,17 +55,15 @@ const navLinkItems = ref([
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
-
 .item {
-  border-left: 1px solid $slate-600;
-  border-right: 1px solid $slate-600;
+  // border-left: 1px solid $slate-600;
+  // border-right: 1px solid $slate-600;
   margin-right: -1px;
   cursor: pointer;
 
   &:hover {
-    background-color: $slate-200;
-    color: $slate-800;
+    // background-color: $slate-200;
+    // color: $slate-800;
   }
 }
 </style>

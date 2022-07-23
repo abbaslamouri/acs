@@ -80,8 +80,6 @@ const transitionName = computed(() => (getPosition().includes('right') ? 'rtl' :
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
-
 .snackbar {
   &.top-left {
     left: 5rem;
@@ -92,29 +90,29 @@ const transitionName = computed(() => (getPosition().includes('right') ? 'rtl' :
   }
 
   &.error {
-    background: $red-700;
-    border-left: 1rem solid $red-400;
+    // background: $red-700;
+    // border-left: 1rem solid $red-400;
 
     .icon {
-      background: $red-400;
+      // background: $red-400;
       // border-radius: 50%;
 
       svg {
-        fill: $red-50;
+        // fill: $red-50;
       }
     }
   }
 
   &.success {
-    background: $green-700;
-    border-left: 1rem solid $green-400;
+    // background: $green-700;
+    // border-left: 1rem solid $green-400;
 
     .icon {
-      background: $green-400;
+      // background: $green-400;
       // border-radius: 50%;
 
       svg {
-        fill: $green-50;
+        // fill: $green-50;
       }
     }
   }

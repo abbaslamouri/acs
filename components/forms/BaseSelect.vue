@@ -59,14 +59,12 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
-
 .base-selects {
   position: relative;
   // --size: 0.5em;
   border-radius: 0.25rem;
   height: 4.5rem;
-  border: 1px solid $slate-200;
+  // border: 1px solid $slate-200;
   background-color: white;
   overflow: hidden;
 
@@ -79,7 +77,7 @@ export default {
     top: 0.2rem;
     left: 2rem;
     font-size: 80%;
-    color: lighten($color: $slate-800, $amount: 50);
+    // color: lighten($color: $slate-800, $amount: 50);
   }
 
   select {
@@ -120,7 +118,7 @@ export default {
     top: 50%;
     transform: translate(-50%, -30%);
     border: 0.5rem solid transparent;
-    border-top: 0.5rem solid $slate-400;
+    // border-top: 0.5rem solid $slate-400;
     pointer-events: none;
   }
 }

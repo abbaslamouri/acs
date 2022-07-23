@@ -20,8 +20,6 @@ const showCartSlideout = useState('showCart')
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
-
 button {
   // border: 1px solid $green-900;
   &:hover {

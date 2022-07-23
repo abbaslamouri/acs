@@ -78,10 +78,10 @@ export default {
     </label>
     <div class="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer" v-if="type === 'password'">
       <span class="icon" v-if="fieldType === 'password'" @click="fieldType = 'text'">
-        <IconsVisibilityOff class="w-4 h-4" />
+        <IconsHide class="w-4 h-4" />
       </span>
       <span class="icon" v-else @click="fieldType = 'password'">
-        <IconsVisibilityOn class="w-4 h-4" />
+        <IconsShow class="w-4 h-4" />
       </span>
     </div>
   </div>

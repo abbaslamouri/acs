@@ -58,8 +58,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
-
 .toggle {
   &.vertical {
     flex-direction: column;
@@ -67,7 +65,7 @@ export default {
 
   input {
     &:checked + .slider {
-      background-color: $slate-800;
+      // background-color: $slate-800;
 
       &:before {
         left: 53.125%;

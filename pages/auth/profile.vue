@@ -28,12 +28,17 @@ const updateLoggedInUserInformation = async () => {
   if (user.value.email !== confirmEmail.value) return (errorMsg.value = "Email and confirmation email don't match")
   const response = await updateLoggedInUserInfo({ email: user.value.email, name: user.value.name })
   console.log('U', response)
+  if (!response) return
+  loggedInUser.value = user.value.name
 }
 
 const updateLoggedInUserPassword = async () => {
   if (newPassword.value !== confirmNewPassword.value)
     return (errorMsg.value = "Password and confirmation [password] don't match")
-  const response = await updateLoggedInUserPwd({ currentPassword:currentPassword.value, newPassword: newPassword.value })
+  const response = await updateLoggedInUserPwd({
+    currentPassword: currentPassword.value,
+    newPassword: newPassword.value,
+  })
   console.log('U', response)
   // if (response) user.value = response
 }

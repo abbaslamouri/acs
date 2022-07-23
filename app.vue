@@ -19,7 +19,7 @@ const hideSnackbar = () => {
   <div>
     <NuxtLayout>
       <NuxtPage />
-      <SnackBar
+      <LazySnackBar
         :show="errorMsg ? true : message ? true : false"
         :message="errorMsg ? errorMsg : message ? message : ''"
         :snackbarType="errorMsg ? 'Error' : 'Success'"

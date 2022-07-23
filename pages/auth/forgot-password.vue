@@ -1,17 +1,18 @@
 <script setup>
 const { forgotPassword } = useAuth()
-const errorMsg = useState('errorMsg')
-const message = useState('messsage')
-
+const message = useState('message')
 const email = ref('abbaslamouri@yrlus.com')
+const loading = ref(false)
 
 const handleForgotPassword = async () => {
+  loading.value = true
   const response = await forgotPassword({
     email: email.value,
     url: `${window.location.protocol}//${window.location.host}/auth/reset-password`,
-    emailSubject: 'Your password reset token (valid for 1 hour)',
   })
-  if (response) return (message.value = 'Please check your email for instructions to reset your password.')
+  loading.value = false
+  if (!response) return
+  message.value = 'Please check your email for instructions to reset your password.'
   console.log(response)
 }
 </script>
@@ -34,11 +35,11 @@ const handleForgotPassword = async () => {
         email from: identification@nespresso.com.
       </p>
       <p class="text-sm">If you have questions, please call customer service at 1-800-555-5555.</p>
-
       <button class="btn btn-primary py-2 px-4 self-end text-xs tracking-wide">
         Reset Password<IconsChevronRight class="fill-white w-5 h-5" />
       </button>
     </form>
+    <Spinner v-if="loading" />
   </div>
 </template>
 

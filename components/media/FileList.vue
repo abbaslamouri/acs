@@ -48,24 +48,22 @@ const fileRefs = ref([])
   </div>
 </template>
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
-
 .item {
   .selected {
-    outline: 3px solid $sky-600;
+    // outline: 3px solid $sky-600;
   }
 
   .actions {
-    border: 1px solid $sky-400;
+    // border: 1px solid $sky-400;
     transform: translate(25%, -25%);
 
     .action {
       width: 100%;
       height: 100%;
-      color: $sky-50;
-      background-color: $sky-600;
-      border: 2px solid $sky-50;
-      outline: 2px solid $sky-600;
+      // color: $sky-50;
+      // background-color: $sky-600;
+      // border: 2px solid $sky-50;
+      // outline: 2px solid $sky-600;
     }
   }
 }

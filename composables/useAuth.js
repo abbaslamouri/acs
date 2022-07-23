@@ -1,33 +1,6 @@
 const useAuth = () => {
-  const config = useRuntimeConfig()
   const errorMsg = useState('errorMsg')
-  const loggedInUser = useState('loggedInUser')
   const jwt = useState('jwt')
-
-  // const { errorMsg, message } = useAppState()
-
-  // const loggedInUser = useState('loggedInUser', () =>
-  //   useCookie('userName') && useCookie('userName').value ? useCookie('userName').value : {}
-  // )
-
-  // const token = useState('token', () =>
-  //   useCookie('token') && useCookie('token').value ? useCookie('token').value : ''
-  // )
-
-  // const isAuthenticated = useState('isAuthenticated', () => (useCookie('jwt') && useCookie('jwt').value ? true : false))
-
-  // const isAdmin = useState('isAdmin', () =>
-  //   useCookie('loggedInUser').value && useCookie('loggedInUser').value.role === 'admin' ? true : false
-  // )
-
-  // const getErrorStr = (errors) => {
-  //   console.log('MYERROR', errors)
-  //   let errorStr = ''
-  //   for (const prop in errors) {
-  //     errorStr = `${errorStr}<li>${errors[prop].message}</li>`
-  //   }
-  //   return `<ul>${errorStr}</ul>`
-  // }
 
   const signup = async (body) => {
     errorMsg.value = ''
@@ -61,37 +34,6 @@ const useAuth = () => {
     }
   }
 
-  // const signupEmail = async (payload) => {
-  //   errorMsg.value = ''
-  //   try {
-  //     const response = await fetch(`${config.apiUrl}/auth/signup-email`, {
-  //       method: 'POST',
-  //       body: JSON.stringify(payload),
-  //       headers: new Headers({
-  //         'Content-Type': 'application/json',
-  //         // Authorization: `Bearer ${token.value}`,
-  //       }),
-  //     })
-  //     if (response.ok) {
-  //       const data = await response.json()
-  //       // const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-  //       // const userCookie = useCookie('user', { maxAge: data.cookieExpires * 24 * 60 * 60 })
-  //       // tokenCookie.value = data.token
-  //       // userCookie.value = data.user
-  //       // user.value = userCookie.value
-  //       // token.value = tokenCookie.value
-  //       // isAuthenticated.value = true
-  //       return data
-  //     }
-  //     if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-  //     throw getErrorStr((await response.json()).errors)
-  //   } catch (err) {
-  //     console.log('MYERROR', err)
-  //     errorMsg.value = err
-  //     return false
-  //   }
-  // }
-
   const signin = async (user) => {
     errorMsg.value = ''
     try {
@@ -109,17 +51,13 @@ const useAuth = () => {
 
   const signout = async (user) => {
     errorMsg.value = ''
-    // const token = useCookie('jwt') && useCookie('jwt').value ? useCookie('jwt').value : ''
-    // console.log('TT', jwt.value)
-    // console.log('loggedInUser', loggedInUser.value)
     try {
       const response = await $fetch(`/api/v1/auth/signout`, {
         method: 'POST',
         body: user,
-        // headers: new Headers({
-        //   'Content-Type': 'application/json',
-        //   Authorization: `Bearer ${jwt.value}`,
-        // }),
+        headers: {
+          Authorization: `Bearer ${jwt.value}`,
+        },
       })
       return response
     } catch (err) {
@@ -248,8 +186,8 @@ const useAuth = () => {
   const updateLoggedInUserInfo = async (body) => {
     errorMsg.value = ''
     try {
-      const response = await $fetch(`/api/v1/auth/update-loggedin-user-info`, {
-        method: 'PATCH',
+      const response = await $fetch(`/api/v1/auth/loggedin-info`, {
+        method: 'POST',
         body,
         headers: {
           Authorization: `Bearer ${jwt.value}`,
@@ -290,8 +228,8 @@ const useAuth = () => {
     console.log('LLLLLLLL')
     errorMsg.value = ''
     try {
-      const response = await $fetch(`/api/v1/auth/update-loggedin-user-password`, {
-        method: 'PATCH',
+      const response = await $fetch(`/api/v1/auth/loggedin-pwd`, {
+        method: 'POST',
         body,
         headers: {
           Authorization: `Bearer ${jwt.value}`,

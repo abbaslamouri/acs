@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb'
-import { setAuthCookies } from '~/server/controllers/v1/auth'
+import { setAuthCookie } from '~/server/controllers/v1/auth'
 import jwt from 'jsonwebtoken'
 import { getSinedJwtToken } from '~/server/controllers/v1/auth'
 import AppError from '~/server/utils/AppError'
@@ -10,7 +10,7 @@ const config = useRuntimeConfig()
 
 export default defineEventHandler(async (event) => {
   try {
-    if (event.req.method !== 'POST') return
+    if (event.req.method !== 'POST') throw new AppError('invalid request', 401)
     const body = await useBody(event)
     console.log('Body', body)
     const { email, signupToken } = body
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
         'We were not able to find your email in our database, please contact customer serveice at 555-555-5555',
         404
       )
-    if (!user.email === email)
+    if (user.email !== email)
       throw new AppError('We were not able to vefify your email, please contact customer serveice at 555-555-5555', 404)
 
     const verified = await mongoClient
@@ -47,14 +47,12 @@ export default defineEventHandler(async (event) => {
         'We were not able to update your records, please contact customer serveice at 555-555-5555',
         404
       )
-
     const token = await getSinedJwtToken(user._id, Number(config.jwtMaxAge) * 24 * 60 * 60)
-
-    await setAuthCookies(event, user, token)
-
+    console.log(token)
+     setAuthCookie(event, 'jwt', token, Number(config.jwtMaxAge) * 24 * 60 * 60)
+    setAuthCookie(event, 'userName', user.name, Number(config.jwtMaxAge) * 24 * 60 * 60)
     return {
       userName: user.name,
-      // token: token,
     }
   } catch (err) {
     errorHandler(event, err)

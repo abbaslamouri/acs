@@ -88,7 +88,6 @@ const setMedia = (event) => {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
 
 // main {
 //   display: grid;

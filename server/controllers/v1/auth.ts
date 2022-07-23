@@ -1,12 +1,15 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
-import { promisify } from 'util'
 import AppError from '~/server/utils/AppError'
 import mongoClient from '~/server/utils/mongoClient'
 import errorHandler from '~/server/utils/errorHandler'
 
 const config = useRuntimeConfig()
+
+const getSinedJwtToken = async function (id: any, maxAge: number) {
+  return jwt.sign({ id }, config.jwtSecret, { expiresIn: maxAge })
+}
 
 const hashPassword = async (password: string) => {
   const salt = await bcrypt.genSalt(12)
@@ -24,20 +27,12 @@ const hasPasswordChanged = async function (JWTTimestamp: number, user: any) {
   return false
 }
 
-const getSinedJwtToken = async function (id: any, maxAge: number) {
-  // return await promisify(jwt.sign)({ id }, config.jwtSecret, { expiresIn: maxAge })
-  return jwt.sign({ id }, config.jwtSecret, { expiresIn: maxAge })
-}
-
-const setAuthCookies = async (event: any, user: any, token: string) => {
-  const cookieOptions = {
-    maxAge: Number(config.jwtMaxAge) * 24 * 60 * 60,
-    // maxAge: 600,
+const setAuthCookie = (event: any, cookieName: string, cookieValue: string, maxAge: number) => {
+  setCookie(event, cookieName, cookieValue, {
+    maxAge,
     httpOnly: true,
-    secure: true,
-  }
-  setCookie(event, 'jwt', token, cookieOptions)
-  setCookie(event, 'userName', user.name, cookieOptions)
+    secure: process.env.NODE_ENV === 'production' ? true : false,
+  })
 }
 
 const fetchUserById = async (event: any) => {
@@ -94,4 +89,4 @@ const getAuth = async (event: any) => {
   }
 }
 
-export { fetchUserById, createUser, hashPassword, checkPassword, getSinedJwtToken, setAuthCookies, getAuth }
+export { fetchUserById, createUser, hashPassword, checkPassword, getSinedJwtToken, setAuthCookie, getAuth }

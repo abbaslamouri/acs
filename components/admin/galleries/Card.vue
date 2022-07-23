@@ -49,7 +49,6 @@ const config = useRuntimeConfig()
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/variables';
 td {
   // border: 1px solid red;
 }
